@@ -1,0 +1,53 @@
+<script setup>
+import {
+  "mizchi/luna/js/resource" @reactivity,
+  let signal = @reactivity.signal,
+  let computed = @reactivity.computed,
+}
+
+let selected_filter = signal("recent")
+let tips_open = signal(true)
+let summary = computed(fn() {
+  let tips = if tips_open.get() { "tips on" } else { "tips off" }
+  "Filter: " + selected_filter.get() + " · " + tips
+})
+
+fn show_archived() -> Unit {
+  selected_filter.set("archived")
+}
+
+fn toggle_tips() -> Unit {
+  tips_open.update(fn(open) { not(open) })
+}
+</script>
+
+<template>
+  <main class="notes-index">
+    <header>
+      <h1>Notes</h1>
+      <p>Small resource app example built with the public API.</p>
+      <p>{{ summary() }}</p>
+      <div class="index-actions">
+        <button type="button" @click='show_archived()'>Show Archived</button>
+        <button type="button" @click='toggle_tips()'>Toggle Tips</button>
+      </div>
+    </header>
+    <NoteCounter client:visible />
+    <form>
+      <input type="text" placeholder="Title" />
+      <textarea placeholder="Write a note"></textarea>
+    </form>
+  </main>
+</template>
+
+<style scoped>
+.notes-index {
+  display: grid;
+  gap: 16px;
+}
+
+.index-actions {
+  display: flex;
+  gap: 8px;
+}
+</style>

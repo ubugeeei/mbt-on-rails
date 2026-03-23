@@ -1,0 +1,46 @@
+<script setup>
+import {
+  "mizchi/luna/js/resource" @reactivity,
+  let signal = @reactivity.signal,
+  let computed = @reactivity.computed,
+}
+
+let preview_open = signal(false)
+let template_name = signal("blank")
+let helper_text = computed(fn() {
+  let preview = if preview_open.get() { "preview on" } else { "preview off" }
+  "Template: " + template_name.get() + " · " + preview
+})
+
+fn toggle_preview() -> Unit {
+  preview_open.update(fn(open) { not(open) })
+}
+
+fn apply_template() -> Unit {
+  template_name.set("launch-post")
+}
+</script>
+
+<template>
+  <section class="posts-new">
+    <h1>New Post</h1>
+    <p>{{ helper_text() }}</p>
+    <div class="post-actions">
+      <button type="button" @click='toggle_preview()'>Toggle Preview</button>
+      <button type="button" @click='apply_template()'>Apply Template</button>
+    </div>
+    <PostForm client:load />
+  </section>
+</template>
+
+<style scoped>
+.posts-new {
+  display: grid;
+  gap: 16px;
+}
+
+.post-actions {
+  display: flex;
+  gap: 8px;
+}
+</style>

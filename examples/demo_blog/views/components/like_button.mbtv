@@ -1,0 +1,54 @@
+<script setup>
+import {
+  "mizchi/luna/js/resource" @reactivity,
+  let signal = @reactivity.signal,
+  let computed = @reactivity.computed,
+}
+
+struct Props {
+  kind : String
+}
+
+let props : Props = defineProps()
+let liked = signal(false)
+let total = signal(if props.kind == "heart" { 12 } else { 3 })
+let button_label = computed(fn() {
+  if liked.get() { "Unlike" } else { "Like" }
+})
+
+fn toggle_like() -> Unit {
+  if liked.get() {
+    liked.set(false)
+    total.update(fn(n) { n - 1 })
+  } else {
+    liked.set(true)
+    total.update(fn(n) { n + 1 })
+  }
+}
+
+fn pressed_attr() -> String {
+  if liked.get() { "true" } else { "false" }
+}
+</script>
+
+<template>
+  <button
+    class="like"
+    :aria-pressed='pressed_attr()'
+    :data-kind='props.kind'
+    @click='toggle_like()'
+  >
+    {{ button_label() + " (" + props.kind + ") · " + total.get().to_string() }}
+  </button>
+</template>
+
+<style scoped>
+.like {
+  width: fit-content;
+  transition: transform 160ms ease;
+}
+
+.like[aria-pressed="true"] {
+  transform: scale(1.04);
+}
+</style>

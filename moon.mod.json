@@ -1,0 +1,16 @@
+{
+  "name": "ubugeeei/mbt_on_rails",
+  "version": "0.1.0",
+  "readme": "README.mbt.md",
+  "repository": "https://github.com/ubugeeei/mbt-on-rails",
+  "license": "Apache-2.0",
+  "keywords": [
+    "moonbit",
+    "rails",
+    "mvc",
+    "orm",
+    "ssr",
+    "vapor-moon"
+  ],
+  "description": "Rails-inspired MoonBit framework skeleton with Vapor Moon compatible SSR and island manifests."
+}

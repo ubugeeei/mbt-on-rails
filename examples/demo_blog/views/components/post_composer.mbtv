@@ -1,0 +1,61 @@
+<script setup>
+import {
+  "mizchi/luna/js/resource" @reactivity,
+  let signal = @reactivity.signal,
+  let computed = @reactivity.computed,
+}
+
+struct Props {
+  mode : String
+}
+
+let props : Props = defineProps()
+let queued_drafts = signal(if props.mode == "home" { 1 } else { 3 })
+let publish_ready = signal(false)
+let summary = computed(fn() {
+  props.mode + " queue · " + queued_drafts.get().to_string() + " drafts"
+})
+let status_label = computed(fn() {
+  if publish_ready.get() { "Ready to submit" } else { "Draft only" }
+})
+
+fn seed_draft() -> Unit {
+  queued_drafts.update(fn(n) { n + 1 })
+  publish_ready.set(true)
+}
+
+fn clear_drafts() -> Unit {
+  queued_drafts.set(0)
+  publish_ready.set(false)
+}
+</script>
+
+<template>
+  <form class="composer">
+    <header class="composer-header">
+      <h2>{{ "Composer: " + props.mode }}</h2>
+      <small>{{ summary() }}</small>
+    </header>
+    <input type="text" placeholder="Title" />
+    <textarea placeholder="Body"></textarea>
+    <div class="composer-actions">
+      <button type="button" @click='seed_draft()'>Seed Draft</button>
+      <button type="button" @click='clear_drafts()'>Clear</button>
+    </div>
+    <p>{{ status_label() }}</p>
+  </form>
+</template>
+
+<style scoped>
+.composer {
+  display: grid;
+  gap: 8px;
+}
+
+.composer-header,
+.composer-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+</style>

@@ -1,0 +1,45 @@
+<script setup>
+import {
+  "mizchi/luna/js/resource" @reactivity,
+  let signal = @reactivity.signal,
+  let computed = @reactivity.computed,
+}
+
+struct Props {
+  count : String
+}
+
+let props : Props = defineProps()
+let highlighted = signal(false)
+let summary = computed(fn() {
+  if highlighted.get() {
+    props.count + " drafts ready"
+  } else {
+    props.count + " drafts waiting for sync"
+  }
+})
+
+fn toggle_highlight() -> Unit {
+  highlighted.update(fn(active) { not(active) })
+}
+</script>
+
+<template>
+  <section class="note-counter" :data-active='if highlighted.get() { "true" } else { "false" }'>
+    <strong>{{ props.count }}</strong>
+    <span>{{ summary() }}</span>
+    <button type="button" @click='toggle_highlight()'>Pulse</button>
+  </section>
+</template>
+
+<style scoped>
+.note-counter {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.note-counter[data-active="true"] {
+  transform: translateY(-1px);
+}
+</style>

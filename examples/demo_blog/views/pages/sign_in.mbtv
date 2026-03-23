@@ -1,0 +1,40 @@
+<script setup>
+import {
+  "mizchi/luna/js/resource" @reactivity,
+  let signal = @reactivity.signal,
+  let computed = @reactivity.computed,
+}
+
+let help_open = signal(false)
+let reveal_count = signal(0)
+let helper_text = computed(fn() {
+  if help_open.get() {
+    "Try demo@example.com / password for the sample flow."
+  } else {
+    "Need the sample credentials?"
+  }
+})
+
+fn toggle_help() -> Unit {
+  help_open.update(fn(open) { not(open) })
+  reveal_count.update(fn(n) { n + 1 })
+}
+</script>
+
+<template>
+  <section class="sign-in">
+    <h1>Sign In</h1>
+    <p>{{ helper_text() }}</p>
+    <button type="button" @click='toggle_help()'>
+      {{ "Toggle Help (" + reveal_count.get().to_string() + ")" }}
+    </button>
+    <SignInForm client:load />
+  </section>
+</template>
+
+<style scoped>
+.sign-in {
+  display: grid;
+  gap: 12px;
+}
+</style>

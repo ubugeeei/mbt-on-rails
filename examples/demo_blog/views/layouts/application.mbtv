@@ -1,0 +1,48 @@
+<script setup>
+import {
+  "mizchi/luna/js/resource" @reactivity,
+  let signal = @reactivity.signal,
+  let computed = @reactivity.computed,
+}
+
+let shell_id = useId()
+let menu_open = signal(false)
+let menu_label = computed(fn() {
+  if menu_open.get() { "Hide Links" } else { "Show Links" }
+})
+
+fn toggle_menu() -> Unit {
+  menu_open.update(fn(open) { not(open) })
+}
+
+fn open_attr() -> String {
+  if menu_open.get() { "true" } else { "false" }
+}
+</script>
+
+<template>
+  <div class="application-shell" :data-shell='shell_id' :data-open='open_attr()'>
+    <header class="site-header">
+      <a href="/">mbt on rails</a>
+      <button type="button" @click='toggle_menu()'>{{ menu_label() }}</button>
+      <nav>
+        <a href="/posts">Posts</a>
+        <a href="/sign-in">Sign In</a>
+      </nav>
+    </header>
+    <slot />
+  </div>
+</template>
+
+<style scoped>
+.application-shell {
+  display: grid;
+  gap: 20px;
+}
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+</style>

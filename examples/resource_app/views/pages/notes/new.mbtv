@@ -1,0 +1,50 @@
+<script setup>
+import {
+  "mizchi/luna/js/resource" @reactivity,
+  let signal = @reactivity.signal,
+  let computed = @reactivity.computed,
+}
+
+let preview_open = signal(false)
+let template_name = signal("blank")
+let helper = computed(fn() {
+  let preview = if preview_open.get() { "preview on" } else { "preview off" }
+  "Template: " + template_name.get() + " · " + preview
+})
+
+fn toggle_preview() -> Unit {
+  preview_open.update(fn(open) { not(open) })
+}
+
+fn load_template() -> Unit {
+  template_name.set("meeting-notes")
+}
+</script>
+
+<template>
+  <main class="note-new">
+    <h1>New Note</h1>
+    <p>{{ helper() }}</p>
+    <div class="new-actions">
+      <button type="button" @click='toggle_preview()'>Toggle Preview</button>
+      <button type="button" @click='load_template()'>Load Template</button>
+    </div>
+    <form>
+      <input type="text" placeholder="Title" />
+      <textarea placeholder="Body"></textarea>
+      <button type="submit">Create</button>
+    </form>
+  </main>
+</template>
+
+<style scoped>
+.note-new {
+  display: grid;
+  gap: 12px;
+}
+
+.new-actions {
+  display: flex;
+  gap: 8px;
+}
+</style>

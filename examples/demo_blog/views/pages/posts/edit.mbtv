@@ -1,0 +1,53 @@
+<script setup>
+import {
+  "mizchi/luna/js/resource" @reactivity,
+  let signal = @reactivity.signal,
+  let computed = @reactivity.computed,
+}
+
+let autosave_count = signal(0)
+let inspector_open = signal(true)
+let status_text = computed(fn() {
+  let base =
+    if autosave_count.get() == 0 {
+      "No local autosaves yet"
+    } else {
+      autosave_count.get().to_string() + " local autosaves"
+    }
+  let inspector =
+    if inspector_open.get() { "inspector open" } else { "inspector closed" }
+  base + " · " + inspector
+})
+
+fn save_local() -> Unit {
+  autosave_count.update(fn(n) { n + 1 })
+}
+
+fn toggle_inspector() -> Unit {
+  inspector_open.update(fn(open) { not(open) })
+}
+</script>
+
+<template>
+  <section class="posts-edit">
+    <h1>Edit Post</h1>
+    <p>{{ status_text() }}</p>
+    <div class="edit-actions">
+      <button type="button" @click='save_local()'>Save Local</button>
+      <button type="button" @click='toggle_inspector()'>Toggle Inspector</button>
+    </div>
+    <PostForm client:load />
+  </section>
+</template>
+
+<style scoped>
+.posts-edit {
+  display: grid;
+  gap: 16px;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+}
+</style>

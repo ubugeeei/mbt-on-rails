@@ -1,0 +1,3 @@
+import {
+  "ubugeeei/mbt_on_rails/src/active_record" @orm,
+}

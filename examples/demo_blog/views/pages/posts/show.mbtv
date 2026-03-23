@@ -1,0 +1,46 @@
+<script setup>
+import {
+  "mizchi/luna/js/resource" @reactivity,
+  let signal = @reactivity.signal,
+  let computed = @reactivity.computed,
+}
+
+let meta_open = signal(false)
+let revision_count = signal(4)
+let meta_label = computed(fn() {
+  if meta_open.get() { "Hide Meta" } else { "Show Meta" }
+})
+
+fn toggle_meta() -> Unit {
+  meta_open.update(fn(open) { not(open) })
+}
+
+fn queue_revision() -> Unit {
+  revision_count.update(fn(n) { n + 1 })
+}
+</script>
+
+<template>
+  <article class="posts-show">
+    <header class="post-meta">
+      <button type="button" @click='toggle_meta()'>{{ meta_label() }}</button>
+      <button type="button" @click='queue_revision()'>
+        {{ "Queue Revision (" + revision_count.get().to_string() + ")" }}
+      </button>
+    </header>
+    <PostHero server:defer />
+    <LikeButton client:load />
+  </article>
+</template>
+
+<style scoped>
+.posts-show {
+  display: grid;
+  gap: 20px;
+}
+
+.post-meta {
+  display: flex;
+  gap: 8px;
+}
+</style>

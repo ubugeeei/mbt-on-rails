@@ -1,0 +1,43 @@
+<script setup>
+import {
+  "mizchi/luna/js/resource" @reactivity,
+  let signal = @reactivity.signal,
+  let computed = @reactivity.computed,
+}
+
+let shell_id = useId()
+let menu_open = signal(false)
+let menu_label = computed(fn() {
+  if menu_open.get() { "Hide Links" } else { "Show Links" }
+})
+
+fn toggle_menu() -> Unit {
+  menu_open.update(fn(open) { not(open) })
+}
+</script>
+
+<template>
+  <div class="notes-shell" :data-shell='shell_id' :data-open='if menu_open.get() { "true" } else { "false" }'>
+    <header class="notes-header">
+      <a href="/notes">Notes</a>
+      <button type="button" @click='toggle_menu()'>{{ menu_label() }}</button>
+      <nav>
+        <a href="/notes/new">New</a>
+      </nav>
+    </header>
+    <slot />
+  </div>
+</template>
+
+<style scoped>
+.notes-shell {
+  display: grid;
+  gap: 20px;
+}
+
+.notes-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+</style>

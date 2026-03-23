@@ -1,0 +1,50 @@
+<script setup>
+import {
+  "mizchi/luna/js/resource" @reactivity,
+  let signal = @reactivity.signal,
+  let computed = @reactivity.computed,
+}
+
+let feed = signal("published")
+let layout_mode = signal("grid")
+let summary = computed(fn() {
+  "Feed: " + feed.get() + " · Layout: " + layout_mode.get()
+})
+
+fn show_drafts() -> Unit {
+  feed.set("drafts")
+}
+
+fn toggle_layout() -> Unit {
+  if layout_mode.get() == "grid" {
+    layout_mode.set("list")
+  } else {
+    layout_mode.set("grid")
+  }
+}
+</script>
+
+<template>
+  <section class="posts-index">
+    <h1>Posts</h1>
+    <p>{{ summary() }}</p>
+    <div class="post-controls">
+      <button type="button" @click='show_drafts()'>Show Drafts</button>
+      <button type="button" @click='toggle_layout()'>Toggle Layout</button>
+    </div>
+    <PostComposer client:visible />
+    <PostsTable server:defer />
+  </section>
+</template>
+
+<style scoped>
+.posts-index {
+  display: grid;
+  gap: 18px;
+}
+
+.post-controls {
+  display: flex;
+  gap: 8px;
+}
+</style>

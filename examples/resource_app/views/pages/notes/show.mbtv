@@ -1,0 +1,40 @@
+<script setup>
+import {
+  "mizchi/luna/js/resource" @reactivity,
+  let signal = @reactivity.signal,
+  let computed = @reactivity.computed,
+}
+
+let archived = signal(false)
+let watcher_count = signal(2)
+let status = computed(fn() {
+  if archived.get() {
+    "This note is archived locally."
+  } else {
+    "This note is active and collaborative."
+  }
+})
+
+fn toggle_archive() -> Unit {
+  archived.update(fn(value) { not(value) })
+  watcher_count.update(fn(n) { n + 1 })
+}
+</script>
+
+<template>
+  <article class="note-show">
+    <h1>Example Note</h1>
+    <p>This page demonstrates SSR plus a server action binding for updates.</p>
+    <p>{{ status() }}</p>
+    <button type="button" @click='toggle_archive()'>
+      {{ "Archive (" + watcher_count.get().to_string() + ")" }}
+    </button>
+  </article>
+</template>
+
+<style scoped>
+.note-show {
+  display: grid;
+  gap: 12px;
+}
+</style>

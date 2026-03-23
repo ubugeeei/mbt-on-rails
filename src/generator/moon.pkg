@@ -1,0 +1,7 @@
+import {
+  "ubugeeei/mbt_on_rails/src/active_record" @orm,
+  "ubugeeei/mbt_on_rails/src/controller" @controller,
+  "ubugeeei/mbt_on_rails/src/http" @http,
+  "ubugeeei/mbt_on_rails/src/support" @support,
+  "ubugeeei/mbt_on_rails/src/view" @view,
+}

@@ -1,0 +1,47 @@
+<script setup>
+import {
+  "mizchi/luna/js/resource" @reactivity,
+  let signal = @reactivity.signal,
+  let computed = @reactivity.computed,
+}
+
+struct Props {
+  title : String
+}
+
+let props : Props = defineProps()
+let spotlight_index = signal(0)
+let spotlight = computed(fn() {
+  if spotlight_index.get() == 0 {
+    "server actions"
+  } else if spotlight_index.get() == 1 {
+    "hydration islands"
+  } else {
+    "route trees"
+  }
+})
+
+fn rotate_spotlight() -> Unit {
+  spotlight_index.update(fn(n) { (n + 1) % 3 })
+}
+</script>
+
+<template>
+  <main class="home">
+    <header>
+      <h1>{{ props.title }}</h1>
+      <p>MoonBit on Rails with Vapor Moon style delivery.</p>
+      <p>{{ "Spotlight: " + spotlight() }}</p>
+      <button type="button" @click='rotate_spotlight()'>Cycle Spotlight</button>
+    </header>
+    <RecentPosts server:defer />
+    <PostComposer client:idle />
+  </main>
+</template>
+
+<style scoped>
+.home {
+  display: grid;
+  gap: 16px;
+}
+</style>
