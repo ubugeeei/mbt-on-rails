@@ -23,7 +23,7 @@ moon run examples/rails_ops
 - `examples/auth_policy`
   - Shows identities, sessions, CSRF validation, cookies, direct auth requirements, and policy-rule checks.
 - `examples/rails_ops`
-  - Shows Strong Parameters, Active Job, Action Mailer, and cache store helpers working together.
+  - Shows Strong Parameters, middleware, Active Job, Action Mailer, Turbo Stream, and cache store helpers working together.
 
 ## Suggested reading order
 

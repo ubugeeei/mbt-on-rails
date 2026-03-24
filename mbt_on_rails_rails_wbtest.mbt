@@ -125,7 +125,58 @@ test "component contracts surface server client boundaries in manifests" {
   )
 
   let demo = demo_blog_app()
+  assert_true(demo.middleware_table().contains("security_headers"))
+  assert_true(demo.fixture_table().contains("fixtures users"))
+  assert_true(demo.seed_table().contains("seed bootstrap"))
   assert_true(demo.job_table().contains("posts.reindex"))
   assert_true(demo.mailer_table().contains("SessionMailer"))
   assert_true(demo.cache_table().contains("cache pages"))
+}
+
+///|
+test "middleware fixtures seeds and turbo streams behave like rails runtime helpers" {
+  let stack = [
+    with_response_header(
+      middleware("security", None, [], [], [], None),
+      "x-frame-options",
+      "DENY",
+    ),
+    halt_with_text("maintenance", "/admin", [http_get()], 503, "down"),
+  ]
+  let admin_request = request(http_get(), "/admin", [], [], None, "")
+  let request_result = apply_request_middleware(stack, admin_request)
+  match request_result.1 {
+    Some(response) => assert_eq(response.status, 503)
+    None => assert_true(false)
+  }
+  let passthrough = apply_response_middleware(
+    stack,
+    request(http_get(), "/posts", [], [], None, ""),
+    ok_text("ok"),
+  )
+  assert_true(passthrough.headers.contains(("x-frame-options", "DENY")))
+
+  let fixtures = fixture_set("users", "users", [
+    fixture_row(
+      "alice",
+      record("users", [("id", "1"), ("email", "a@example.com")]),
+    ),
+  ])
+  let seeded = apply_seed(
+    load_fixture_set(empty_memory_database(), fixtures),
+    seed_plan(
+      "bootstrap",
+      [record("users", [("id", "2"), ("email", "b@example.com")])],
+      [],
+    ),
+  )
+  assert_eq(find_records(seeded, "users", "id", "1").length(), 1)
+  assert_eq(find_records(seeded, "users", "id", "2").length(), 1)
+
+  let turbo = ok_turbo_stream([
+    append_stream("posts", "<li>New</li>"),
+    remove_stream("stale_post"),
+  ])
+  assert_true(render_response_body(turbo.body).contains("turbo-stream"))
+  assert_eq(turbo.headers[0].1, "text/vnd.turbo-stream.html; charset=utf-8")
 }

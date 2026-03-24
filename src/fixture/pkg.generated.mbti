@@ -1,0 +1,49 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "ubugeeei/mbt_on_rails/src/fixture"
+
+import {
+  "ubugeeei/mbt_on_rails/src/active_record",
+  "ubugeeei/mbt_on_rails/src/job",
+}
+
+// Values
+pub fn apply_seed(@active_record.MemoryDatabase, SeedPlan) -> @active_record.MemoryDatabase
+
+pub fn fixture_row(String, @active_record.Record) -> FixtureRow
+
+pub fn fixture_set(String, String, Array[FixtureRow]) -> FixtureSet
+
+pub fn fixture_summary(FixtureSet) -> String
+
+pub fn load_fixture_set(@active_record.MemoryDatabase, FixtureSet) -> @active_record.MemoryDatabase
+
+pub fn load_fixtures(@active_record.MemoryDatabase, Array[FixtureSet]) -> @active_record.MemoryDatabase
+
+pub fn seed_plan(String, Array[@active_record.Record], Array[@job.EnqueuedJob]) -> SeedPlan
+
+pub fn seed_summary(SeedPlan) -> String
+
+// Errors
+
+// Types and methods
+pub struct FixtureRow {
+  name : String
+  record : @active_record.Record
+}
+
+pub struct FixtureSet {
+  name : String
+  table : String
+  rows : Array[FixtureRow]
+}
+
+pub struct SeedPlan {
+  name : String
+  records : Array[@active_record.Record]
+  jobs : Array[@job.EnqueuedJob]
+}
+
+// Type aliases
+
+// Traits
+

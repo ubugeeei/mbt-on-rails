@@ -6,16 +6,18 @@ import {
   "ubugeeei/mbt_on_rails/src/auth",
   "ubugeeei/mbt_on_rails/src/cache",
   "ubugeeei/mbt_on_rails/src/controller",
+  "ubugeeei/mbt_on_rails/src/fixture",
   "ubugeeei/mbt_on_rails/src/generator",
   "ubugeeei/mbt_on_rails/src/http",
   "ubugeeei/mbt_on_rails/src/job",
   "ubugeeei/mbt_on_rails/src/mailer",
+  "ubugeeei/mbt_on_rails/src/middleware",
   "ubugeeei/mbt_on_rails/src/migration",
   "ubugeeei/mbt_on_rails/src/view",
 }
 
 // Values
-pub fn app(String, @auth.AuthConfig, Array[@active_record.ModelSchema], Array[@migration.Migration], Array[@job.JobQueue], Array[@mailer.MailerDefinition], Array[@cache.CacheStore], Array[@controller.ControllerDefinition], Array[@http.RouteSpec], Array[@view.PageModule], Array[@view.ServerAction], Array[@generator.ScaffoldPlan]) -> MbtOnRailsApp
+pub fn app(String, @auth.AuthConfig, Array[@active_record.ModelSchema], Array[@migration.Migration], Array[@middleware.Middleware], Array[@fixture.FixtureSet], Array[@fixture.SeedPlan], Array[@job.JobQueue], Array[@mailer.MailerDefinition], Array[@cache.CacheStore], Array[@controller.ControllerDefinition], Array[@http.RouteSpec], Array[@view.PageModule], Array[@view.ServerAction], Array[@generator.ScaffoldPlan]) -> MbtOnRailsApp
 
 pub fn demo_application_layout() -> @view.LayoutModule
 
@@ -25,6 +27,8 @@ pub fn demo_blog_app() -> MbtOnRailsApp
 
 pub fn demo_caches() -> Array[@cache.CacheStore]
 
+pub fn demo_fixtures() -> Array[@fixture.FixtureSet]
+
 pub fn demo_home_page_component() -> @view.VaporComponentRef
 
 pub fn demo_job_queues() -> Array[@job.JobQueue]
@@ -32,6 +36,8 @@ pub fn demo_job_queues() -> Array[@job.JobQueue]
 pub fn demo_like_button_island() -> @view.VaporComponentRef
 
 pub fn demo_mailers() -> Array[@mailer.MailerDefinition]
+
+pub fn demo_middlewares() -> Array[@middleware.Middleware]
 
 pub fn demo_migrations(@active_record.ModelSchema, @active_record.ModelSchema, @active_record.ModelSchema) -> Array[@migration.Migration]
 
@@ -57,6 +63,8 @@ pub fn demo_posts_show_page_component() -> @view.VaporComponentRef
 
 pub fn demo_routes(String) -> Array[@http.RouteSpec]
 
+pub fn demo_seeds() -> Array[@fixture.SeedPlan]
+
 pub fn demo_server_actions() -> Array[@view.ServerAction]
 
 pub fn demo_session_model() -> @active_record.ModelSchema
@@ -77,6 +85,9 @@ pub struct MbtOnRailsApp {
   auth : @auth.AuthConfig
   models : Array[@active_record.ModelSchema]
   migrations : Array[@migration.Migration]
+  middlewares : Array[@middleware.Middleware]
+  fixtures : Array[@fixture.FixtureSet]
+  seeds : Array[@fixture.SeedPlan]
   job_queues : Array[@job.JobQueue]
   mailers : Array[@mailer.MailerDefinition]
   caches : Array[@cache.CacheStore]
@@ -89,14 +100,17 @@ pub struct MbtOnRailsApp {
 pub fn MbtOnRailsApp::cache_table(Self) -> String
 pub fn MbtOnRailsApp::controller_table(Self) -> String
 pub fn MbtOnRailsApp::example_html(Self, String) -> String?
+pub fn MbtOnRailsApp::fixture_table(Self) -> String
 pub fn MbtOnRailsApp::job_table(Self) -> String
 pub fn MbtOnRailsApp::mailer_table(Self) -> String
+pub fn MbtOnRailsApp::middleware_table(Self) -> String
 pub fn MbtOnRailsApp::route_tree(Self) -> String
 pub fn MbtOnRailsApp::router_manifest(Self) -> String
 pub fn MbtOnRailsApp::routes_table(Self) -> String
 pub fn MbtOnRailsApp::scaffold_table(Self) -> String
 pub fn MbtOnRailsApp::schema_dump(Self) -> String
 pub fn MbtOnRailsApp::schema_statements(Self) -> Array[String]
+pub fn MbtOnRailsApp::seed_table(Self) -> String
 
 // Type aliases
 

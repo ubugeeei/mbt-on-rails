@@ -7,12 +7,15 @@ import {
   "ubugeeei/mbt_on_rails/src/auth",
   "ubugeeei/mbt_on_rails/src/cache",
   "ubugeeei/mbt_on_rails/src/controller",
+  "ubugeeei/mbt_on_rails/src/fixture",
   "ubugeeei/mbt_on_rails/src/generator",
   "ubugeeei/mbt_on_rails/src/http",
   "ubugeeei/mbt_on_rails/src/job",
   "ubugeeei/mbt_on_rails/src/mailer",
+  "ubugeeei/mbt_on_rails/src/middleware",
   "ubugeeei/mbt_on_rails/src/migration",
   "ubugeeei/mbt_on_rails/src/params",
+  "ubugeeei/mbt_on_rails/src/turbo",
   "ubugeeei/mbt_on_rails/src/view",
 }
 
@@ -33,9 +36,17 @@ pub fn all_http_methods() -> Array[@http.HttpMethod]
 
 pub fn allowed(@auth.Identity?, @auth.PolicyRule, String?) -> Bool
 
-pub fn app(String, @auth.AuthConfig, Array[@active_record.ModelSchema], Array[@migration.Migration], Array[@job.JobQueue], Array[@mailer.MailerDefinition], Array[@cache.CacheStore], Array[@controller.ControllerDefinition], Array[@http.RouteSpec], Array[@view.PageModule], Array[@view.ServerAction], Array[@generator.ScaffoldPlan]) -> @app.MbtOnRailsApp
+pub fn app(String, @auth.AuthConfig, Array[@active_record.ModelSchema], Array[@migration.Migration], Array[@middleware.Middleware], Array[@fixture.FixtureSet], Array[@fixture.SeedPlan], Array[@job.JobQueue], Array[@mailer.MailerDefinition], Array[@cache.CacheStore], Array[@controller.ControllerDefinition], Array[@http.RouteSpec], Array[@view.PageModule], Array[@view.ServerAction], Array[@generator.ScaffoldPlan]) -> @app.MbtOnRailsApp
 
 pub fn append_entries(Array[(String, String)], Array[(String, String)]) -> Array[(String, String)]
+
+pub fn append_stream(String, String) -> @turbo.TurboStream
+
+pub fn apply_request_middleware(Array[@middleware.Middleware], @http.Request) -> (@http.Request, @http.Response?)
+
+pub fn apply_response_middleware(Array[@middleware.Middleware], @http.Request, @http.Response) -> @http.Response
+
+pub fn apply_seed(@active_record.MemoryDatabase, @fixture.SeedPlan) -> @active_record.MemoryDatabase
 
 pub fn asset_manifest(Array[String], Array[String]) -> @view.AssetManifest
 
@@ -163,9 +174,17 @@ pub fn find_entry(Array[(String, String)], String) -> String?
 
 pub fn find_records(@active_record.MemoryDatabase, String, String, String) -> Array[@active_record.Record]
 
+pub fn fixture_row(String, @active_record.Record) -> @fixture.FixtureRow
+
+pub fn fixture_set(String, String, Array[@fixture.FixtureRow]) -> @fixture.FixtureSet
+
+pub fn fixture_summary(@fixture.FixtureSet) -> String
+
 pub fn flash(String, String) -> @controller.ActionStep
 
 pub fn form_binding(String, String, String, String?, String?) -> @view.FormBinding
+
+pub fn halt_with_text(String, String, Array[@http.HttpMethod], Int, String) -> @middleware.Middleware
 
 pub fn handle_request(@app.MbtOnRailsApp, @http.Request) -> @http.Response
 
@@ -249,6 +268,10 @@ pub fn limit_to(@active_record.Relation, Int) -> @active_record.Relation
 
 pub fn load_collection_step(String) -> @controller.ActionStep
 
+pub fn load_fixture_set(@active_record.MemoryDatabase, @fixture.FixtureSet) -> @active_record.MemoryDatabase
+
+pub fn load_fixtures(@active_record.MemoryDatabase, Array[@fixture.FixtureSet]) -> @active_record.MemoryDatabase
+
 pub fn load_member_step(String) -> @controller.ActionStep
 
 pub fn loader_module(String, String, Int?, Array[String]) -> @view.LoaderModule
@@ -262,6 +285,10 @@ pub fn mailer_summary(@mailer.MailerDefinition) -> String
 pub fn match_route(@http.RoutePattern, String) -> Array[(String, String)]?
 
 pub fn merge_params(Array[(String, String)], Array[(String, String)], Array[(String, String)]) -> @params.Parameters
+
+pub fn middleware(String, String?, Array[@http.HttpMethod], Array[(String, String)], Array[(String, String)], @http.Response?) -> @middleware.Middleware
+
+pub fn middleware_summary(Array[@middleware.Middleware]) -> String
 
 pub fn migration(String, String, Array[@migration.MigrationStep]) -> @migration.Migration
 
@@ -293,6 +320,8 @@ pub fn ok_json(String) -> @http.Response
 
 pub fn ok_text(String) -> @http.Response
 
+pub fn ok_turbo_stream(Array[@turbo.TurboStream]) -> @http.Response
+
 pub fn order_by(@active_record.Relation, String, Bool) -> @active_record.Relation
 
 pub fn page_module(String, String, String, String, @view.VaporComponentRef) -> @view.PageModule
@@ -323,6 +352,8 @@ pub fn policy_rule(String, String, Array[String], Array[String], Bool) -> @auth.
 
 pub fn preload(@active_record.Relation, String) -> @active_record.Relation
 
+pub fn prepend_stream(String, String) -> @turbo.TurboStream
+
 pub fn prop_contract(String, String, Bool, String) -> @view.PropContract
 
 pub fn recognize(Array[@http.RouteSpec], @http.Request) -> @http.MatchedRoute?
@@ -342,6 +373,8 @@ pub fn relation_for(@active_record.ModelSchema) -> @active_record.Relation
 pub fn relation_to_sql(@active_record.Relation) -> String
 
 pub fn remove_column_step(String, String) -> @migration.MigrationStep
+
+pub fn remove_stream(String) -> @turbo.TurboStream
 
 pub fn rename_table_step(String, String) -> @migration.MigrationStep
 
@@ -366,6 +399,10 @@ pub fn render_route_tree(Array[@view.PageModule]) -> String
 pub fn render_router_manifest(Array[@view.PageModule]) -> String
 
 pub fn render_server_action_manifest(Array[@view.ServerAction]) -> String
+
+pub fn render_turbo_stream(Array[@turbo.TurboStream]) -> String
+
+pub fn replace_stream(String, String) -> @turbo.TurboStream
 
 pub fn request(@http.HttpMethod, String, Array[(String, String)], Array[(String, String)], String?, String) -> @http.Request
 
@@ -399,6 +436,10 @@ pub fn schema_sql(Array[@migration.Migration]) -> Array[String]
 
 pub fn scope_routes(String, String, Array[@http.RouteSpec]) -> Array[@http.RouteSpec]
 
+pub fn seed_plan(String, Array[@active_record.Record], Array[@job.EnqueuedJob]) -> @fixture.SeedPlan
+
+pub fn seed_summary(@fixture.SeedPlan) -> String
+
 pub fn select_columns(@active_record.Relation, Array[String]) -> @active_record.Relation
 
 pub fn server_action(String, String, Array[(String, String)], String, Bool) -> @view.ServerAction
@@ -421,11 +462,15 @@ pub fn timestamp_column(String) -> @active_record.Column
 
 pub fn touch_cache_step(String) -> @controller.ActionStep
 
+pub fn turbo_stream(@turbo.TurboStreamAction, String, String) -> @turbo.TurboStream
+
 pub fn turbo_stream_format() -> @controller.ResponseFormat
 
 pub fn unique(@active_record.Column) -> @active_record.Column
 
 pub fn update_sql(@active_record.ModelSchema, @active_record.Record, String) -> String
+
+pub fn update_stream(String, String) -> @turbo.TurboStream
 
 pub fn upsert_sql(@active_record.ModelSchema, @active_record.Record, String) -> String
 
@@ -499,6 +544,10 @@ pub fn with_only(@http.ResourceOptions, Array[String]) -> @http.ResourceOptions
 
 pub fn with_param_name(@http.ResourceOptions, String) -> @http.ResourceOptions
 
+pub fn with_request_header(@middleware.Middleware, String, String) -> @middleware.Middleware
+
+pub fn with_response_header(@middleware.Middleware, String, String) -> @middleware.Middleware
+
 pub fn with_validation(@active_record.ModelSchema, @active_record.Validation) -> @active_record.ModelSchema
 
 // Errors
@@ -550,6 +599,10 @@ pub using @auth {type EmailVerificationToken}
 
 pub using @job {type EnqueuedJob}
 
+pub using @fixture {type FixtureRow}
+
+pub using @fixture {type FixtureSet}
+
 pub using @view {type FormBinding}
 
 pub using @generator {type GeneratedArtifact}
@@ -583,6 +636,8 @@ pub using @app {type MbtOnRailsApp}
 pub using @active_record {type MemoryDatabase}
 
 pub using @active_record {type MemoryTable}
+
+pub using @middleware {type Middleware}
 
 pub using @migration {type Migration}
 
@@ -634,9 +689,15 @@ pub using @generator {type ScaffoldField}
 
 pub using @generator {type ScaffoldPlan}
 
+pub using @fixture {type SeedPlan}
+
 pub using @view {type ServerAction}
 
 pub using @auth {type Session}
+
+pub using @turbo {type TurboStream}
+
+pub using @turbo {type TurboStreamAction}
 
 pub using @active_record {type Validation}
 

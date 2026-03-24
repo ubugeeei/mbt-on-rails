@@ -1,4 +1,20 @@
 ///|
+/// Builds a plain text response with an explicit content type.
+pub fn typed_text_response(
+  status : Int,
+  content_type : String,
+  body : String,
+) -> Response {
+  { status, headers: [("content-type", content_type)], body: Text(body) }
+}
+
+///|
+/// Builds a plain text response for an arbitrary status.
+pub fn text_response(status : Int, body : String) -> Response {
+  typed_text_response(status, "text/plain; charset=utf-8", body)
+}
+
+///|
 /// Builds a `200 OK` HTML response.
 pub fn ok_html(body : String) -> Response {
   {
@@ -48,6 +64,19 @@ pub fn not_found_response() -> Response {
 /// Builds a `204 No Content` response.
 pub fn no_content_response() -> Response {
   { status: 204, headers: [], body: Empty }
+}
+
+///|
+/// Returns a response with extra headers appended.
+pub fn append_response_headers(
+  response : Response,
+  extra_headers : Array[(String, String)],
+) -> Response {
+  let headers = @support.clone_array(response.headers)
+  for header in extra_headers {
+    headers.push(header)
+  }
+  { status: response.status, headers, body: response.body }
 }
 
 ///|

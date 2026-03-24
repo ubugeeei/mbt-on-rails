@@ -1,0 +1,53 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "ubugeeei/mbt_on_rails/src/turbo"
+
+import {
+  "ubugeeei/mbt_on_rails/src/http",
+}
+
+// Values
+pub fn after_stream(String, String) -> TurboStream
+
+pub fn append_stream(String, String) -> TurboStream
+
+pub fn before_stream(String, String) -> TurboStream
+
+pub fn ok_turbo_stream(Array[TurboStream]) -> @http.Response
+
+pub fn prepend_stream(String, String) -> TurboStream
+
+pub fn remove_stream(String) -> TurboStream
+
+pub fn render_turbo_stream(Array[TurboStream]) -> String
+
+pub fn replace_stream(String, String) -> TurboStream
+
+pub fn turbo_stream(TurboStreamAction, String, String) -> TurboStream
+
+pub fn update_stream(String, String) -> TurboStream
+
+// Errors
+
+// Types and methods
+pub struct TurboStream {
+  action : TurboStreamAction
+  target : String
+  html : String
+}
+
+pub enum TurboStreamAction {
+  Append
+  Prepend
+  Replace
+  Update
+  Remove
+  Before
+  After
+}
+pub impl Eq for TurboStreamAction
+pub impl Show for TurboStreamAction
+
+// Type aliases
+
+// Traits
+

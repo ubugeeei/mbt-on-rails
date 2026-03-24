@@ -13,6 +13,54 @@ fn print_params_example() -> Unit {
 }
 
 ///|
+/// Prints a Rack-style middleware example.
+fn print_middleware_example() -> Unit {
+  let stack = [
+    @mbor.with_response_header(
+      @mbor.middleware("security", None, [], [], [], None),
+      "x-frame-options",
+      "DENY",
+    ),
+    @mbor.halt_with_text(
+      "maintenance",
+      "/admin",
+      [@mbor.http_get()],
+      503,
+      "down",
+    ),
+  ]
+  println("Middleware")
+  println(@mbor.middleware_summary(stack))
+  println("")
+}
+
+///|
+/// Prints a fixtures and seed example.
+fn print_fixture_example() -> Unit {
+  let fixtures = @mbor.fixture_set("users", "users", [
+    @mbor.fixture_row(
+      "alice",
+      @mbor.record("users", [("id", "1"), ("email", "alice@example.com")]),
+    ),
+  ])
+  let seeded = @mbor.apply_seed(
+    @mbor.load_fixture_set(@mbor.empty_memory_database(), fixtures),
+    @mbor.seed_plan(
+      "bootstrap",
+      [@mbor.record("users", [("id", "2"), ("email", "bob@example.com")])],
+      [],
+    ),
+  )
+  println("Fixtures")
+  println(@mbor.fixture_summary(fixtures))
+  println(@mbor.seed_summary(@mbor.seed_plan("bootstrap", [], [])))
+  let alice = @mbor.find_records(seeded, "users", "id", "1").length()
+  let bob = @mbor.find_records(seeded, "users", "id", "2").length()
+  println("users loaded = " + (alice + bob).to_string())
+  println("")
+}
+
+///|
 /// Prints an Active Job plus Action Mailer example.
 fn print_job_and_mailer_example() -> Unit {
   let announcement_mailer = @mbor.mailer(
@@ -50,6 +98,18 @@ fn print_job_and_mailer_example() -> Unit {
 }
 
 ///|
+/// Prints a Turbo Stream rendering example.
+fn print_turbo_example() -> Unit {
+  let body = @mbor.render_turbo_stream([
+    @mbor.append_stream("posts", "<li>New post</li>"),
+    @mbor.replace_stream("flash", "<div>Saved</div>"),
+  ])
+  println("Turbo")
+  println(body)
+  println("")
+}
+
+///|
 /// Prints a cache read-through example.
 fn print_cache_example() -> Unit {
   let result = @mbor.cache_fetch(
@@ -72,6 +132,9 @@ fn main {
   println("=================")
   println("")
   print_params_example()
+  print_middleware_example()
+  print_fixture_example()
   print_job_and_mailer_example()
+  print_turbo_example()
   print_cache_example()
 }

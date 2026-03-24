@@ -1,0 +1,38 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "ubugeeei/mbt_on_rails/src/middleware"
+
+import {
+  "ubugeeei/mbt_on_rails/src/http",
+}
+
+// Values
+pub fn apply_request_middleware(Array[Middleware], @http.Request) -> (@http.Request, @http.Response?)
+
+pub fn apply_response_middleware(Array[Middleware], @http.Request, @http.Response) -> @http.Response
+
+pub fn halt_with_text(String, String, Array[@http.HttpMethod], Int, String) -> Middleware
+
+pub fn middleware(String, String?, Array[@http.HttpMethod], Array[(String, String)], Array[(String, String)], @http.Response?) -> Middleware
+
+pub fn middleware_summary(Array[Middleware]) -> String
+
+pub fn with_request_header(Middleware, String, String) -> Middleware
+
+pub fn with_response_header(Middleware, String, String) -> Middleware
+
+// Errors
+
+// Types and methods
+pub struct Middleware {
+  name : String
+  path_prefix : String?
+  methods : Array[@http.HttpMethod]
+  request_headers : Array[(String, String)]
+  response_headers : Array[(String, String)]
+  halt_response : @http.Response?
+}
+
+// Type aliases
+
+// Traits
+

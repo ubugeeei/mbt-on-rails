@@ -4,6 +4,10 @@ package "ubugeeei/mbt_on_rails/src/http"
 // Values
 pub fn all_http_methods() -> Array[HttpMethod]
 
+pub fn append_request_header(Request, String, String) -> Request
+
+pub fn append_response_headers(Response, Array[(String, String)]) -> Response
+
 pub fn build_path(RouteSpec, Array[(String, String)]) -> String
 
 pub fn default_resource_options(String, String?) -> ResourceOptions
@@ -51,6 +55,10 @@ pub fn resources(String, String, ResourceOptions) -> Array[RouteSpec]
 pub fn route(String, HttpMethod, String, String, String, String?) -> RouteSpec
 
 pub fn scope_routes(String, String, Array[RouteSpec]) -> Array[RouteSpec]
+
+pub fn text_response(Int, String) -> Response
+
+pub fn typed_text_response(Int, String, String) -> Response
 
 pub fn with_collection_action(ResourceOptions, String, HttpMethod) -> ResourceOptions
 

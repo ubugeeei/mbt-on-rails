@@ -4,24 +4,43 @@ pub fn handle_request(
   app : MbtOnRailsApp,
   incoming : @http.Request,
 ) -> @http.Response {
-  match find_server_action(app.server_actions, incoming.path) {
+  let request_result = @middleware.apply_request_middleware(
+    app.middlewares,
+    incoming,
+  )
+  let request = request_result.0
+  match request_result.1 {
+    Some(response) =>
+      return @middleware.apply_response_middleware(
+        app.middlewares,
+        request,
+        response,
+      )
+    None => ()
+  }
+
+  match find_server_action(app.server_actions, request.path) {
     Some(action) =>
-      if incoming.verb == @http.http_post() {
-        return @http.ok_json(
-          "{" +
-          "\"action\": " +
-          @support.json_string(action.name) +
-          ", \"status\": " +
-          @support.json_string("accepted") +
-          ", \"body\": " +
-          @support.json_string(incoming.body) +
-          "}",
+      if request.verb == @http.http_post() {
+        return @middleware.apply_response_middleware(
+          app.middlewares,
+          request,
+          @http.ok_json(
+            "{" +
+            "\"action\": " +
+            @support.json_string(action.name) +
+            ", \"status\": " +
+            @support.json_string("accepted") +
+            ", \"body\": " +
+            @support.json_string(request.body) +
+            "}",
+          ),
         )
       }
     None => ()
   }
 
-  match @http.recognize(app.routes, incoming) {
+  match @http.recognize(app.routes, request) {
     Some(matched) =>
       match matched.route.page_name {
         Some(page_name) =>
@@ -37,14 +56,22 @@ pub fn handle_request(
                 loader_data,
                 app.server_actions,
               )
-              @http.ok_html(rendered.html)
+              @middleware.apply_response_middleware(
+                app.middlewares,
+                request,
+                @http.ok_html(rendered.html),
+              )
             }
             None =>
-              @http.ok_text(
-                matched.route.controller +
-                "#" +
-                matched.route.action +
-                " is configured but has no page module",
+              @middleware.apply_response_middleware(
+                app.middlewares,
+                request,
+                @http.ok_text(
+                  matched.route.controller +
+                  "#" +
+                  matched.route.action +
+                  " is configured but has no page module",
+                ),
               )
           }
         None =>
@@ -54,17 +81,31 @@ pub fn handle_request(
               matched.route.action,
               matched.params,
             ) {
-            Some(location) => @http.redirect_response(location)
+            Some(location) =>
+              @middleware.apply_response_middleware(
+                app.middlewares,
+                request,
+                @http.redirect_response(location),
+              )
             None =>
-              @http.ok_text(
-                "handled " +
-                matched.route.controller +
-                "#" +
-                matched.route.action,
+              @middleware.apply_response_middleware(
+                app.middlewares,
+                request,
+                @http.ok_text(
+                  "handled " +
+                  matched.route.controller +
+                  "#" +
+                  matched.route.action,
+                ),
               )
           }
       }
-    None => @http.not_found_response()
+    None =>
+      @middleware.apply_response_middleware(
+        app.middlewares,
+        request,
+        @http.not_found_response(),
+      )
   }
 }
 

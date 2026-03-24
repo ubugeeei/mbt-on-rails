@@ -148,6 +148,26 @@ pub fn request(
 }
 
 ///|
+/// Returns a request with one more header attached.
+pub fn append_request_header(
+  request : Request,
+  key : String,
+  value : String,
+) -> Request {
+  let headers = @support.clone_array(request.headers)
+  headers.push((key, value))
+  {
+    verb: request.verb,
+    path: request.path,
+    headers,
+    query: @support.clone_array(request.query),
+    form: @support.clone_array(request.form),
+    session_id: request.session_id,
+    body: request.body,
+  }
+}
+
+///|
 /// Builds a route spec and parses its route pattern.
 pub fn route(
   name : String,
