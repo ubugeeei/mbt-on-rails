@@ -16,6 +16,7 @@ pub fn render_page(
     None => ()
   }
   let data_json = @support.entries_to_json(page_payload)
+  let component_manifest_json = render_component_manifest(page)
 
   let body = StringBuilder::new()
   body.write_string(
@@ -73,6 +74,11 @@ pub fn render_page(
     "</script>",
   )
   script_bits.push(
+    "<script type=\"application/json\" id=\"mbor-components\">" +
+    @support.escape_html(component_manifest_json) +
+    "</script>",
+  )
+  script_bits.push(
     "<script type=\"application/json\" id=\"mbor-forms\">" +
     @support.escape_html(render_form_manifest(page.forms)) +
     "</script>",
@@ -90,7 +96,12 @@ pub fn render_page(
     script_bits.join("") +
     "</body></html>"
 
-  { html, data_json, router_manifest_entry: render_page_manifest_entry(page) }
+  {
+    html,
+    data_json,
+    component_manifest_json,
+    router_manifest_entry: render_page_manifest_entry(page),
+  }
 }
 
 ///|
@@ -142,6 +153,10 @@ fn render_layout_placeholder(layout : LayoutModule) -> String {
 fn render_component_placeholder(component : VaporComponentRef) -> String {
   let props_json = @support.entries_to_json(component.props)
   let attrs = StringBuilder::new()
+  let boundary = match component.contract {
+    Some(contract) => render_boundary_attr(contract.boundary)
+    None => if component.is_server_component { "server" } else { "client" }
+  }
   attrs.write_string(
     "data-mbor-component=\"" + @support.escape_html(component.name) + "\" ",
   )
@@ -150,6 +165,9 @@ fn render_component_placeholder(component : VaporComponentRef) -> String {
   )
   attrs.write_string(
     "data-mbor-props='" + @support.escape_html(props_json) + "' ",
+  )
+  attrs.write_string(
+    "data-mbor-boundary=\"" + @support.escape_html(boundary) + "\" ",
   )
   if component.is_server_component {
     attrs.write_string("data-mbor-server-component=\"true\" ")
@@ -165,9 +183,24 @@ fn render_component_placeholder(component : VaporComponentRef) -> String {
       None => ()
     }
   }
+  match component.contract {
+    Some(contract) =>
+      attrs.write_string(
+        "data-mbor-transport=\"" +
+        @support.escape_html(contract.transport) +
+        "\" ",
+      )
+    None => ()
+  }
+  let fallback = match component.fallback_html {
+    Some(html) => "<template data-mbor-fallback>" + html + "</template>"
+    None => ""
+  }
   "<section class=\"mbor-component\" " +
   attrs.to_string().trim().to_string() +
-  "></section>"
+  ">" +
+  fallback +
+  "</section>"
 }
 
 ///|
@@ -192,5 +225,14 @@ fn render_dynamic_mode(mode : DynamicMode) -> String {
     ForceDynamic => "force-dynamic"
     ForceStatic => "force-static"
     Revalidate(seconds) => "revalidate:" + seconds.to_string()
+  }
+}
+
+///|
+/// Renders one boundary kind into the HTML attribute value used by placeholders.
+fn render_boundary_attr(kind : BoundaryKind) -> String {
+  match kind {
+    ServerBoundary => "server"
+    ClientBoundary => "client"
   }
 }

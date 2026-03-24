@@ -1,0 +1,44 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "ubugeeei/mbt_on_rails/src/generator"
+
+import {
+  "ubugeeei/mbt_on_rails/src/active_record",
+  "ubugeeei/mbt_on_rails/src/controller",
+  "ubugeeei/mbt_on_rails/src/http",
+  "ubugeeei/mbt_on_rails/src/view",
+}
+
+// Values
+pub fn scaffold_field(String, @active_record.Column) -> ScaffoldField
+
+pub fn scaffold_resource(String, Array[ScaffoldField]) -> ScaffoldPlan
+
+pub fn scaffold_summary(ScaffoldPlan) -> String
+
+// Errors
+
+// Types and methods
+pub struct GeneratedArtifact {
+  path : String
+  description : String
+}
+
+pub struct ScaffoldField {
+  name : String
+  column : @active_record.Column
+}
+
+pub struct ScaffoldPlan {
+  resource_name : String
+  model : @active_record.ModelSchema
+  controller : @controller.ControllerDefinition
+  routes : Array[@http.RouteSpec]
+  pages : Array[@view.PageModule]
+  server_actions : Array[@view.ServerAction]
+  artifacts : Array[GeneratedArtifact]
+}
+
+// Type aliases
+
+// Traits
+

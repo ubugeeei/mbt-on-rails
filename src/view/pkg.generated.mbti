@@ -1,0 +1,202 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "ubugeeei/mbt_on_rails/src/view"
+
+// Values
+pub fn asset_manifest(Array[String], Array[String]) -> AssetManifest
+
+pub fn client_component(String, String, Array[(String, String)], HydrationMode) -> VaporComponentRef
+
+pub fn client_contract(Array[PropContract]) -> ComponentContract
+
+pub fn default_assets() -> AssetManifest
+
+pub fn defer_on_server() -> HydrationMode
+
+pub fn dynamic_auto() -> DynamicMode
+
+pub fn dynamic_force_dynamic() -> DynamicMode
+
+pub fn dynamic_force_static() -> DynamicMode
+
+pub fn dynamic_revalidate(Int) -> DynamicMode
+
+pub fn form_binding(String, String, String, String?, String?) -> FormBinding
+
+pub fn hydrate_idle() -> HydrationMode
+
+pub fn hydrate_load() -> HydrationMode
+
+pub fn hydrate_manual() -> HydrationMode
+
+pub fn hydrate_media(String) -> HydrationMode
+
+pub fn hydrate_only() -> HydrationMode
+
+pub fn hydrate_visible() -> HydrationMode
+
+pub fn layout_module(String, String, VaporComponentRef) -> LayoutModule
+
+pub fn loader_module(String, String, Int?, Array[String]) -> LoaderModule
+
+pub fn page_module(String, String, String, String, VaporComponentRef) -> PageModule
+
+pub fn prop_contract(String, String, Bool, String) -> PropContract
+
+pub fn render_bundle_plan(PageModule) -> String
+
+pub fn render_component_manifest(PageModule) -> String
+
+pub fn render_form_manifest(Array[FormBinding]) -> String
+
+pub fn render_page(PageModule, Array[(String, String)], Array[(String, String)], Array[ServerAction]) -> RenderedPage
+
+pub fn render_page_manifest_entry(PageModule) -> String
+
+pub fn render_route_tree(Array[PageModule]) -> String
+
+pub fn render_router_manifest(Array[PageModule]) -> String
+
+pub fn render_server_action_manifest(Array[ServerAction]) -> String
+
+pub fn server_action(String, String, Array[(String, String)], String, Bool) -> ServerAction
+
+pub fn server_component(String, String, Array[(String, String)]) -> VaporComponentRef
+
+pub fn server_contract(Array[PropContract], Bool) -> ComponentContract
+
+pub fn with_action_name(PageModule, String) -> PageModule
+
+pub fn with_assets(PageModule, AssetManifest) -> PageModule
+
+pub fn with_contract(VaporComponentRef, ComponentContract) -> VaporComponentRef
+
+pub fn with_dynamic_mode(PageModule, DynamicMode) -> PageModule
+
+pub fn with_fallback(VaporComponentRef, String) -> VaporComponentRef
+
+pub fn with_form(PageModule, FormBinding) -> PageModule
+
+pub fn with_island(PageModule, VaporComponentRef) -> PageModule
+
+pub fn with_layout(PageModule, LayoutModule) -> PageModule
+
+pub fn with_loader(PageModule, LoaderModule) -> PageModule
+
+pub fn with_metadata(PageModule, String, String) -> PageModule
+
+// Errors
+
+// Types and methods
+pub struct AssetManifest {
+  style_urls : Array[String]
+  script_urls : Array[String]
+}
+
+pub enum BoundaryKind {
+  ServerBoundary
+  ClientBoundary
+}
+pub impl Eq for BoundaryKind
+pub impl Show for BoundaryKind
+
+pub struct ComponentContract {
+  boundary : BoundaryKind
+  props : Array[PropContract]
+  transport : String
+  async_only : Bool
+}
+
+pub enum DynamicMode {
+  Auto
+  ForceDynamic
+  ForceStatic
+  Revalidate(Int)
+}
+pub impl Eq for DynamicMode
+pub impl Show for DynamicMode
+
+pub struct FormBinding {
+  name : String
+  action_name : String
+  verb : String
+  optimistic_key : String?
+  redirect_to : String?
+}
+
+pub enum HydrationMode {
+  Manual
+  Load
+  Idle
+  Visible
+  Media(String)
+  Only
+  ServerDefer
+}
+pub impl Eq for HydrationMode
+pub impl Show for HydrationMode
+
+pub struct LayoutModule {
+  name : String
+  file_path : String
+  component : VaporComponentRef
+}
+
+pub struct LoaderModule {
+  name : String
+  cache_key : String
+  revalidate_seconds : Int?
+  depends_on : Array[String]
+}
+
+pub struct PageModule {
+  route_name : String
+  route_path : String
+  file_path : String
+  title : String
+  component : VaporComponentRef
+  layouts : Array[LayoutModule]
+  loader : LoaderModule?
+  action_name : String?
+  client_islands : Array[VaporComponentRef]
+  forms : Array[FormBinding]
+  metadata : Array[(String, String)]
+  dynamic_mode : DynamicMode
+  assets : AssetManifest
+}
+
+pub struct PropContract {
+  name : String
+  type_name : String
+  required : Bool
+  description : String
+}
+
+pub struct RenderedPage {
+  html : String
+  data_json : String
+  component_manifest_json : String
+  router_manifest_entry : String
+}
+
+pub struct ServerAction {
+  name : String
+  route : String
+  input_fields : Array[(String, String)]
+  output_type : String
+  csrf_protected : Bool
+}
+
+pub struct VaporComponentRef {
+  name : String
+  source_path : String
+  props : Array[(String, String)]
+  hydration : HydrationMode?
+  is_server_component : Bool
+  contract : ComponentContract?
+  fallback_html : String?
+}
+
+// Type aliases
+
+// Traits
+

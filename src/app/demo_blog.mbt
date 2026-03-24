@@ -8,6 +8,9 @@ pub fn demo_blog_app() -> MbtOnRailsApp {
   let post_model = demo_post_model(post_scaffold)
   let models = [user_model, session_model, post_model]
   let migrations = demo_migrations(user_model, session_model, post_model)
+  let job_queues = demo_job_queues()
+  let mailers = demo_mailers()
+  let caches = demo_caches()
   let controllers = [
     demo_pages_controller(),
     demo_sessions_controller(),
@@ -22,6 +25,9 @@ pub fn demo_blog_app() -> MbtOnRailsApp {
     auth,
     models,
     migrations,
+    job_queues,
+    mailers,
+    caches,
     controllers,
     routes,
     pages,

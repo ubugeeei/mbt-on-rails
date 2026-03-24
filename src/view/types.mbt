@@ -20,6 +20,31 @@ pub enum DynamicMode {
 } derive(Eq, Show)
 
 ///|
+/// Distinguishes server-rendered components from client islands.
+pub enum BoundaryKind {
+  ServerBoundary
+  ClientBoundary
+} derive(Eq, Show)
+
+///|
+/// Declares one JSON-serializable prop accepted by a component.
+pub struct PropContract {
+  name : String
+  type_name : String
+  required : Bool
+  description : String
+}
+
+///|
+/// Captures the client/server contract attached to a component.
+pub struct ComponentContract {
+  boundary : BoundaryKind
+  props : Array[PropContract]
+  transport : String
+  async_only : Bool
+}
+
+///|
 /// References a Vapor-style component module and its props.
 pub struct VaporComponentRef {
   name : String
@@ -27,6 +52,8 @@ pub struct VaporComponentRef {
   props : Array[(String, String)]
   hydration : HydrationMode?
   is_server_component : Bool
+  contract : ComponentContract?
+  fallback_html : String?
 }
 
 ///|
@@ -96,5 +123,6 @@ pub struct PageModule {
 pub struct RenderedPage {
   html : String
   data_json : String
+  component_manifest_json : String
   router_manifest_entry : String
 }

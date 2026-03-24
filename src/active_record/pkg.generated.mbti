@@ -1,0 +1,266 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "ubugeeei/mbt_on_rails/src/active_record"
+
+// Values
+pub fn after_create(String) -> Callback
+
+pub fn after_destroy(String) -> Callback
+
+pub fn after_save(String) -> Callback
+
+pub fn before_create(String) -> Callback
+
+pub fn before_destroy(String) -> Callback
+
+pub fn before_save(String) -> Callback
+
+pub fn before_validation(String) -> Callback
+
+pub fn belongs_to(String, String, String) -> Association
+
+pub fn boolean_column(String) -> Column
+
+pub fn column_definition_sql(Column) -> String
+
+pub fn count_sql(Relation) -> String
+
+pub fn create_table_sql(ModelSchema) -> String
+
+pub fn delete_sql(ModelSchema, String) -> String
+
+pub fn empty_memory_database() -> MemoryDatabase
+
+pub fn find_records(MemoryDatabase, String, String, String) -> Array[Record]
+
+pub fn has_and_belongs_to_many(String, String, String) -> Association
+
+pub fn has_many(String, String, String) -> Association
+
+pub fn has_one(String, String, String) -> Association
+
+pub fn index_statements(ModelSchema) -> Array[String]
+
+pub fn indexed(Column) -> Column
+
+pub fn insert_record(MemoryDatabase, Record) -> MemoryDatabase
+
+pub fn insert_sql(ModelSchema, Record) -> String
+
+pub fn integer_column(String) -> Column
+
+pub fn join_relation(Relation, String) -> Relation
+
+pub fn json_column(String) -> Column
+
+pub fn limit_to(Relation, Int) -> Relation
+
+pub fn model(String, String, Array[Column], Bool, Bool) -> ModelSchema
+
+pub fn nullable(Column) -> Column
+
+pub fn offset_by(Relation, Int) -> Relation
+
+pub fn order_by(Relation, String, Bool) -> Relation
+
+pub fn preload(Relation, String) -> Relation
+
+pub fn record(String, Array[(String, String)]) -> Record
+
+pub fn references_column(String, String) -> Column
+
+pub fn relation_for(ModelSchema) -> Relation
+
+pub fn relation_to_sql(Relation) -> String
+
+pub fn save_record(ModelSchema, MemoryDatabase, Record) -> SaveOutcome
+
+pub fn schema_dump(Array[ModelSchema]) -> String
+
+pub fn select_columns(Relation, Array[String]) -> Relation
+
+pub fn string_column(String) -> Column
+
+pub fn text_column(String) -> Column
+
+pub fn timestamp_column(String) -> Column
+
+pub fn unique(Column) -> Column
+
+pub fn update_sql(ModelSchema, Record, String) -> String
+
+pub fn upsert_sql(ModelSchema, Record, String) -> String
+
+pub fn validate_record(ModelSchema, Record, MemoryDatabase) -> Array[String]
+
+pub fn validates_confirmation(String, String) -> Validation
+
+pub fn validates_format(String, String) -> Validation
+
+pub fn validates_inclusion(String, Array[String]) -> Validation
+
+pub fn validates_length_max(String, Int) -> Validation
+
+pub fn validates_length_min(String, Int) -> Validation
+
+pub fn validates_presence(String) -> Validation
+
+pub fn validates_uniqueness(String) -> Validation
+
+pub fn where_eq(Relation, String, String) -> Relation
+
+pub fn where_gt(Relation, String, String) -> Relation
+
+pub fn where_in(Relation, String, Array[String]) -> Relation
+
+pub fn where_like(Relation, String, String) -> Relation
+
+pub fn where_lt(Relation, String, String) -> Relation
+
+pub fn where_not_eq(Relation, String, String) -> Relation
+
+pub fn where_raw(Relation, String) -> Relation
+
+pub fn with_association(ModelSchema, Association) -> ModelSchema
+
+pub fn with_callback(ModelSchema, Callback) -> ModelSchema
+
+pub fn with_default(Column, String) -> Column
+
+pub fn with_validation(ModelSchema, Validation) -> ModelSchema
+
+// Errors
+
+// Types and methods
+pub struct Association {
+  name : String
+  target : String
+  kind : AssociationKind
+  foreign_key : String
+  optional : Bool
+}
+
+pub enum AssociationKind {
+  BelongsTo
+  HasMany
+  HasOne
+  HasAndBelongsToMany
+}
+pub impl Eq for AssociationKind
+pub impl Show for AssociationKind
+
+pub struct Callback {
+  hook : LifecycleHook
+  function_name : String
+}
+
+pub struct Column {
+  name : String
+  column_type : ColumnType
+  nullable : Bool
+  unique : Bool
+  indexed : Bool
+  default_value : String?
+}
+
+pub enum ColumnType {
+  Varchar
+  Text
+  Integer
+  Boolean
+  Timestamp
+  Json
+  References(String)
+}
+pub impl Eq for ColumnType
+pub impl Show for ColumnType
+
+pub enum LifecycleHook {
+  BeforeValidation
+  BeforeCreate
+  BeforeSave
+  AfterSave
+  AfterCreate
+  BeforeDestroy
+  AfterDestroy
+}
+pub impl Eq for LifecycleHook
+pub impl Show for LifecycleHook
+
+pub struct MemoryDatabase {
+  tables : Array[MemoryTable]
+}
+
+pub struct MemoryTable {
+  name : String
+  rows : Array[Record]
+}
+
+pub struct ModelSchema {
+  name : String
+  table : String
+  primary_key : String
+  columns : Array[Column]
+  timestamps : Bool
+  soft_delete : Bool
+  associations : Array[Association]
+  validations : Array[Validation]
+  callbacks : Array[Callback]
+}
+
+pub struct OrderBy {
+  column : String
+  descending : Bool
+}
+
+pub enum Predicate {
+  Eq(String, String)
+  NotEq(String, String)
+  Like(String, String)
+  Gt(String, String)
+  Lt(String, String)
+  InList(String, Array[String])
+  Raw(String)
+}
+pub impl Show for Predicate
+
+pub struct Record {
+  table : String
+  fields : Array[(String, String)]
+}
+
+pub struct Relation {
+  table : String
+  selects : Array[String]
+  predicates : Array[Predicate]
+  orderings : Array[OrderBy]
+  joins : Array[String]
+  limit : Int?
+  offset : Int?
+  preloads : Array[String]
+}
+
+pub enum SaveOutcome {
+  Saved(MemoryDatabase, Record)
+  ValidationFailed(Array[String])
+}
+
+pub struct Validation {
+  field : String
+  rule : ValidationRule
+}
+
+pub enum ValidationRule {
+  Presence
+  Uniqueness
+  LengthMin(Int)
+  LengthMax(Int)
+  Inclusion(Array[String])
+  Confirmation(String)
+  Format(String)
+}
+pub impl Show for ValidationRule
+
+// Type aliases
+
+// Traits
+

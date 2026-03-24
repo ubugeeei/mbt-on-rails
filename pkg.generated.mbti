@@ -1,0 +1,648 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "ubugeeei/mbt_on_rails"
+
+import {
+  "ubugeeei/mbt_on_rails/src/active_record",
+  "ubugeeei/mbt_on_rails/src/app",
+  "ubugeeei/mbt_on_rails/src/auth",
+  "ubugeeei/mbt_on_rails/src/cache",
+  "ubugeeei/mbt_on_rails/src/controller",
+  "ubugeeei/mbt_on_rails/src/generator",
+  "ubugeeei/mbt_on_rails/src/http",
+  "ubugeeei/mbt_on_rails/src/job",
+  "ubugeeei/mbt_on_rails/src/mailer",
+  "ubugeeei/mbt_on_rails/src/migration",
+  "ubugeeei/mbt_on_rails/src/params",
+  "ubugeeei/mbt_on_rails/src/view",
+}
+
+// Values
+pub fn action(String, Array[@controller.ActionStep], String?, Bool, Array[String], Array[@controller.ResponseFormat], Bool) -> @controller.ActionDefinition
+
+pub fn add_column_step(String, @active_record.Column) -> @migration.MigrationStep
+
+pub fn add_index_step(String, String, Bool) -> @migration.MigrationStep
+
+pub fn after_create(String) -> @active_record.Callback
+
+pub fn after_destroy(String) -> @active_record.Callback
+
+pub fn after_save(String) -> @active_record.Callback
+
+pub fn all_http_methods() -> Array[@http.HttpMethod]
+
+pub fn allowed(@auth.Identity?, @auth.PolicyRule, String?) -> Bool
+
+pub fn app(String, @auth.AuthConfig, Array[@active_record.ModelSchema], Array[@migration.Migration], Array[@job.JobQueue], Array[@mailer.MailerDefinition], Array[@cache.CacheStore], Array[@controller.ControllerDefinition], Array[@http.RouteSpec], Array[@view.PageModule], Array[@view.ServerAction], Array[@generator.ScaffoldPlan]) -> @app.MbtOnRailsApp
+
+pub fn append_entries(Array[(String, String)], Array[(String, String)]) -> Array[(String, String)]
+
+pub fn asset_manifest(Array[String], Array[String]) -> @view.AssetManifest
+
+pub fn auth_guest_only() -> @auth.AuthRequirement
+
+pub fn auth_public() -> @auth.AuthRequirement
+
+pub fn auth_required() -> @auth.AuthRequirement
+
+pub fn auth_summary(@auth.AuthConfig) -> String
+
+pub fn authorize(@auth.Identity?, @auth.AuthRequirement) -> Bool
+
+pub fn authorize_step(String, String) -> @controller.ActionStep
+
+pub fn before_action(String?, @auth.AuthRequirement?, Array[String]) -> @controller.BeforeAction
+
+pub fn before_create(String) -> @active_record.Callback
+
+pub fn before_destroy(String) -> @active_record.Callback
+
+pub fn before_save(String) -> @active_record.Callback
+
+pub fn before_validation(String) -> @active_record.Callback
+
+pub fn belongs_to(String, String, String) -> @active_record.Association
+
+pub fn boolean_column(String) -> @active_record.Column
+
+pub fn build_path(@http.RouteSpec, Array[(String, String)]) -> String
+
+pub fn cache_delete(@cache.CacheStore, String) -> @cache.CacheStore
+
+pub fn cache_delete_tag(@cache.CacheStore, String) -> @cache.CacheStore
+
+pub fn cache_fetch(@cache.CacheStore, String, String, String?, String?, Array[String], String?) -> @cache.CacheFetchResult
+
+pub fn cache_key(Array[String]) -> String
+
+pub fn cache_read(@cache.CacheStore, String, String?) -> String?
+
+pub fn cache_store(String) -> @cache.CacheStore
+
+pub fn cache_summary(@cache.CacheStore) -> String
+
+pub fn cache_write(@cache.CacheStore, String, String, String?, String?, Array[String]) -> @cache.CacheStore
+
+pub fn classify(String) -> String
+
+pub fn client_component(String, String, Array[(String, String)], @view.HydrationMode) -> @view.VaporComponentRef
+
+pub fn client_contract(Array[@view.PropContract]) -> @view.ComponentContract
+
+pub fn[T] clone_array(Array[T]) -> Array[T]
+
+pub fn column_definition_sql(@active_record.Column) -> String
+
+pub fn compose_mail(@mailer.MailerDefinition, String, Array[String], Array[(String, String)]) -> @mailer.MailDelivery?
+
+pub fn controller(String, String?, String, Array[@controller.BeforeAction], Array[@controller.ActionDefinition]) -> @controller.ControllerDefinition
+
+pub fn controller_action(@controller.ControllerDefinition, String) -> @controller.ActionDefinition?
+
+pub fn controller_summary(@controller.ControllerDefinition) -> String
+
+pub fn cookie_header(@auth.AuthCookie) -> String
+
+pub fn count_sql(@active_record.Relation) -> String
+
+pub fn create_table_sql(@active_record.ModelSchema) -> String
+
+pub fn create_table_step(@active_record.ModelSchema) -> @migration.MigrationStep
+
+pub fn csrf_valid(@auth.Session?, String?) -> Bool
+
+pub fn default_assets() -> @view.AssetManifest
+
+pub fn default_auth_config() -> @auth.AuthConfig
+
+pub fn default_resource_options(String, String?) -> @http.ResourceOptions
+
+pub fn defer_on_server() -> @view.HydrationMode
+
+pub fn delete_sql(@active_record.ModelSchema, String) -> String
+
+pub fn deliver_mail_step(String) -> @controller.ActionStep
+
+pub fn delivery_job(@mailer.MailDelivery, String, String?) -> @job.EnqueuedJob
+
+pub fn demo_blog_app() -> @app.MbtOnRailsApp
+
+pub fn digest_password(String, String) -> String
+
+pub fn drain_ready(@job.JobQueue, String) -> @job.DrainedJobs
+
+pub fn drop_table_step(String) -> @migration.MigrationStep
+
+pub fn dynamic_auto() -> @view.DynamicMode
+
+pub fn dynamic_force_dynamic() -> @view.DynamicMode
+
+pub fn dynamic_force_static() -> @view.DynamicMode
+
+pub fn dynamic_revalidate(Int) -> @view.DynamicMode
+
+pub fn empty_memory_database() -> @active_record.MemoryDatabase
+
+pub fn enqueue_at(@job.JobQueue, @job.JobDefinition, Array[(String, String)], String) -> @job.JobQueue
+
+pub fn enqueue_delivery(@job.JobQueue, @mailer.MailDelivery, String?) -> @job.JobQueue
+
+pub fn enqueue_job_step(String) -> @controller.ActionStep
+
+pub fn enqueue_now(@job.JobQueue, @job.JobDefinition, Array[(String, String)]) -> @job.JobQueue
+
+pub fn enqueued_job(@job.JobDefinition, Array[(String, String)], String, Int) -> @job.EnqueuedJob
+
+pub fn entries_to_json(Array[(String, String)]) -> String
+
+pub fn escape_html(String) -> String
+
+pub fn execute_sql_step(String) -> @migration.MigrationStep
+
+pub fn find_entry(Array[(String, String)], String) -> String?
+
+pub fn find_records(@active_record.MemoryDatabase, String, String, String) -> Array[@active_record.Record]
+
+pub fn flash(String, String) -> @controller.ActionStep
+
+pub fn form_binding(String, String, String, String?, String?) -> @view.FormBinding
+
+pub fn handle_request(@app.MbtOnRailsApp, @http.Request) -> @http.Response
+
+pub fn has_and_belongs_to_many(String, String, String) -> @active_record.Association
+
+pub fn has_many(String, String, String) -> @active_record.Association
+
+pub fn has_one(String, String, String) -> @active_record.Association
+
+pub fn hash_string(String) -> String
+
+pub fn html_format() -> @controller.ResponseFormat
+
+pub fn http_delete() -> @http.HttpMethod
+
+pub fn http_get() -> @http.HttpMethod
+
+pub fn http_head() -> @http.HttpMethod
+
+pub fn http_options() -> @http.HttpMethod
+
+pub fn http_patch() -> @http.HttpMethod
+
+pub fn http_post() -> @http.HttpMethod
+
+pub fn http_put() -> @http.HttpMethod
+
+pub fn hydrate_idle() -> @view.HydrationMode
+
+pub fn hydrate_load() -> @view.HydrationMode
+
+pub fn hydrate_manual() -> @view.HydrationMode
+
+pub fn hydrate_media(String) -> @view.HydrationMode
+
+pub fn hydrate_only() -> @view.HydrationMode
+
+pub fn hydrate_visible() -> @view.HydrationMode
+
+pub fn identity(String, String, String, Array[String], String?) -> @auth.Identity
+
+pub fn index_statements(@active_record.ModelSchema) -> Array[String]
+
+pub fn indexed(@active_record.Column) -> @active_record.Column
+
+pub fn insert_record(@active_record.MemoryDatabase, @active_record.Record) -> @active_record.MemoryDatabase
+
+pub fn insert_sql(@active_record.ModelSchema, @active_record.Record) -> String
+
+pub fn integer_column(String) -> @active_record.Column
+
+pub fn invoke_server_action_step(String) -> @controller.ActionStep
+
+pub fn issue_email_verification(String, String, String) -> @auth.EmailVerificationToken
+
+pub fn issue_password_reset(String, String, String) -> @auth.PasswordResetToken
+
+pub fn issue_session(String, String) -> @auth.Session
+
+pub fn job(String, String, Array[(String, String)], Int, String?) -> @job.JobDefinition
+
+pub fn job_queue(String) -> @job.JobQueue
+
+pub fn job_ready(@job.EnqueuedJob, String) -> Bool
+
+pub fn job_summary(@job.JobQueue) -> String
+
+pub fn join_path_segments(Array[String]) -> String
+
+pub fn join_relation(@active_record.Relation, String) -> @active_record.Relation
+
+pub fn json_column(String) -> @active_record.Column
+
+pub fn json_format() -> @controller.ResponseFormat
+
+pub fn json_string(String) -> String
+
+pub fn layout_module(String, String, @view.VaporComponentRef) -> @view.LayoutModule
+
+pub fn limit_to(@active_record.Relation, Int) -> @active_record.Relation
+
+pub fn load_collection_step(String) -> @controller.ActionStep
+
+pub fn load_member_step(String) -> @controller.ActionStep
+
+pub fn loader_module(String, String, Int?, Array[String]) -> @view.LoaderModule
+
+pub fn mail_template(String, String, String, String?) -> @mailer.MailTemplate
+
+pub fn mailer(String, String, String?, Array[@mailer.MailTemplate]) -> @mailer.MailerDefinition
+
+pub fn mailer_summary(@mailer.MailerDefinition) -> String
+
+pub fn match_route(@http.RoutePattern, String) -> Array[(String, String)]?
+
+pub fn merge_params(Array[(String, String)], Array[(String, String)], Array[(String, String)]) -> @params.Parameters
+
+pub fn migration(String, String, Array[@migration.MigrationStep]) -> @migration.Migration
+
+pub fn migration_down_sql(@migration.Migration) -> Array[String]
+
+pub fn migration_from_model(String, String, @active_record.ModelSchema) -> @migration.Migration
+
+pub fn migration_sql(@migration.Migration) -> Array[String]
+
+pub fn migration_up_sql(@migration.Migration) -> Array[String]
+
+pub fn model(String, String, Array[@active_record.Column], Bool, Bool) -> @active_record.ModelSchema
+
+pub fn namespace_routes(String, Array[@http.RouteSpec]) -> Array[@http.RouteSpec]
+
+pub fn no_content_response() -> @http.Response
+
+pub fn normalize_path(String) -> String
+
+pub fn not_found_response() -> @http.Response
+
+pub fn nullable(@active_record.Column) -> @active_record.Column
+
+pub fn offset_by(@active_record.Relation, Int) -> @active_record.Relation
+
+pub fn ok_html(String) -> @http.Response
+
+pub fn ok_json(String) -> @http.Response
+
+pub fn ok_text(String) -> @http.Response
+
+pub fn order_by(@active_record.Relation, String, Bool) -> @active_record.Relation
+
+pub fn page_module(String, String, String, String, @view.VaporComponentRef) -> @view.PageModule
+
+pub fn param_value(@params.Parameters, String) -> String?
+
+pub fn params(Array[(String, String)]) -> @params.Parameters
+
+pub fn parse_route_pattern(String) -> @http.RoutePattern
+
+pub fn permission_access(String) -> @auth.AuthRequirement
+
+pub fn permit(@params.Parameters, Array[String]) -> @params.PermittedParams
+
+pub fn permit_params_step(Array[String]) -> @controller.ActionStep
+
+pub fn permit_scope(@params.Parameters, String, Array[String]) -> @params.PermittedParams
+
+pub fn permitted_attributes(@params.PermittedParams) -> Array[(String, String)]
+
+pub fn permitted_summary(@params.PermittedParams) -> String
+
+pub fn permitted_value(@params.PermittedParams, String) -> String?
+
+pub fn persist_model_step(String) -> @controller.ActionStep
+
+pub fn policy_rule(String, String, Array[String], Array[String], Bool) -> @auth.PolicyRule
+
+pub fn preload(@active_record.Relation, String) -> @active_record.Relation
+
+pub fn prop_contract(String, String, Bool, String) -> @view.PropContract
+
+pub fn recognize(Array[@http.RouteSpec], @http.Request) -> @http.MatchedRoute?
+
+pub fn record(String, Array[(String, String)]) -> @active_record.Record
+
+pub fn redirect_format() -> @controller.ResponseFormat
+
+pub fn redirect_response(String) -> @http.Response
+
+pub fn redirect_to_step(String) -> @controller.ActionStep
+
+pub fn references_column(String, String) -> @active_record.Column
+
+pub fn relation_for(@active_record.ModelSchema) -> @active_record.Relation
+
+pub fn relation_to_sql(@active_record.Relation) -> String
+
+pub fn remove_column_step(String, String) -> @migration.MigrationStep
+
+pub fn rename_table_step(String, String) -> @migration.MigrationStep
+
+pub fn render_auth_requirement(@auth.AuthRequirement) -> String
+
+pub fn render_bundle_plan(@view.PageModule) -> String
+
+pub fn render_component_manifest(@view.PageModule) -> String
+
+pub fn render_form_manifest(Array[@view.FormBinding]) -> String
+
+pub fn render_page(@view.PageModule, Array[(String, String)], Array[(String, String)], Array[@view.ServerAction]) -> @view.RenderedPage
+
+pub fn render_page_manifest_entry(@view.PageModule) -> String
+
+pub fn render_page_step(String) -> @controller.ActionStep
+
+pub fn render_response_body(@http.ResponseBody) -> String
+
+pub fn render_route_tree(Array[@view.PageModule]) -> String
+
+pub fn render_router_manifest(Array[@view.PageModule]) -> String
+
+pub fn render_server_action_manifest(Array[@view.ServerAction]) -> String
+
+pub fn request(@http.HttpMethod, String, Array[(String, String)], Array[(String, String)], String?, String) -> @http.Request
+
+pub fn require_auth(@auth.AuthRequirement) -> @controller.ActionStep
+
+pub fn require_scope(@params.Parameters, String) -> @params.Parameters?
+
+pub fn resources(String, String, @http.ResourceOptions) -> Array[@http.RouteSpec]
+
+pub fn restful_controller(String, String) -> @controller.ControllerDefinition
+
+pub fn retry_job(@job.EnqueuedJob, String) -> @job.EnqueuedJob?
+
+pub fn reversible_step(String, String) -> @migration.MigrationStep
+
+pub fn role_access(String) -> @auth.AuthRequirement
+
+pub fn route(String, @http.HttpMethod, String, String, String, String?) -> @http.RouteSpec
+
+pub fn save_record(@active_record.ModelSchema, @active_record.MemoryDatabase, @active_record.Record) -> @active_record.SaveOutcome
+
+pub fn scaffold_field(String, @active_record.Column) -> @generator.ScaffoldField
+
+pub fn scaffold_resource(String, Array[@generator.ScaffoldField]) -> @generator.ScaffoldPlan
+
+pub fn scaffold_summary(@generator.ScaffoldPlan) -> String
+
+pub fn schema_dump(Array[@active_record.ModelSchema]) -> String
+
+pub fn schema_sql(Array[@migration.Migration]) -> Array[String]
+
+pub fn scope_routes(String, String, Array[@http.RouteSpec]) -> Array[@http.RouteSpec]
+
+pub fn select_columns(@active_record.Relation, Array[String]) -> @active_record.Relation
+
+pub fn server_action(String, String, Array[(String, String)], String, Bool) -> @view.ServerAction
+
+pub fn server_component(String, String, Array[(String, String)]) -> @view.VaporComponentRef
+
+pub fn server_contract(Array[@view.PropContract], Bool) -> @view.ComponentContract
+
+pub fn session_cookie(@auth.AuthConfig, @auth.Session, Bool) -> @auth.AuthCookie
+
+pub fn singularize(String) -> String
+
+pub fn split_path(String) -> Array[String]
+
+pub fn string_column(String) -> @active_record.Column
+
+pub fn text_column(String) -> @active_record.Column
+
+pub fn timestamp_column(String) -> @active_record.Column
+
+pub fn touch_cache_step(String) -> @controller.ActionStep
+
+pub fn turbo_stream_format() -> @controller.ResponseFormat
+
+pub fn unique(@active_record.Column) -> @active_record.Column
+
+pub fn update_sql(@active_record.ModelSchema, @active_record.Record, String) -> String
+
+pub fn upsert_sql(@active_record.ModelSchema, @active_record.Record, String) -> String
+
+pub fn validate_record(@active_record.ModelSchema, @active_record.Record, @active_record.MemoryDatabase) -> Array[String]
+
+pub fn validates_confirmation(String, String) -> @active_record.Validation
+
+pub fn validates_format(String, String) -> @active_record.Validation
+
+pub fn validates_inclusion(String, Array[String]) -> @active_record.Validation
+
+pub fn validates_length_max(String, Int) -> @active_record.Validation
+
+pub fn validates_length_min(String, Int) -> @active_record.Validation
+
+pub fn validates_presence(String) -> @active_record.Validation
+
+pub fn validates_uniqueness(String) -> @active_record.Validation
+
+pub fn verify_password(String, String, String) -> Bool
+
+pub fn where_eq(@active_record.Relation, String, String) -> @active_record.Relation
+
+pub fn where_gt(@active_record.Relation, String, String) -> @active_record.Relation
+
+pub fn where_in(@active_record.Relation, String, Array[String]) -> @active_record.Relation
+
+pub fn where_like(@active_record.Relation, String, String) -> @active_record.Relation
+
+pub fn where_lt(@active_record.Relation, String, String) -> @active_record.Relation
+
+pub fn where_not_eq(@active_record.Relation, String, String) -> @active_record.Relation
+
+pub fn where_raw(@active_record.Relation, String) -> @active_record.Relation
+
+pub fn with_action_name(@view.PageModule, String) -> @view.PageModule
+
+pub fn with_assets(@view.PageModule, @view.AssetManifest) -> @view.PageModule
+
+pub fn with_association(@active_record.ModelSchema, @active_record.Association) -> @active_record.ModelSchema
+
+pub fn with_bcc(@mailer.MailDelivery, Array[String]) -> @mailer.MailDelivery
+
+pub fn with_callback(@active_record.ModelSchema, @active_record.Callback) -> @active_record.ModelSchema
+
+pub fn with_cc(@mailer.MailDelivery, Array[String]) -> @mailer.MailDelivery
+
+pub fn with_collection_action(@http.ResourceOptions, String, @http.HttpMethod) -> @http.ResourceOptions
+
+pub fn with_contract(@view.VaporComponentRef, @view.ComponentContract) -> @view.VaporComponentRef
+
+pub fn with_default(@active_record.Column, String) -> @active_record.Column
+
+pub fn with_dynamic_mode(@view.PageModule, @view.DynamicMode) -> @view.PageModule
+
+pub fn with_fallback(@view.VaporComponentRef, String) -> @view.VaporComponentRef
+
+pub fn with_form(@view.PageModule, @view.FormBinding) -> @view.PageModule
+
+pub fn with_island(@view.PageModule, @view.VaporComponentRef) -> @view.PageModule
+
+pub fn with_layout(@view.PageModule, @view.LayoutModule) -> @view.PageModule
+
+pub fn with_loader(@view.PageModule, @view.LoaderModule) -> @view.PageModule
+
+pub fn with_member_action(@http.ResourceOptions, String, @http.HttpMethod) -> @http.ResourceOptions
+
+pub fn with_metadata(@view.PageModule, String, String) -> @view.PageModule
+
+pub fn with_only(@http.ResourceOptions, Array[String]) -> @http.ResourceOptions
+
+pub fn with_param_name(@http.ResourceOptions, String) -> @http.ResourceOptions
+
+pub fn with_validation(@active_record.ModelSchema, @active_record.Validation) -> @active_record.ModelSchema
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+pub using @controller {type ActionDefinition}
+
+pub using @controller {type ActionStep}
+
+pub using @view {type AssetManifest}
+
+pub using @active_record {type Association}
+
+pub using @active_record {type AssociationKind}
+
+pub using @auth {type AuthConfig}
+
+pub using @auth {type AuthCookie}
+
+pub using @auth {type AuthRequirement}
+
+pub using @controller {type BeforeAction}
+
+pub using @view {type BoundaryKind}
+
+pub using @cache {type CacheEntry}
+
+pub using @cache {type CacheFetchResult}
+
+pub using @cache {type CacheStore}
+
+pub using @active_record {type Callback}
+
+pub using @active_record {type Column}
+
+pub using @active_record {type ColumnType}
+
+pub using @view {type ComponentContract}
+
+pub using @controller {type ControllerDefinition}
+
+pub using @job {type DrainedJobs}
+
+pub using @view {type DynamicMode}
+
+pub using @auth {type EmailVerificationToken}
+
+pub using @job {type EnqueuedJob}
+
+pub using @view {type FormBinding}
+
+pub using @generator {type GeneratedArtifact}
+
+pub using @http {type HttpMethod}
+
+pub using @view {type HydrationMode}
+
+pub using @auth {type Identity}
+
+pub using @job {type JobDefinition}
+
+pub using @job {type JobQueue}
+
+pub using @view {type LayoutModule}
+
+pub using @active_record {type LifecycleHook}
+
+pub using @view {type LoaderModule}
+
+pub using @mailer {type MailDelivery}
+
+pub using @mailer {type MailTemplate}
+
+pub using @mailer {type MailerDefinition}
+
+pub using @http {type MatchedRoute}
+
+pub using @app {type MbtOnRailsApp}
+
+pub using @active_record {type MemoryDatabase}
+
+pub using @active_record {type MemoryTable}
+
+pub using @migration {type Migration}
+
+pub using @migration {type MigrationStep}
+
+pub using @active_record {type ModelSchema}
+
+pub using @active_record {type OrderBy}
+
+pub using @view {type PageModule}
+
+pub using @params {type Parameters}
+
+pub using @auth {type PasswordResetToken}
+
+pub using @params {type PermittedParams}
+
+pub using @auth {type PolicyRule}
+
+pub using @active_record {type Predicate}
+
+pub using @view {type PropContract}
+
+pub using @active_record {type Record}
+
+pub using @active_record {type Relation}
+
+pub using @view {type RenderedPage}
+
+pub using @http {type Request}
+
+pub using @http {type ResourceOptions}
+
+pub using @http {type Response}
+
+pub using @http {type ResponseBody}
+
+pub using @controller {type ResponseFormat}
+
+pub using @http {type RoutePattern}
+
+pub using @http {type RouteSegment}
+
+pub using @http {type RouteSpec}
+
+pub using @active_record {type SaveOutcome}
+
+pub using @generator {type ScaffoldField}
+
+pub using @generator {type ScaffoldPlan}
+
+pub using @view {type ServerAction}
+
+pub using @auth {type Session}
+
+pub using @active_record {type Validation}
+
+pub using @active_record {type ValidationRule}
+
+pub using @view {type VaporComponentRef}
+
+// Traits
+

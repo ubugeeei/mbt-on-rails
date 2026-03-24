@@ -1,0 +1,46 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "ubugeeei/mbt_on_rails/src/cache"
+
+// Values
+pub fn cache_delete(CacheStore, String) -> CacheStore
+
+pub fn cache_delete_tag(CacheStore, String) -> CacheStore
+
+pub fn cache_fetch(CacheStore, String, String, String?, String?, Array[String], String?) -> CacheFetchResult
+
+pub fn cache_key(Array[String]) -> String
+
+pub fn cache_read(CacheStore, String, String?) -> String?
+
+pub fn cache_store(String) -> CacheStore
+
+pub fn cache_summary(CacheStore) -> String
+
+pub fn cache_write(CacheStore, String, String, String?, String?, Array[String]) -> CacheStore
+
+// Errors
+
+// Types and methods
+pub struct CacheEntry {
+  key : String
+  value : String
+  version : String?
+  expires_at : String?
+  tags : Array[String]
+}
+
+pub struct CacheFetchResult {
+  store : CacheStore
+  value : String
+  hit : Bool
+}
+
+pub struct CacheStore {
+  store_name : String
+  entries : Array[CacheEntry]
+}
+
+// Type aliases
+
+// Traits
+

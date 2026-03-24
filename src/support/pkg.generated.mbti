@@ -1,0 +1,46 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "ubugeeei/mbt_on_rails/src/support"
+
+// Values
+pub fn append_entries(Array[(String, String)], Array[(String, String)]) -> Array[(String, String)]
+
+pub fn classify(String) -> String
+
+pub fn[T] clone_array(Array[T]) -> Array[T]
+
+pub fn entries_to_json(Array[(String, String)]) -> String
+
+pub fn escape_html(String) -> String
+
+pub fn escape_sql_string(String) -> String
+
+pub fn find_entry(Array[(String, String)], String) -> String?
+
+pub fn hash_string(String) -> String
+
+pub fn is_numeric_literal(String) -> Bool
+
+pub fn join_path_segments(Array[String]) -> String
+
+pub fn json_string(String) -> String
+
+pub fn json_value(String) -> String
+
+pub fn normalize_path(String) -> String
+
+pub fn remove_query_string(String) -> String
+
+pub fn singularize(String) -> String
+
+pub fn split_path(String) -> Array[String]
+
+pub fn sql_literal(String) -> String
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+

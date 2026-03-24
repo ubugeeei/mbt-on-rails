@@ -3,12 +3,16 @@
 pub enum ActionStep {
   RequireAuth(@auth.AuthRequirement)
   Authorize(String, String)
+  PermitParams(Array[String])
   LoadCollection(String)
   LoadMember(String)
   PersistModel(String)
   RenderPage(String)
   RedirectTo(String)
   InvokeServerAction(String)
+  EnqueueJob(String)
+  DeliverMail(String)
+  TouchCache(String)
   SetFlash(String, String)
 } derive(Show)
 
@@ -106,6 +110,12 @@ pub fn authorize_step(resource : String, action : String) -> ActionStep {
 }
 
 ///|
+/// Adds a strong-parameters filtering step to an action plan.
+pub fn permit_params_step(keys : Array[String]) -> ActionStep {
+  PermitParams(keys)
+}
+
+///|
 /// Adds a collection load step to an action plan.
 pub fn load_collection_step(resource : String) -> ActionStep {
   LoadCollection(resource)
@@ -139,6 +149,24 @@ pub fn redirect_to_step(path : String) -> ActionStep {
 /// Adds a server action invocation step to an action plan.
 pub fn invoke_server_action_step(name : String) -> ActionStep {
   InvokeServerAction(name)
+}
+
+///|
+/// Adds a background job enqueue step to an action plan.
+pub fn enqueue_job_step(name : String) -> ActionStep {
+  EnqueueJob(name)
+}
+
+///|
+/// Adds a mail delivery step to an action plan.
+pub fn deliver_mail_step(name : String) -> ActionStep {
+  DeliverMail(name)
+}
+
+///|
+/// Adds a cache invalidation step to an action plan.
+pub fn touch_cache_step(name : String) -> ActionStep {
+  TouchCache(name)
 }
 
 ///|

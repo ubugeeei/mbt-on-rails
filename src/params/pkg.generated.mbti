@@ -1,0 +1,40 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "ubugeeei/mbt_on_rails/src/params"
+
+// Values
+pub fn merge_params(Array[(String, String)], Array[(String, String)], Array[(String, String)]) -> Parameters
+
+pub fn param_value(Parameters, String) -> String?
+
+pub fn params(Array[(String, String)]) -> Parameters
+
+pub fn permit(Parameters, Array[String]) -> PermittedParams
+
+pub fn permit_scope(Parameters, String, Array[String]) -> PermittedParams
+
+pub fn permitted_attributes(PermittedParams) -> Array[(String, String)]
+
+pub fn permitted_summary(PermittedParams) -> String
+
+pub fn permitted_value(PermittedParams, String) -> String?
+
+pub fn require_scope(Parameters, String) -> Parameters?
+
+// Errors
+
+// Types and methods
+pub struct Parameters {
+  values : Array[(String, String)]
+}
+
+pub struct PermittedParams {
+  scope : String?
+  values : Array[(String, String)]
+  missing : Array[String]
+  rejected : Array[String]
+}
+
+// Type aliases
+
+// Traits
+

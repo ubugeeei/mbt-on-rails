@@ -1,0 +1,111 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "ubugeeei/mbt_on_rails/src/controller"
+
+import {
+  "ubugeeei/mbt_on_rails/src/auth",
+}
+
+// Values
+pub fn action(String, Array[ActionStep], String?, Bool, Array[String], Array[ResponseFormat], Bool) -> ActionDefinition
+
+pub fn authorize_step(String, String) -> ActionStep
+
+pub fn before_action(String?, @auth.AuthRequirement?, Array[String]) -> BeforeAction
+
+pub fn controller(String, String?, String, Array[BeforeAction], Array[ActionDefinition]) -> ControllerDefinition
+
+pub fn controller_action(ControllerDefinition, String) -> ActionDefinition?
+
+pub fn controller_summary(ControllerDefinition) -> String
+
+pub fn deliver_mail_step(String) -> ActionStep
+
+pub fn enqueue_job_step(String) -> ActionStep
+
+pub fn flash(String, String) -> ActionStep
+
+pub fn html_format() -> ResponseFormat
+
+pub fn invoke_server_action_step(String) -> ActionStep
+
+pub fn json_format() -> ResponseFormat
+
+pub fn load_collection_step(String) -> ActionStep
+
+pub fn load_member_step(String) -> ActionStep
+
+pub fn permit_params_step(Array[String]) -> ActionStep
+
+pub fn persist_model_step(String) -> ActionStep
+
+pub fn redirect_format() -> ResponseFormat
+
+pub fn redirect_to_step(String) -> ActionStep
+
+pub fn render_page_step(String) -> ActionStep
+
+pub fn require_auth(@auth.AuthRequirement) -> ActionStep
+
+pub fn restful_controller(String, String) -> ControllerDefinition
+
+pub fn touch_cache_step(String) -> ActionStep
+
+pub fn turbo_stream_format() -> ResponseFormat
+
+// Errors
+
+// Types and methods
+pub struct ActionDefinition {
+  name : String
+  steps : Array[ActionStep]
+  page_name : String?
+  mutation : Bool
+  allowed_params : Array[String]
+  formats : Array[ResponseFormat]
+  transactional : Bool
+}
+
+pub enum ActionStep {
+  RequireAuth(@auth.AuthRequirement)
+  Authorize(String, String)
+  PermitParams(Array[String])
+  LoadCollection(String)
+  LoadMember(String)
+  PersistModel(String)
+  RenderPage(String)
+  RedirectTo(String)
+  InvokeServerAction(String)
+  EnqueueJob(String)
+  DeliverMail(String)
+  TouchCache(String)
+  SetFlash(String, String)
+}
+pub impl Show for ActionStep
+
+pub struct BeforeAction {
+  action_name : String?
+  requirement : @auth.AuthRequirement?
+  allowed_params : Array[String]
+}
+
+pub struct ControllerDefinition {
+  name : String
+  resource_name : String?
+  layout_name : String
+  before_actions : Array[BeforeAction]
+  actions : Array[ActionDefinition]
+}
+
+pub enum ResponseFormat {
+  HtmlFormat
+  JsonFormat
+  TurboStreamFormat
+  RedirectFormat
+}
+pub impl Eq for ResponseFormat
+pub impl Show for ResponseFormat
+
+// Type aliases
+
+// Traits
+

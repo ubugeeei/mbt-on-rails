@@ -27,6 +27,11 @@ pub fn controller_summary(controller : ControllerDefinition) -> String {
     for format in action.formats {
       formats.push(format.to_string())
     }
+    let params_label = if action.allowed_params.is_empty() {
+      ""
+    } else {
+      " params(" + action.allowed_params.join(", ") + ")"
+    }
     lines.push(
       "  - " +
       action.name +
@@ -34,7 +39,8 @@ pub fn controller_summary(controller : ControllerDefinition) -> String {
       step_labels.join(" -> ") +
       " [" +
       formats.join(", ") +
-      "]",
+      "]" +
+      params_label,
     )
   }
   lines.join("\n")
@@ -47,12 +53,16 @@ fn render_action_step(step : ActionStep) -> String {
     RequireAuth(requirement) =>
       "auth(" + @auth.render_auth_requirement(requirement) + ")"
     Authorize(resource, action) => "authorize(" + resource + "." + action + ")"
+    PermitParams(keys) => "params(" + keys.join(", ") + ")"
     LoadCollection(resource) => "load_collection(" + resource + ")"
     LoadMember(resource) => "load_member(" + resource + ")"
     PersistModel(resource) => "persist(" + resource + ")"
     RenderPage(page_name) => "render(" + page_name + ")"
     RedirectTo(path) => "redirect(" + path + ")"
     InvokeServerAction(name) => "server_action(" + name + ")"
+    EnqueueJob(name) => "enqueue(" + name + ")"
+    DeliverMail(name) => "mail(" + name + ")"
+    TouchCache(name) => "cache(" + name + ")"
     SetFlash(key, value) => "flash(" + key + "=" + value + ")"
   }
 }

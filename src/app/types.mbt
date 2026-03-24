@@ -5,6 +5,9 @@ pub struct MbtOnRailsApp {
   auth : @auth.AuthConfig
   models : Array[@orm.ModelSchema]
   migrations : Array[@migration.Migration]
+  job_queues : Array[@job.JobQueue]
+  mailers : Array[@mailer.MailerDefinition]
+  caches : Array[@cache.CacheStore]
   controllers : Array[@controller.ControllerDefinition]
   routes : Array[@http.RouteSpec]
   pages : Array[@view.PageModule]
@@ -19,6 +22,9 @@ pub fn app(
   auth : @auth.AuthConfig,
   models : Array[@orm.ModelSchema],
   migrations : Array[@migration.Migration],
+  job_queues : Array[@job.JobQueue],
+  mailers : Array[@mailer.MailerDefinition],
+  caches : Array[@cache.CacheStore],
   controllers : Array[@controller.ControllerDefinition],
   routes : Array[@http.RouteSpec],
   pages : Array[@view.PageModule],
@@ -30,6 +36,9 @@ pub fn app(
     auth,
     models,
     migrations,
+    job_queues,
+    mailers,
+    caches,
     controllers,
     routes,
     pages,

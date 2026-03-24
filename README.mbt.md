@@ -10,7 +10,7 @@ All implementation code now lives under `src/`, with the repository root exposin
   - request/response types
   - Rails-like route recognition
   - `resources`, `scope`, and `namespace` style route DSL
-  - controller action plans, before-actions, auth gates, redirects, flashes, and response formats
+  - controller action plans, before-actions, auth gates, Strong Parameters steps, redirects, flashes, background jobs, cache touches, and response formats
 - Active Record style backend primitives
   - model schema DSL
   - associations
@@ -33,11 +33,18 @@ All implementation code now lives under `src/`, with the repository root exposin
   - policy rules
   - CSRF helpers
   - cookie helpers
+- Rails operational primitives
+  - Strong Parameters-style filtering
+  - Active Job-style queues, retries, and drain helpers
+  - Action Mailer-style templates, composed deliveries, and queue integration
+  - cache store helpers with namespaced keys, tags, and read-through fetch
 - Vapor Moon compatible frontend boundary
   - `.mbtv` page and component examples under `examples/`
   - layouts and loaders
   - server component references
+  - explicit server/client contracts with JSON-only prop schemas
   - island hydration metadata
+  - SSR fallback HTML for islands
   - form bindings
   - server action manifest
   - route tree and page-router manifest
@@ -65,7 +72,11 @@ That keeps the current codebase buildable while preserving the intended interfac
 - [`src/auth/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/auth/types.mbt), [`src/auth/session.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/auth/session.mbt), [`src/auth/policy.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/auth/policy.mbt): authentication, sessions, policies, cookies, CSRF helpers
 - [`src/active_record/schema.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/active_record/schema.mbt), [`src/active_record/relation.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/active_record/relation.mbt), [`src/active_record/sql.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/active_record/sql.mbt), [`src/active_record/memory.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/active_record/memory.mbt): model, relation, SQL, validation, memory DB
 - [`src/migration/migration.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/migration/migration.mbt): migration generation and rollback SQL
-- [`src/view/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/types.mbt), [`src/view/builders.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/builders.mbt), [`src/view/render.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/render.mbt), [`src/view/manifest.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/manifest.mbt): server components, SSR shell, hydration metadata, manifests
+- [`src/params/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/params/types.mbt), [`src/params/filtering.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/params/filtering.mbt): Strong Parameters-style filtering
+- [`src/job/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/job/types.mbt), [`src/job/queue.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/job/queue.mbt): Active Job-style queueing and retries
+- [`src/mailer/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/mailer/types.mbt), [`src/mailer/delivery.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/mailer/delivery.mbt): Action Mailer-style templates and deliveries
+- [`src/cache/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/cache/types.mbt), [`src/cache/store.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/cache/store.mbt): cache stores, tags, and read-through fetch helpers
+- [`src/view/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/types.mbt), [`src/view/builders.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/builders.mbt), [`src/view/contracts.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/contracts.mbt), [`src/view/render.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/render.mbt), [`src/view/manifest.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/manifest.mbt): server components, server/client contracts, SSR shell, hydration metadata, manifests
 - [`src/generator/generator.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/generator/generator.mbt): scaffold planner
 - [`src/app/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/app/types.mbt), [`src/app/runtime.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/app/runtime.mbt), [`src/app/demo_blog.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/app/demo_blog.mbt): integrated demo application and runtime
 - [`src/view/assets/hydrate.js`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/assets/hydrate.js): small client bridge source
@@ -86,6 +97,7 @@ See [`examples/README.md`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rai
 - `moon run examples/resource_app`
 - `moon run examples/orm_migration`
 - `moon run examples/auth_policy`
+- `moon run examples/rails_ops`
 - built-in demo blog view assets: [`examples/demo_blog/README.md`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/examples/demo_blog/README.md)
 
 ## Example API

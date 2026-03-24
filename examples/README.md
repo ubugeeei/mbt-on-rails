@@ -8,6 +8,7 @@
 moon run examples/resource_app
 moon run examples/orm_migration
 moon run examples/auth_policy
+moon run examples/rails_ops
 ```
 
 ## Included examples
@@ -21,10 +22,13 @@ moon run examples/auth_policy
   - Shows model schema design, relation SQL generation, migration SQL generation, and the in-memory validation flow.
 - `examples/auth_policy`
   - Shows identities, sessions, CSRF validation, cookies, direct auth requirements, and policy-rule checks.
+- `examples/rails_ops`
+  - Shows Strong Parameters, Active Job, Action Mailer, and cache store helpers working together.
 
 ## Suggested reading order
 
 1. Start with `examples/resource_app/main.mbt` for end-to-end app composition.
 2. Read `examples/orm_migration/main.mbt` to understand the data layer.
 3. Read `examples/auth_policy/main.mbt` to understand the auth primitives.
-4. Browse `examples/demo_blog/views/` to see the view assets used by `demo_blog_app()`.
+4. Read `examples/rails_ops/main.mbt` to understand the Rails-style operational helpers.
+5. Browse `examples/demo_blog/views/` to see the view and mailer assets used by `demo_blog_app()`.

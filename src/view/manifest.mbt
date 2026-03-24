@@ -48,16 +48,43 @@ pub fn render_bundle_plan(page : PageModule) -> String {
 }
 
 ///|
+/// Renders the component contract manifest consumed by the client bridge.
+pub fn render_component_manifest(page : PageModule) -> String {
+  let entries : Array[String] = [render_component_entry(page.component)]
+  for layout in page.layouts {
+    entries.push(render_component_entry(layout.component))
+  }
+  for island in page.client_islands {
+    entries.push(render_component_entry(island))
+  }
+  "[" + entries.join(", ") + "]"
+}
+
+///|
 /// Renders the server action manifest consumed by the client bridge.
 pub fn render_server_action_manifest(actions : Array[ServerAction]) -> String {
   let entries : Array[String] = []
   for action in actions {
+    let inputs : Array[String] = []
+    for field in action.input_fields {
+      inputs.push(
+        "{" +
+        "\"name\": " +
+        @support.json_string(field.0) +
+        ", \"type\": " +
+        @support.json_string(field.1) +
+        "}",
+      )
+    }
     entries.push(
       "{" +
       "\"name\": " +
       @support.json_string(action.name) +
       ", \"route\": " +
       @support.json_string(action.route) +
+      ", \"input_fields\": [" +
+      inputs.join(", ") +
+      "]" +
       ", \"output_type\": " +
       @support.json_string(action.output_type) +
       ", \"csrf_protected\": " +
@@ -97,4 +124,75 @@ pub fn render_form_manifest(forms : Array[FormBinding]) -> String {
     )
   }
   "[" + entries.join(", ") + "]"
+}
+
+///|
+/// Renders one component entry for the component contract manifest.
+fn render_component_entry(component : VaporComponentRef) -> String {
+  let boundary = match component.contract {
+    Some(contract) => render_boundary_kind(contract.boundary)
+    None => if component.is_server_component { "server" } else { "client" }
+  }
+  let transport = match component.contract {
+    Some(contract) => @support.json_string(contract.transport)
+    None => "null"
+  }
+  let async_only = match component.contract {
+    Some(contract) => if contract.async_only { "true" } else { "false" }
+    None => "false"
+  }
+  let props = match component.contract {
+    Some(contract) => render_prop_contracts(contract.props)
+    None => "[]"
+  }
+  let fallback_html = match component.fallback_html {
+    Some(html) => @support.json_string(html)
+    None => "null"
+  }
+  "{" +
+  "\"name\": " +
+  @support.json_string(component.name) +
+  ", \"source_path\": " +
+  @support.json_string(component.source_path) +
+  ", \"boundary\": " +
+  @support.json_string(boundary) +
+  ", \"transport\": " +
+  transport +
+  ", \"async_only\": " +
+  async_only +
+  ", \"props\": " +
+  props +
+  ", \"fallback_html\": " +
+  fallback_html +
+  "}"
+}
+
+///|
+/// Renders a prop contract list into JSON.
+fn render_prop_contracts(props : Array[PropContract]) -> String {
+  let entries : Array[String] = []
+  for prop in props {
+    entries.push(
+      "{" +
+      "\"name\": " +
+      @support.json_string(prop.name) +
+      ", \"type\": " +
+      @support.json_string(prop.type_name) +
+      ", \"required\": " +
+      (if prop.required { "true" } else { "false" }) +
+      ", \"description\": " +
+      @support.json_string(prop.description) +
+      "}",
+    )
+  }
+  "[" + entries.join(", ") + "]"
+}
+
+///|
+/// Renders one boundary kind into a manifest-friendly string.
+fn render_boundary_kind(kind : BoundaryKind) -> String {
+  match kind {
+    ServerBoundary => "server"
+    ClientBoundary => "client"
+  }
 }

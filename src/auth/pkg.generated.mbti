@@ -1,0 +1,120 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "ubugeeei/mbt_on_rails/src/auth"
+
+// Values
+pub fn allowed(Identity?, PolicyRule, String?) -> Bool
+
+pub fn auth_guest_only() -> AuthRequirement
+
+pub fn auth_public() -> AuthRequirement
+
+pub fn auth_required() -> AuthRequirement
+
+pub fn auth_summary(AuthConfig) -> String
+
+pub fn authorize(Identity?, AuthRequirement) -> Bool
+
+pub fn cookie_header(AuthCookie) -> String
+
+pub fn csrf_valid(Session?, String?) -> Bool
+
+pub fn default_auth_config() -> AuthConfig
+
+pub fn digest_password(String, String) -> String
+
+pub fn identity(String, String, String, Array[String], String?) -> Identity
+
+pub fn issue_email_verification(String, String, String) -> EmailVerificationToken
+
+pub fn issue_password_reset(String, String, String) -> PasswordResetToken
+
+pub fn issue_session(String, String) -> Session
+
+pub fn permission_access(String) -> AuthRequirement
+
+pub fn policy_rule(String, String, Array[String], Array[String], Bool) -> PolicyRule
+
+pub fn render_auth_requirement(AuthRequirement) -> String
+
+pub fn role_access(String) -> AuthRequirement
+
+pub fn session_cookie(AuthConfig, Session, Bool) -> AuthCookie
+
+pub fn verify_password(String, String, String) -> Bool
+
+// Errors
+
+// Types and methods
+pub struct AuthConfig {
+  user_model : String
+  session_model : String
+  session_cookie : String
+  csrf_header : String
+  sign_in_path : String
+  sign_out_path : String
+  password_reset_path : String
+  verify_email_path : String
+  remember_cookie : String
+}
+
+pub struct AuthCookie {
+  name : String
+  value : String
+  path : String
+  http_only : Bool
+  secure : Bool
+  same_site : String
+  max_age_seconds : Int?
+}
+
+pub enum AuthRequirement {
+  Public
+  GuestOnly
+  Authenticated
+  Role(String)
+  Permission(String)
+}
+pub impl Eq for AuthRequirement
+pub impl Show for AuthRequirement
+
+pub struct EmailVerificationToken {
+  token : String
+  user_id : String
+  email : String
+  expires_at : String
+}
+
+pub struct Identity {
+  user_id : String
+  email : String
+  role : String
+  permissions : Array[String]
+  tenant_id : String?
+}
+
+pub struct PasswordResetToken {
+  token : String
+  user_id : String
+  email : String
+  expires_at : String
+}
+
+pub struct PolicyRule {
+  resource : String
+  action : String
+  roles : Array[String]
+  permissions : Array[String]
+  allow_owner : Bool
+}
+
+pub struct Session {
+  id : String
+  user_id : String
+  csrf_token : String
+  fresh : Bool
+}
+
+// Type aliases
+
+// Traits
+

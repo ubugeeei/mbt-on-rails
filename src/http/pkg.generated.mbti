@@ -1,0 +1,141 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "ubugeeei/mbt_on_rails/src/http"
+
+// Values
+pub fn all_http_methods() -> Array[HttpMethod]
+
+pub fn build_path(RouteSpec, Array[(String, String)]) -> String
+
+pub fn default_resource_options(String, String?) -> ResourceOptions
+
+pub fn http_delete() -> HttpMethod
+
+pub fn http_get() -> HttpMethod
+
+pub fn http_head() -> HttpMethod
+
+pub fn http_options() -> HttpMethod
+
+pub fn http_patch() -> HttpMethod
+
+pub fn http_post() -> HttpMethod
+
+pub fn http_put() -> HttpMethod
+
+pub fn match_route(RoutePattern, String) -> Array[(String, String)]?
+
+pub fn namespace_routes(String, Array[RouteSpec]) -> Array[RouteSpec]
+
+pub fn no_content_response() -> Response
+
+pub fn not_found_response() -> Response
+
+pub fn ok_html(String) -> Response
+
+pub fn ok_json(String) -> Response
+
+pub fn ok_text(String) -> Response
+
+pub fn parse_route_pattern(String) -> RoutePattern
+
+pub fn recognize(Array[RouteSpec], Request) -> MatchedRoute?
+
+pub fn redirect_response(String) -> Response
+
+pub fn render_response_body(ResponseBody) -> String
+
+pub fn request(HttpMethod, String, Array[(String, String)], Array[(String, String)], String?, String) -> Request
+
+pub fn resources(String, String, ResourceOptions) -> Array[RouteSpec]
+
+pub fn route(String, HttpMethod, String, String, String, String?) -> RouteSpec
+
+pub fn scope_routes(String, String, Array[RouteSpec]) -> Array[RouteSpec]
+
+pub fn with_collection_action(ResourceOptions, String, HttpMethod) -> ResourceOptions
+
+pub fn with_member_action(ResourceOptions, String, HttpMethod) -> ResourceOptions
+
+pub fn with_only(ResourceOptions, Array[String]) -> ResourceOptions
+
+pub fn with_param_name(ResourceOptions, String) -> ResourceOptions
+
+// Errors
+
+// Types and methods
+pub enum HttpMethod {
+  Get
+  Post
+  Put
+  Patch
+  Delete
+  Head
+  Options
+}
+pub impl Eq for HttpMethod
+pub impl Show for HttpMethod
+
+pub struct MatchedRoute {
+  route : RouteSpec
+  params : Array[(String, String)]
+}
+
+pub struct Request {
+  verb : HttpMethod
+  path : String
+  headers : Array[(String, String)]
+  query : Array[(String, String)]
+  form : Array[(String, String)]
+  session_id : String?
+  body : String
+}
+
+pub struct ResourceOptions {
+  only : Array[String]
+  page_prefix : String
+  param_name : String
+  member_actions : Array[(String, HttpMethod)]
+  collection_actions : Array[(String, HttpMethod)]
+}
+
+pub struct Response {
+  status : Int
+  headers : Array[(String, String)]
+  body : ResponseBody
+}
+
+pub enum ResponseBody {
+  Html(String)
+  Json(String)
+  Text(String)
+  Redirect(String)
+  Empty
+}
+
+pub struct RoutePattern {
+  raw : String
+  segments : Array[RouteSegment]
+}
+
+pub enum RouteSegment {
+  Static(String)
+  Param(String)
+  CatchAll(String)
+  OptionalCatchAll(String)
+}
+pub impl Eq for RouteSegment
+pub impl Show for RouteSegment
+
+pub struct RouteSpec {
+  name : String
+  verb : HttpMethod
+  pattern : RoutePattern
+  controller : String
+  action : String
+  page_name : String?
+}
+
+// Type aliases
+
+// Traits
+

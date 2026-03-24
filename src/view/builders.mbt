@@ -5,7 +5,15 @@ pub fn server_component(
   source_path : String,
   props : Array[(String, String)],
 ) -> VaporComponentRef {
-  { name, source_path, props, hydration: None, is_server_component: true }
+  {
+    name,
+    source_path,
+    props,
+    hydration: None,
+    is_server_component: true,
+    contract: None,
+    fallback_html: None,
+  }
 }
 
 ///|
@@ -22,6 +30,8 @@ pub fn client_component(
     props,
     hydration: Some(hydration),
     is_server_component: false,
+    contract: None,
+    fallback_html: None,
   }
 }
 

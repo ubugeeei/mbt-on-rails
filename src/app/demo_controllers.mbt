@@ -44,7 +44,10 @@ pub fn demo_sessions_controller() -> @controller.ControllerDefinition {
         "create",
         [
           @controller.require_auth(@auth.auth_guest_only()),
+          @controller.permit_params_step(["email", "password"]),
           @controller.invoke_server_action_step("sessions.create"),
+          @controller.deliver_mail_step("SessionMailer.welcome"),
+          @controller.touch_cache_step("session"),
           @controller.flash("notice", "welcome"),
           @controller.redirect_to_step("/"),
         ],
@@ -59,6 +62,7 @@ pub fn demo_sessions_controller() -> @controller.ControllerDefinition {
         [
           @controller.require_auth(@auth.auth_required()),
           @controller.invoke_server_action_step("sessions.destroy"),
+          @controller.touch_cache_step("session"),
           @controller.redirect_to_step("/"),
         ],
         None,

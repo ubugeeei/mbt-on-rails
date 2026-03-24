@@ -1,0 +1,6 @@
+<template>
+  <article class="mailer-card">
+    <h1>Welcome to mbt on rails</h1>
+    <p>Your account is ready, and the demo mailer pipeline is wired up.</p>
+  </article>
+</template>

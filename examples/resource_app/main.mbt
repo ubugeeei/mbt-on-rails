@@ -202,6 +202,9 @@ fn note_app() -> @mbor.MbtOnRailsApp {
     @mbor.default_auth_config(),
     [model],
     [@mbor.migration_from_model("20260323040101", "create_notes", model)],
+    [@mbor.job_queue("default")],
+    [],
+    [@mbor.cache_store("notes")],
     [controller],
     @mbor.resources(
       "notes",

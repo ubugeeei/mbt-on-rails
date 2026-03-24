@@ -11,6 +11,7 @@
 
   const data = readJson("mbor-data") || {};
   const actions = readJson("mbor-actions") || [];
+  const components = readJson("mbor-components") || [];
   const forms = readJson("mbor-forms") || [];
   const islands = document.querySelectorAll("[data-mbor-island]");
 
@@ -41,6 +42,7 @@
   window.mbtOnRails = {
     data,
     actions,
+    components,
     forms,
     async callAction(name, payload) {
       const action = actions.find((entry) => entry.name === name);
@@ -63,6 +65,7 @@
       detail: {
         data,
         actions,
+        components,
         forms,
       },
     }),

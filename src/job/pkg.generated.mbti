@@ -1,0 +1,57 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "ubugeeei/mbt_on_rails/src/job"
+
+// Values
+pub fn drain_ready(JobQueue, String) -> DrainedJobs
+
+pub fn enqueue_at(JobQueue, JobDefinition, Array[(String, String)], String) -> JobQueue
+
+pub fn enqueue_now(JobQueue, JobDefinition, Array[(String, String)]) -> JobQueue
+
+pub fn enqueued_job(JobDefinition, Array[(String, String)], String, Int) -> EnqueuedJob
+
+pub fn job(String, String, Array[(String, String)], Int, String?) -> JobDefinition
+
+pub fn job_queue(String) -> JobQueue
+
+pub fn job_ready(EnqueuedJob, String) -> Bool
+
+pub fn job_summary(JobQueue) -> String
+
+pub fn retry_job(EnqueuedJob, String) -> EnqueuedJob?
+
+// Errors
+
+// Types and methods
+pub struct DrainedJobs {
+  queue : JobQueue
+  ready : Array[EnqueuedJob]
+}
+
+pub struct EnqueuedJob {
+  name : String
+  queue : String
+  payload : Array[(String, String)]
+  run_at : String
+  attempts : Int
+  retry_limit : Int
+  unique_key : String?
+}
+
+pub struct JobDefinition {
+  name : String
+  queue : String
+  argument_types : Array[(String, String)]
+  retry_limit : Int
+  unique_key : String?
+}
+
+pub struct JobQueue {
+  name : String
+  jobs : Array[EnqueuedJob]
+}
+
+// Type aliases
+
+// Traits
+

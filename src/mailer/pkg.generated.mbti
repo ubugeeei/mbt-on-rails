@@ -1,0 +1,56 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "ubugeeei/mbt_on_rails/src/mailer"
+
+import {
+  "ubugeeei/mbt_on_rails/src/job",
+}
+
+// Values
+pub fn compose_mail(MailerDefinition, String, Array[String], Array[(String, String)]) -> MailDelivery?
+
+pub fn delivery_job(MailDelivery, String, String?) -> @job.EnqueuedJob
+
+pub fn enqueue_delivery(@job.JobQueue, MailDelivery, String?) -> @job.JobQueue
+
+pub fn mail_template(String, String, String, String?) -> MailTemplate
+
+pub fn mailer(String, String, String?, Array[MailTemplate]) -> MailerDefinition
+
+pub fn mailer_summary(MailerDefinition) -> String
+
+pub fn with_bcc(MailDelivery, Array[String]) -> MailDelivery
+
+pub fn with_cc(MailDelivery, Array[String]) -> MailDelivery
+
+// Errors
+
+// Types and methods
+pub struct MailDelivery {
+  mailer_name : String
+  action_name : String
+  from : String
+  to : Array[String]
+  cc : Array[String]
+  bcc : Array[String]
+  subject : String
+  assigns : Array[(String, String)]
+}
+
+pub struct MailTemplate {
+  action_name : String
+  subject : String
+  html_path : String
+  text_path : String?
+}
+
+pub struct MailerDefinition {
+  name : String
+  from : String
+  layout_name : String?
+  templates : Array[MailTemplate]
+}
+
+// Type aliases
+
+// Traits
+
