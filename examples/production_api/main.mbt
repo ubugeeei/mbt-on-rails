@@ -69,7 +69,8 @@ fn dispatch(
 }
 
 ///|
-fn main {
+/// Runs the production API example output.
+fn run_example() -> Unit {
   let routes = api_routes()
   let registry = @mbor.with_metric(
     @mbor.set_metric(
@@ -149,4 +150,9 @@ fn main {
   println("")
   println("Post")
   println(@mbor.render_response_body(post.body))
+}
+
+///|
+fn main {
+  run_example()
 }

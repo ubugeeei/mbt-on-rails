@@ -1,5 +1,6 @@
 ///|
-fn main {
+/// Runs the process topology example output.
+fn run_example() -> Unit {
   let processes = [
     @mbor.web_process("web", "moon run cmd/main", 2, ["PORT", "DATABASE_URL"]),
     @mbor.worker_process(
@@ -33,4 +34,9 @@ fn main {
   println("")
   println("Env")
   println(@mbor.env_keys_summary(processes[0]))
+}
+
+///|
+fn main {
+  run_example()
 }

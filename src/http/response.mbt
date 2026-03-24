@@ -25,13 +25,19 @@ pub fn ok_html(body : String) -> Response {
 }
 
 ///|
-/// Builds a `200 OK` JSON response.
-pub fn ok_json(body : String) -> Response {
+/// Builds a JSON response for an arbitrary status.
+pub fn json_response(status : Int, body : String) -> Response {
   {
-    status: 200,
+    status,
     headers: [("content-type", "application/json; charset=utf-8")],
     body: Json(body),
   }
+}
+
+///|
+/// Builds a `200 OK` JSON response.
+pub fn ok_json(body : String) -> Response {
+  json_response(200, body)
 }
 
 ///|

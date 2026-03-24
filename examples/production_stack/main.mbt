@@ -1,5 +1,6 @@
 ///|
-fn main {
+/// Runs the production stack example output.
+fn run_example() -> Unit {
   let config = @mbor.default_production_config()
   let checks = [
     @mbor.health_check("database", true, "primary reachable"),
@@ -29,4 +30,9 @@ fn main {
   println("")
   println("JSON Log")
   println(@mbor.json_log(event))
+}
+
+///|
+fn main {
+  run_example()
 }

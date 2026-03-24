@@ -1,33 +1,21 @@
 ///|
-/// Prints a Strong Parameters-style filtering example.
-fn print_params_example() -> Unit {
+test "rails ops example primitives produce stable summaries and runtime behavior" {
   let parameters = @mbor.merge_params([("id", "42")], [("page", "1")], [
     ("post.title", "MoonBit on Rails"),
     ("post.body", "Typed islands"),
     ("post.admin", "true"),
   ])
   let permitted = @mbor.permit_scope(parameters, "post", ["title", "body"])
-  println("Params")
-  println(@mbor.permitted_summary(permitted))
-  println("")
-}
+  assert_eq(@mbor.permitted_attributes(permitted).length(), 2)
+  assert_true(permitted.rejected.contains("admin"))
 
-///|
-/// Prints an Action Cable-style channel and broadcast example.
-fn print_cable_example() -> Unit {
   let channel = @mbor.cable_channel("PostsChannel", "posts", ["post_id"])
   let broadcast = @mbor.broadcast_turbo(channel, [
     @mbor.append_stream("posts", "<li>Broadcasted</li>"),
   ])
-  println("Cable")
-  println(@mbor.cable_summary([channel]))
-  println(@mbor.broadcast_summary(broadcast))
-  println("")
-}
+  assert_true(@mbor.cable_summary([channel]).contains("PostsChannel"))
+  assert_true(@mbor.broadcast_summary(broadcast).contains("turbo-stream"))
 
-///|
-/// Prints a Rack-style middleware example.
-fn print_middleware_example() -> Unit {
   let stack = [
     @mbor.with_response_header(
       @mbor.middleware("security", None, [], [], [], None),
@@ -42,14 +30,15 @@ fn print_middleware_example() -> Unit {
       "down",
     ),
   ]
-  println("Middleware")
-  println(@mbor.middleware_summary(stack))
-  println("")
-}
+  let result = @mbor.apply_request_middleware(
+    stack,
+    @mbor.request(@mbor.http_get(), "/admin", [], [], None, ""),
+  )
+  match result.1 {
+    Some(response) => assert_eq(response.status, 503)
+    None => assert_true(false)
+  }
 
-///|
-/// Prints a fixtures and seed example.
-fn print_fixture_example() -> Unit {
   let fixtures = @mbor.fixture_set("users", "users", [
     @mbor.fixture_row(
       "alice",
@@ -64,18 +53,12 @@ fn print_fixture_example() -> Unit {
       [],
     ),
   )
-  println("Fixtures")
-  println(@mbor.fixture_summary(fixtures))
-  println(@mbor.seed_summary(@mbor.seed_plan("bootstrap", [], [])))
-  let alice = @mbor.find_records(seeded, "users", "id", "1").length()
-  let bob = @mbor.find_records(seeded, "users", "id", "2").length()
-  println("users loaded = " + (alice + bob).to_string())
-  println("")
+  assert_eq(@mbor.find_records(seeded, "users", "id", "1").length(), 1)
+  assert_eq(@mbor.find_records(seeded, "users", "id", "2").length(), 1)
 }
 
 ///|
-/// Prints an Active Job plus Action Mailer example.
-fn print_job_and_mailer_example() -> Unit {
+test "rails ops example covers jobs mailers turbo cache and main smoke" {
   let announcement_mailer = @mbor.mailer(
     "AnnouncementMailer",
     "noreply@example.com",
@@ -99,33 +82,19 @@ fn print_job_and_mailer_example() -> Unit {
         delivery,
         None,
       )
-      println("Jobs")
-      println(@mbor.job_summary(queue))
-      println("")
-      println("Mailers")
-      println(@mbor.mailer_summary(announcement_mailer))
-      println("")
+      assert_true(@mbor.job_summary(queue).contains("mailers.deliver"))
+      assert_true(@mbor.mailer_summary(announcement_mailer).contains("launch"))
     }
-    None => ()
+    None => assert_true(false)
   }
-}
 
-///|
-/// Prints a Turbo Stream rendering example.
-fn print_turbo_example() -> Unit {
   let body = @mbor.render_turbo_stream([
     @mbor.append_stream("posts", "<li>New post</li>"),
     @mbor.replace_stream("flash", "<div>Saved</div>"),
   ])
-  println("Turbo")
-  println(body)
-  println("")
-}
+  assert_true(body.contains("turbo-stream"))
 
-///|
-/// Prints a cache read-through example.
-fn print_cache_example() -> Unit {
-  let result = @mbor.cache_fetch(
+  let cache_result = @mbor.cache_fetch(
     @mbor.cache_store("pages"),
     @mbor.cache_key(["posts", "index"]),
     "{\"posts\":[]}",
@@ -134,17 +103,9 @@ fn print_cache_example() -> Unit {
     ["posts", "pages"],
     Some("2026-03-25T00:00:00Z"),
   )
-  println("Cache")
-  println(@mbor.cache_summary(result.store))
-  println("")
-}
+  assert_false(cache_result.hit)
+  assert_true(@mbor.cache_summary(cache_result.store).contains("cache pages"))
 
-///|
-/// Runs the Rails operations example output.
-fn run_example() -> Unit {
-  println("Rails Ops Example")
-  println("=================")
-  println("")
   print_params_example()
   print_cable_example()
   print_middleware_example()
@@ -152,9 +113,6 @@ fn run_example() -> Unit {
   print_job_and_mailer_example()
   print_turbo_example()
   print_cache_example()
-}
-
-///|
-fn main {
   run_example()
+  assert_true(true)
 }

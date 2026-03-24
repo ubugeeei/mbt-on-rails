@@ -47,6 +47,7 @@ pub using @http {
   http_patch,
   http_post,
   http_put,
+  json_response,
   match_route,
   namespace_routes,
   no_content_response,

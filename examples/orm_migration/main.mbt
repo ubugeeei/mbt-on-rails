@@ -90,7 +90,8 @@ fn print_memory_example(model : @mbor.ModelSchema) -> Unit {
 }
 
 ///|
-fn main {
+/// Runs the ORM and migration example output.
+fn run_example() -> Unit {
   let model = post_model()
   println("ORM + Migration Example")
   println("=======================")
@@ -100,4 +101,9 @@ fn main {
   print_migration_example(model)
   println("")
   print_memory_example(model)
+}
+
+///|
+fn main {
+  run_example()
 }

@@ -26,6 +26,8 @@ pub fn http_post() -> HttpMethod
 
 pub fn http_put() -> HttpMethod
 
+pub fn json_response(Int, String) -> Response
+
 pub fn match_route(RoutePattern, String) -> Array[(String, String)]?
 
 pub fn namespace_routes(String, Array[RouteSpec]) -> Array[RouteSpec]

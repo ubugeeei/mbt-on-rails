@@ -75,7 +75,8 @@ fn print_session_checks(identity : @mbor.Identity) -> Unit {
 }
 
 ///|
-fn main {
+/// Runs the auth and policy example output.
+fn run_example() -> Unit {
   let identity = editor()
   println("Auth + Policy Example")
   println("=====================")
@@ -85,4 +86,9 @@ fn main {
   print_policy_checks(identity)
   println("")
   print_session_checks(identity)
+}
+
+///|
+fn main {
+  run_example()
 }

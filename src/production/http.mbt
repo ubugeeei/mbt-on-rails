@@ -35,7 +35,8 @@ pub fn json_api_error(
   code : String,
   detail : String,
 ) -> @http.Response {
-  @http.ok_json(
+  @http.json_response(
+    status,
     "{" +
     "\"errors\": [{" +
     "\"status\": " +

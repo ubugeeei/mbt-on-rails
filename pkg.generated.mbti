@@ -311,6 +311,8 @@ pub fn json_format() -> @controller.ResponseFormat
 
 pub fn json_log(@production.LogEvent) -> String
 
+pub fn json_response(Int, String) -> @http.Response
+
 pub fn json_string(String) -> String
 
 pub fn layout_module(String, String, @view.VaporComponentRef) -> @view.LayoutModule
