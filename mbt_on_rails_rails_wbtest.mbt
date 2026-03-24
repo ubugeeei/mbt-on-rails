@@ -208,3 +208,55 @@ test "production helpers render config health and logs" {
   assert_true(rate_limited(rule, 61))
   assert_true(json_log(event).contains("\"request_id\": \"req_1\""))
 }
+
+///|
+test "metrics secrets and production http helpers are production friendly" {
+  let registry = with_metric(
+    set_metric(
+      increment_metric(
+        metrics_registry(),
+        "http_requests_total",
+        [("controller", "PostsController")],
+        5,
+      ),
+      "db_pool_available",
+      [],
+      4,
+    ),
+    counter("job_executions_total", [("queue", "default")], 2),
+  )
+  assert_eq(
+    metric_value(registry, "http_requests_total", [
+      ("controller", "PostsController"),
+    ]),
+    5,
+  )
+  assert_true(
+    render_prometheus(registry).contains("# TYPE http_requests_total counter"),
+  )
+
+  let secrets = secrets_config([
+    secret_var(
+      "DATABASE_URL",
+      Some("postgres://app:secret@db/prod"),
+      true,
+      true,
+    ),
+    secret_var("SMTP_PASSWORD", None, true, true),
+  ])
+  assert_false(secrets_valid(secrets))
+  assert_true(masked_secret_summary(secrets).contains("po****od"))
+  assert_eq(missing_secrets(secrets)[0], "SMTP_PASSWORD")
+
+  let healthy = health_response([health_check("app", true, "ok")])
+  let metrics = metrics_response(render_prometheus(registry))
+  let api_ok = json_api_ok("posts", "42", [("title", "MoonBit")])
+  let api_error = json_api_error(404, "not_found", "missing")
+
+  assert_eq(healthy.status, 200)
+  assert_eq(metrics.headers[0].1, "text/plain; version=0.0.4; charset=utf-8")
+  assert_true(render_response_body(api_ok.body).contains("\"type\": \"posts\""))
+  assert_true(
+    render_response_body(api_error.body).contains("\"code\": \"not_found\""),
+  )
+}

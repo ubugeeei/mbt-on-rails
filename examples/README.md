@@ -10,6 +10,7 @@ moon run examples/orm_migration
 moon run examples/auth_policy
 moon run examples/rails_ops
 moon run examples/production_stack
+moon run examples/production_api
 ```
 
 ## Included examples
@@ -27,6 +28,8 @@ moon run examples/production_stack
   - Shows Strong Parameters, Action Cable, middleware, fixtures/seeds, Active Job, Action Mailer, Turbo Stream, and cache store helpers working together.
 - `examples/production_stack`
   - Shows deployment config, health/readiness JSON, rate limiting, and structured logging helpers.
+- `examples/production_api`
+  - Shows an API-only stack with versioned routes, health/readiness endpoints, Prometheus metrics, JSON API payloads, and secret summaries.
 
 ## Suggested reading order
 
@@ -35,4 +38,5 @@ moon run examples/production_stack
 3. Read `examples/auth_policy/main.mbt` to understand the auth primitives.
 4. Read `examples/rails_ops/main.mbt` to understand the Rails-style operational helpers.
 5. Read `examples/production_stack/main.mbt` for production-facing runtime helpers.
-6. Browse `examples/demo_blog/views/` to see the view and mailer assets used by `demo_blog_app()`.
+6. Read `examples/production_api/main.mbt` for API-only production helpers.
+7. Browse `examples/demo_blog/views/` to see the view and mailer assets used by `demo_blog_app()`.

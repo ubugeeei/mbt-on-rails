@@ -1,4 +1,3 @@
 import {
-  "ubugeeei/mbt_on_rails/src/http" @http,
   "ubugeeei/mbt_on_rails/src/support" @support,
 }

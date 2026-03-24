@@ -43,6 +43,8 @@ All implementation code now lives under `src/`, with the repository root exposin
   - fixture loading and `db:seed` style plans
   - Turbo Stream response rendering
   - deployment config, health/readiness JSON, rate limiting, and structured logging
+  - Prometheus-style metrics and secret masking helpers
+  - JSON API style response helpers for API-only surfaces
 - Vapor Moon compatible frontend boundary
   - `.mbtv` page and component examples under `examples/`
   - layouts and loaders
@@ -86,6 +88,9 @@ That keeps the current codebase buildable while preserving the intended interfac
 - [`src/cache/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/cache/types.mbt), [`src/cache/store.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/cache/store.mbt): cache stores, tags, and read-through fetch helpers
 - [`src/turbo/stream.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/turbo/stream.mbt): Turbo Stream rendering helpers
 - [`src/production/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/production/types.mbt), [`src/production/render.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/production/render.mbt): deployment config, health probes, rate limiting, and JSON logs
+- [`src/production/http.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/production/http.mbt): health/readiness responses, metrics responses, and JSON API helpers
+- [`src/metrics/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/metrics/types.mbt), [`src/metrics/render.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/metrics/render.mbt): Prometheus-style metrics registry helpers
+- [`src/secrets/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/secrets/types.mbt), [`src/secrets/render.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/secrets/render.mbt): secret contracts, masking, and validation
 - [`src/view/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/types.mbt), [`src/view/builders.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/builders.mbt), [`src/view/contracts.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/contracts.mbt), [`src/view/render.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/render.mbt), [`src/view/manifest.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/manifest.mbt): server components, server/client contracts, SSR shell, hydration metadata, manifests
 - [`src/generator/generator.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/generator/generator.mbt): scaffold planner
 - [`src/app/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/app/types.mbt), [`src/app/runtime.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/app/runtime.mbt), [`src/app/demo_blog.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/app/demo_blog.mbt): integrated demo application and runtime
@@ -109,6 +114,7 @@ See [`examples/README.md`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rai
 - `moon run examples/auth_policy`
 - `moon run examples/rails_ops`
 - `moon run examples/production_stack`
+- `moon run examples/production_api`
 - built-in demo blog view assets: [`examples/demo_blog/README.md`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/examples/demo_blog/README.md)
 
 ## Example API

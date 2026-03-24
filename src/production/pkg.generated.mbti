@@ -1,6 +1,10 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "ubugeeei/mbt_on_rails/src/production"
 
+import {
+  "ubugeeei/mbt_on_rails/src/http",
+}
+
 // Values
 pub fn config_summary(DeploymentConfig) -> String
 
@@ -16,15 +20,27 @@ pub fn deployment_config(Environment, String, Int, Bool, Bool, String?, String, 
 
 pub fn health_check(String, Bool, String) -> HealthCheck
 
+pub fn health_response(Array[HealthCheck]) -> @http.Response
+
+pub fn json_api_document(String, String, Array[(String, String)], Array[(String, String)]) -> String
+
+pub fn json_api_error(Int, String, String) -> @http.Response
+
+pub fn json_api_ok(String, String, Array[(String, String)]) -> @http.Response
+
 pub fn json_log(LogEvent) -> String
 
 pub fn log_event(String, String, String?, Array[(String, String)]) -> LogEvent
+
+pub fn metrics_response(String) -> @http.Response
 
 pub fn rate_limit_rule(String, String, Int, Int) -> RateLimitRule
 
 pub fn rate_limit_summary(RateLimitRule) -> String
 
 pub fn rate_limited(RateLimitRule, Int) -> Bool
+
+pub fn readiness_response(Array[HealthCheck]) -> @http.Response
 
 pub fn render_health_json(Array[HealthCheck]) -> String
 

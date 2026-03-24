@@ -13,10 +13,12 @@ import {
   "ubugeeei/mbt_on_rails/src/http",
   "ubugeeei/mbt_on_rails/src/job",
   "ubugeeei/mbt_on_rails/src/mailer",
+  "ubugeeei/mbt_on_rails/src/metrics",
   "ubugeeei/mbt_on_rails/src/middleware",
   "ubugeeei/mbt_on_rails/src/migration",
   "ubugeeei/mbt_on_rails/src/params",
   "ubugeeei/mbt_on_rails/src/production",
+  "ubugeeei/mbt_on_rails/src/secrets",
   "ubugeeei/mbt_on_rails/src/turbo",
   "ubugeeei/mbt_on_rails/src/view",
 }
@@ -130,6 +132,8 @@ pub fn cookie_header(@auth.AuthCookie) -> String
 
 pub fn count_sql(@active_record.Relation) -> String
 
+pub fn counter(String, Array[(String, String)], Int) -> @metrics.MetricSample
+
 pub fn create_table_sql(@active_record.ModelSchema) -> String
 
 pub fn create_table_step(@active_record.ModelSchema) -> @migration.MigrationStep
@@ -163,6 +167,8 @@ pub fn demo_blog_app() -> @app.MbtOnRailsApp
 pub fn deployment_config(@production.Environment, String, Int, Bool, Bool, String?, String, String) -> @production.DeploymentConfig
 
 pub fn digest_password(String, String) -> String
+
+pub fn dotenv_preview(@secrets.SecretsConfig) -> String
 
 pub fn drain_ready(@job.JobQueue, String) -> @job.DrainedJobs
 
@@ -208,6 +214,8 @@ pub fn flash(String, String) -> @controller.ActionStep
 
 pub fn form_binding(String, String, String, String?, String?) -> @view.FormBinding
 
+pub fn gauge(String, Array[(String, String)], Int) -> @metrics.MetricSample
+
 pub fn halt_with_text(String, String, Array[@http.HttpMethod], Int, String) -> @middleware.Middleware
 
 pub fn handle_request(@app.MbtOnRailsApp, @http.Request) -> @http.Response
@@ -221,6 +229,8 @@ pub fn has_one(String, String, String) -> @active_record.Association
 pub fn hash_string(String) -> String
 
 pub fn health_check(String, Bool, String) -> @production.HealthCheck
+
+pub fn health_response(Array[@production.HealthCheck]) -> @http.Response
 
 pub fn html_format() -> @controller.ResponseFormat
 
@@ -252,6 +262,8 @@ pub fn hydrate_visible() -> @view.HydrationMode
 
 pub fn identity(String, String, String, Array[String], String?) -> @auth.Identity
 
+pub fn increment_metric(@metrics.MetricsRegistry, String, Array[(String, String)], Int) -> @metrics.MetricsRegistry
+
 pub fn index_statements(@active_record.ModelSchema) -> Array[String]
 
 pub fn indexed(@active_record.Column) -> @active_record.Column
@@ -281,6 +293,12 @@ pub fn job_summary(@job.JobQueue) -> String
 pub fn join_path_segments(Array[String]) -> String
 
 pub fn join_relation(@active_record.Relation, String) -> @active_record.Relation
+
+pub fn json_api_document(String, String, Array[(String, String)], Array[(String, String)]) -> String
+
+pub fn json_api_error(Int, String, String) -> @http.Response
+
+pub fn json_api_ok(String, String, Array[(String, String)]) -> @http.Response
 
 pub fn json_column(String) -> @active_record.Column
 
@@ -312,9 +330,19 @@ pub fn mailer(String, String, String?, Array[@mailer.MailTemplate]) -> @mailer.M
 
 pub fn mailer_summary(@mailer.MailerDefinition) -> String
 
+pub fn masked_secret_summary(@secrets.SecretsConfig) -> String
+
 pub fn match_route(@http.RoutePattern, String) -> Array[(String, String)]?
 
 pub fn merge_params(Array[(String, String)], Array[(String, String)], Array[(String, String)]) -> @params.Parameters
+
+pub fn metric_value(@metrics.MetricsRegistry, String, Array[(String, String)]) -> Int
+
+pub fn metrics_registry() -> @metrics.MetricsRegistry
+
+pub fn metrics_response(String) -> @http.Response
+
+pub fn metrics_summary(@metrics.MetricsRegistry) -> String
 
 pub fn middleware(String, String?, Array[@http.HttpMethod], Array[(String, String)], Array[(String, String)], @http.Response?) -> @middleware.Middleware
 
@@ -329,6 +357,8 @@ pub fn migration_from_model(String, String, @active_record.ModelSchema) -> @migr
 pub fn migration_sql(@migration.Migration) -> Array[String]
 
 pub fn migration_up_sql(@migration.Migration) -> Array[String]
+
+pub fn missing_secrets(@secrets.SecretsConfig) -> Array[String]
 
 pub fn model(String, String, Array[@active_record.Column], Bool, Bool) -> @active_record.ModelSchema
 
@@ -392,6 +422,8 @@ pub fn rate_limit_summary(@production.RateLimitRule) -> String
 
 pub fn rate_limited(@production.RateLimitRule, Int) -> Bool
 
+pub fn readiness_response(Array[@production.HealthCheck]) -> @http.Response
+
 pub fn recognize(Array[@http.RouteSpec], @http.Request) -> @http.MatchedRoute?
 
 pub fn record(String, Array[(String, String)]) -> @active_record.Record
@@ -429,6 +461,8 @@ pub fn render_page(@view.PageModule, Array[(String, String)], Array[(String, Str
 pub fn render_page_manifest_entry(@view.PageModule) -> String
 
 pub fn render_page_step(String) -> @controller.ActionStep
+
+pub fn render_prometheus(@metrics.MetricsRegistry) -> String
 
 pub fn render_response_body(@http.ResponseBody) -> String
 
@@ -474,6 +508,14 @@ pub fn schema_sql(Array[@migration.Migration]) -> Array[String]
 
 pub fn scope_routes(String, String, Array[@http.RouteSpec]) -> Array[@http.RouteSpec]
 
+pub fn secret_value(@secrets.SecretsConfig, String) -> String?
+
+pub fn secret_var(String, String?, Bool, Bool) -> @secrets.SecretVar
+
+pub fn secrets_config(Array[@secrets.SecretVar]) -> @secrets.SecretsConfig
+
+pub fn secrets_valid(@secrets.SecretsConfig) -> Bool
+
 pub fn seed_plan(String, Array[@active_record.Record], Array[@job.EnqueuedJob]) -> @fixture.SeedPlan
 
 pub fn seed_summary(@fixture.SeedPlan) -> String
@@ -487,6 +529,8 @@ pub fn server_component(String, String, Array[(String, String)]) -> @view.VaporC
 pub fn server_contract(Array[@view.PropContract], Bool) -> @view.ComponentContract
 
 pub fn session_cookie(@auth.AuthConfig, @auth.Session, Bool) -> @auth.AuthCookie
+
+pub fn set_metric(@metrics.MetricsRegistry, String, Array[(String, String)], Int) -> @metrics.MetricsRegistry
 
 pub fn singularize(String) -> String
 
@@ -577,6 +621,8 @@ pub fn with_loader(@view.PageModule, @view.LoaderModule) -> @view.PageModule
 pub fn with_member_action(@http.ResourceOptions, String, @http.HttpMethod) -> @http.ResourceOptions
 
 pub fn with_metadata(@view.PageModule, String, String) -> @view.PageModule
+
+pub fn with_metric(@metrics.MetricsRegistry, @metrics.MetricSample) -> @metrics.MetricsRegistry
 
 pub fn with_only(@http.ResourceOptions, Array[String]) -> @http.ResourceOptions
 
@@ -687,6 +733,12 @@ pub using @active_record {type MemoryDatabase}
 
 pub using @active_record {type MemoryTable}
 
+pub using @metrics {type MetricKind}
+
+pub using @metrics {type MetricSample}
+
+pub using @metrics {type MetricsRegistry}
+
 pub using @middleware {type Middleware}
 
 pub using @migration {type Migration}
@@ -740,6 +792,10 @@ pub using @active_record {type SaveOutcome}
 pub using @generator {type ScaffoldField}
 
 pub using @generator {type ScaffoldPlan}
+
+pub using @secrets {type SecretVar}
+
+pub using @secrets {type SecretsConfig}
 
 pub using @fixture {type SeedPlan}
 

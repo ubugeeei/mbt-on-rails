@@ -1,0 +1,47 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "ubugeeei/mbt_on_rails/src/metrics"
+
+// Values
+pub fn counter(String, Array[(String, String)], Int) -> MetricSample
+
+pub fn gauge(String, Array[(String, String)], Int) -> MetricSample
+
+pub fn increment_metric(MetricsRegistry, String, Array[(String, String)], Int) -> MetricsRegistry
+
+pub fn metric_value(MetricsRegistry, String, Array[(String, String)]) -> Int
+
+pub fn metrics_registry() -> MetricsRegistry
+
+pub fn metrics_summary(MetricsRegistry) -> String
+
+pub fn render_prometheus(MetricsRegistry) -> String
+
+pub fn set_metric(MetricsRegistry, String, Array[(String, String)], Int) -> MetricsRegistry
+
+pub fn with_metric(MetricsRegistry, MetricSample) -> MetricsRegistry
+
+// Errors
+
+// Types and methods
+pub enum MetricKind {
+  CounterMetric
+  GaugeMetric
+}
+pub impl Eq for MetricKind
+pub impl Show for MetricKind
+
+pub struct MetricSample {
+  name : String
+  kind : MetricKind
+  labels : Array[(String, String)]
+  value : Int
+}
+
+pub struct MetricsRegistry {
+  samples : Array[MetricSample]
+}
+
+// Type aliases
+
+// Traits
+
