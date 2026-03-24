@@ -260,3 +260,32 @@ test "metrics secrets and production http helpers are production friendly" {
     render_response_body(api_error.body).contains("\"code\": \"not_found\""),
   )
 }
+
+///|
+test "deployment helpers describe production process topology" {
+  let processes = [
+    web_process("web", "moon run cmd/main", 2, ["PORT", "DATABASE_URL"]),
+    worker_process(
+      "worker",
+      "moon run examples/rails_ops",
+      4,
+      ["default", "mailers"],
+      ["DATABASE_URL", "REDIS_URL"],
+    ),
+    cable_process("cable", "moon run cmd/main", 1, ["REDIS_URL"]),
+    scheduler_process("scheduler", "moon run examples/production_stack", [
+      "DATABASE_URL",
+    ]),
+    release_process("release", "moon run examples/orm_migration", [
+      "DATABASE_URL",
+    ]),
+  ]
+  let tasks = [
+    release_task("db:migrate", "moon run examples/orm_migration", true),
+    release_task("db:seed", "moon run examples/rails_ops", false),
+  ]
+
+  assert_true(process_summary(processes).contains("worker role=worker"))
+  assert_true(env_keys_summary(processes[0]).contains("DATABASE_URL"))
+  assert_true(release_summary(tasks).contains("db:migrate"))
+}

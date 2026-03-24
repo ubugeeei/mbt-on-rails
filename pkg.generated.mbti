@@ -17,6 +17,7 @@ import {
   "ubugeeei/mbt_on_rails/src/middleware",
   "ubugeeei/mbt_on_rails/src/migration",
   "ubugeeei/mbt_on_rails/src/params",
+  "ubugeeei/mbt_on_rails/src/process",
   "ubugeeei/mbt_on_rails/src/production",
   "ubugeeei/mbt_on_rails/src/secrets",
   "ubugeeei/mbt_on_rails/src/turbo",
@@ -89,6 +90,8 @@ pub fn build_path(@http.RouteSpec, Array[(String, String)]) -> String
 pub fn cable_broadcast(@cable.CableChannel, String, String) -> @cable.CableBroadcast
 
 pub fn cable_channel(String, String, Array[String]) -> @cable.CableChannel
+
+pub fn cable_process(String, String, Int, Array[String]) -> @process.ProcessDefinition
 
 pub fn cable_summary(Array[@cable.CableChannel]) -> String
 
@@ -195,6 +198,8 @@ pub fn enqueue_now(@job.JobQueue, @job.JobDefinition, Array[(String, String)]) -
 pub fn enqueued_job(@job.JobDefinition, Array[(String, String)], String, Int) -> @job.EnqueuedJob
 
 pub fn entries_to_json(Array[(String, String)]) -> String
+
+pub fn env_keys_summary(@process.ProcessDefinition) -> String
 
 pub fn escape_html(String) -> String
 
@@ -414,6 +419,10 @@ pub fn preload(@active_record.Relation, String) -> @active_record.Relation
 
 pub fn prepend_stream(String, String) -> @turbo.TurboStream
 
+pub fn process_definition(String, @process.ProcessRole, String, Int, Array[String], Array[String]) -> @process.ProcessDefinition
+
+pub fn process_summary(Array[@process.ProcessDefinition]) -> String
+
 pub fn prop_contract(String, String, Bool, String) -> @view.PropContract
 
 pub fn rate_limit_rule(String, String, Int, Int) -> @production.RateLimitRule
@@ -439,6 +448,12 @@ pub fn references_column(String, String) -> @active_record.Column
 pub fn relation_for(@active_record.ModelSchema) -> @active_record.Relation
 
 pub fn relation_to_sql(@active_record.Relation) -> String
+
+pub fn release_process(String, String, Array[String]) -> @process.ProcessDefinition
+
+pub fn release_summary(Array[@process.ReleaseTask]) -> String
+
+pub fn release_task(String, String, Bool) -> @process.ReleaseTask
 
 pub fn remove_column_step(String, String) -> @migration.MigrationStep
 
@@ -501,6 +516,8 @@ pub fn scaffold_field(String, @active_record.Column) -> @generator.ScaffoldField
 pub fn scaffold_resource(String, Array[@generator.ScaffoldField]) -> @generator.ScaffoldPlan
 
 pub fn scaffold_summary(@generator.ScaffoldPlan) -> String
+
+pub fn scheduler_process(String, String, Array[String]) -> @process.ProcessDefinition
 
 pub fn schema_dump(Array[@active_record.ModelSchema]) -> String
 
@@ -574,6 +591,8 @@ pub fn validates_uniqueness(String) -> @active_record.Validation
 
 pub fn verify_password(String, String, String) -> Bool
 
+pub fn web_process(String, String, Int, Array[String]) -> @process.ProcessDefinition
+
 pub fn where_eq(@active_record.Relation, String, String) -> @active_record.Relation
 
 pub fn where_gt(@active_record.Relation, String, String) -> @active_record.Relation
@@ -633,6 +652,8 @@ pub fn with_request_header(@middleware.Middleware, String, String) -> @middlewar
 pub fn with_response_header(@middleware.Middleware, String, String) -> @middleware.Middleware
 
 pub fn with_validation(@active_record.ModelSchema, @active_record.Validation) -> @active_record.ModelSchema
+
+pub fn worker_process(String, String, Int, Array[String], Array[String]) -> @process.ProcessDefinition
 
 // Errors
 
@@ -761,6 +782,10 @@ pub using @auth {type PolicyRule}
 
 pub using @active_record {type Predicate}
 
+pub using @process {type ProcessDefinition}
+
+pub using @process {type ProcessRole}
+
 pub using @view {type PropContract}
 
 pub using @production {type RateLimitRule}
@@ -768,6 +793,8 @@ pub using @production {type RateLimitRule}
 pub using @active_record {type Record}
 
 pub using @active_record {type Relation}
+
+pub using @process {type ReleaseTask}
 
 pub using @view {type RenderedPage}
 

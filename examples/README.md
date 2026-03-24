@@ -11,6 +11,7 @@ moon run examples/auth_policy
 moon run examples/rails_ops
 moon run examples/production_stack
 moon run examples/production_api
+moon run examples/process_topology
 ```
 
 ## Included examples
@@ -30,6 +31,8 @@ moon run examples/production_api
   - Shows deployment config, health/readiness JSON, rate limiting, and structured logging helpers.
 - `examples/production_api`
   - Shows an API-only stack with versioned routes, health/readiness endpoints, Prometheus metrics, JSON API payloads, and secret summaries.
+- `examples/process_topology`
+  - Shows a Procfile-like deployment topology with web, worker, cable, scheduler, and release tasks.
 
 ## Suggested reading order
 
@@ -39,4 +42,5 @@ moon run examples/production_api
 4. Read `examples/rails_ops/main.mbt` to understand the Rails-style operational helpers.
 5. Read `examples/production_stack/main.mbt` for production-facing runtime helpers.
 6. Read `examples/production_api/main.mbt` for API-only production helpers.
-7. Browse `examples/demo_blog/views/` to see the view and mailer assets used by `demo_blog_app()`.
+7. Read `examples/process_topology/main.mbt` for deployment process planning.
+8. Browse `examples/demo_blog/views/` to see the view and mailer assets used by `demo_blog_app()`.

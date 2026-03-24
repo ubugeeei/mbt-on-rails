@@ -1,0 +1,56 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "ubugeeei/mbt_on_rails/src/process"
+
+// Values
+pub fn cable_process(String, String, Int, Array[String]) -> ProcessDefinition
+
+pub fn env_keys_summary(ProcessDefinition) -> String
+
+pub fn process_definition(String, ProcessRole, String, Int, Array[String], Array[String]) -> ProcessDefinition
+
+pub fn process_summary(Array[ProcessDefinition]) -> String
+
+pub fn release_process(String, String, Array[String]) -> ProcessDefinition
+
+pub fn release_summary(Array[ReleaseTask]) -> String
+
+pub fn release_task(String, String, Bool) -> ReleaseTask
+
+pub fn scheduler_process(String, String, Array[String]) -> ProcessDefinition
+
+pub fn web_process(String, String, Int, Array[String]) -> ProcessDefinition
+
+pub fn worker_process(String, String, Int, Array[String], Array[String]) -> ProcessDefinition
+
+// Errors
+
+// Types and methods
+pub struct ProcessDefinition {
+  name : String
+  role : ProcessRole
+  command : String
+  concurrency : Int
+  queues : Array[String]
+  env_keys : Array[String]
+}
+
+pub enum ProcessRole {
+  WebRole
+  WorkerRole
+  CableRole
+  SchedulerRole
+  ReleaseRole
+}
+pub impl Eq for ProcessRole
+pub impl Show for ProcessRole
+
+pub struct ReleaseTask {
+  name : String
+  command : String
+  required : Bool
+}
+
+// Type aliases
+
+// Traits
+
