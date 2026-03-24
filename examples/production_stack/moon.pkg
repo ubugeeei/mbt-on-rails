@@ -1,0 +1,7 @@
+import {
+  "ubugeeei/mbt_on_rails" @mbor,
+}
+
+options(
+  "is-main": true,
+)

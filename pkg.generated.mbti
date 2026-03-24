@@ -16,6 +16,7 @@ import {
   "ubugeeei/mbt_on_rails/src/middleware",
   "ubugeeei/mbt_on_rails/src/migration",
   "ubugeeei/mbt_on_rails/src/params",
+  "ubugeeei/mbt_on_rails/src/production",
   "ubugeeei/mbt_on_rails/src/turbo",
   "ubugeeei/mbt_on_rails/src/view",
 }
@@ -117,6 +118,8 @@ pub fn column_definition_sql(@active_record.Column) -> String
 
 pub fn compose_mail(@mailer.MailerDefinition, String, Array[String], Array[(String, String)]) -> @mailer.MailDelivery?
 
+pub fn config_summary(@production.DeploymentConfig) -> String
+
 pub fn controller(String, String?, String, Array[@controller.BeforeAction], Array[@controller.ActionDefinition]) -> @controller.ControllerDefinition
 
 pub fn controller_action(@controller.ControllerDefinition, String) -> @controller.ActionDefinition?
@@ -137,7 +140,15 @@ pub fn default_assets() -> @view.AssetManifest
 
 pub fn default_auth_config() -> @auth.AuthConfig
 
+pub fn default_development_config() -> @production.DeploymentConfig
+
+pub fn default_production_config() -> @production.DeploymentConfig
+
 pub fn default_resource_options(String, String?) -> @http.ResourceOptions
+
+pub fn default_staging_config() -> @production.DeploymentConfig
+
+pub fn default_test_config() -> @production.DeploymentConfig
 
 pub fn defer_on_server() -> @view.HydrationMode
 
@@ -148,6 +159,8 @@ pub fn deliver_mail_step(String) -> @controller.ActionStep
 pub fn delivery_job(@mailer.MailDelivery, String, String?) -> @job.EnqueuedJob
 
 pub fn demo_blog_app() -> @app.MbtOnRailsApp
+
+pub fn deployment_config(@production.Environment, String, Int, Bool, Bool, String?, String, String) -> @production.DeploymentConfig
 
 pub fn digest_password(String, String) -> String
 
@@ -206,6 +219,8 @@ pub fn has_many(String, String, String) -> @active_record.Association
 pub fn has_one(String, String, String) -> @active_record.Association
 
 pub fn hash_string(String) -> String
+
+pub fn health_check(String, Bool, String) -> @production.HealthCheck
 
 pub fn html_format() -> @controller.ResponseFormat
 
@@ -271,6 +286,8 @@ pub fn json_column(String) -> @active_record.Column
 
 pub fn json_format() -> @controller.ResponseFormat
 
+pub fn json_log(@production.LogEvent) -> String
+
 pub fn json_string(String) -> String
 
 pub fn layout_module(String, String, @view.VaporComponentRef) -> @view.LayoutModule
@@ -286,6 +303,8 @@ pub fn load_fixtures(@active_record.MemoryDatabase, Array[@fixture.FixtureSet]) 
 pub fn load_member_step(String) -> @controller.ActionStep
 
 pub fn loader_module(String, String, Int?, Array[String]) -> @view.LoaderModule
+
+pub fn log_event(String, String, String?, Array[(String, String)]) -> @production.LogEvent
 
 pub fn mail_template(String, String, String, String?) -> @mailer.MailTemplate
 
@@ -367,6 +386,12 @@ pub fn prepend_stream(String, String) -> @turbo.TurboStream
 
 pub fn prop_contract(String, String, Bool, String) -> @view.PropContract
 
+pub fn rate_limit_rule(String, String, Int, Int) -> @production.RateLimitRule
+
+pub fn rate_limit_summary(@production.RateLimitRule) -> String
+
+pub fn rate_limited(@production.RateLimitRule, Int) -> Bool
+
 pub fn recognize(Array[@http.RouteSpec], @http.Request) -> @http.MatchedRoute?
 
 pub fn record(String, Array[(String, String)]) -> @active_record.Record
@@ -396,6 +421,8 @@ pub fn render_bundle_plan(@view.PageModule) -> String
 pub fn render_component_manifest(@view.PageModule) -> String
 
 pub fn render_form_manifest(Array[@view.FormBinding]) -> String
+
+pub fn render_health_json(Array[@production.HealthCheck]) -> String
 
 pub fn render_page(@view.PageModule, Array[(String, String)], Array[(String, String)], Array[@view.ServerAction]) -> @view.RenderedPage
 
@@ -606,6 +633,8 @@ pub using @view {type ComponentContract}
 
 pub using @controller {type ControllerDefinition}
 
+pub using @production {type DeploymentConfig}
+
 pub using @job {type DrainedJobs}
 
 pub using @view {type DynamicMode}
@@ -614,6 +643,8 @@ pub using @auth {type EmailVerificationToken}
 
 pub using @job {type EnqueuedJob}
 
+pub using @production {type Environment}
+
 pub using @fixture {type FixtureRow}
 
 pub using @fixture {type FixtureSet}
@@ -621,6 +652,8 @@ pub using @fixture {type FixtureSet}
 pub using @view {type FormBinding}
 
 pub using @generator {type GeneratedArtifact}
+
+pub using @production {type HealthCheck}
 
 pub using @http {type HttpMethod}
 
@@ -637,6 +670,8 @@ pub using @view {type LayoutModule}
 pub using @active_record {type LifecycleHook}
 
 pub using @view {type LoaderModule}
+
+pub using @production {type LogEvent}
 
 pub using @mailer {type MailDelivery}
 
@@ -675,6 +710,8 @@ pub using @auth {type PolicyRule}
 pub using @active_record {type Predicate}
 
 pub using @view {type PropContract}
+
+pub using @production {type RateLimitRule}
 
 pub using @active_record {type Record}
 

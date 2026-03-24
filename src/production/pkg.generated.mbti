@@ -1,0 +1,77 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "ubugeeei/mbt_on_rails/src/production"
+
+// Values
+pub fn config_summary(DeploymentConfig) -> String
+
+pub fn default_development_config() -> DeploymentConfig
+
+pub fn default_production_config() -> DeploymentConfig
+
+pub fn default_staging_config() -> DeploymentConfig
+
+pub fn default_test_config() -> DeploymentConfig
+
+pub fn deployment_config(Environment, String, Int, Bool, Bool, String?, String, String) -> DeploymentConfig
+
+pub fn health_check(String, Bool, String) -> HealthCheck
+
+pub fn json_log(LogEvent) -> String
+
+pub fn log_event(String, String, String?, Array[(String, String)]) -> LogEvent
+
+pub fn rate_limit_rule(String, String, Int, Int) -> RateLimitRule
+
+pub fn rate_limit_summary(RateLimitRule) -> String
+
+pub fn rate_limited(RateLimitRule, Int) -> Bool
+
+pub fn render_health_json(Array[HealthCheck]) -> String
+
+// Errors
+
+// Types and methods
+pub struct DeploymentConfig {
+  environment : Environment
+  host : String
+  port : Int
+  force_ssl : Bool
+  trust_proxy : Bool
+  asset_host : String?
+  health_path : String
+  ready_path : String
+}
+
+pub enum Environment {
+  Development
+  Test
+  Staging
+  Production
+}
+pub impl Eq for Environment
+pub impl Show for Environment
+
+pub struct HealthCheck {
+  name : String
+  ok : Bool
+  detail : String
+}
+
+pub struct LogEvent {
+  level : String
+  message : String
+  request_id : String?
+  metadata : Array[(String, String)]
+}
+
+pub struct RateLimitRule {
+  name : String
+  path_prefix : String
+  limit : Int
+  window_seconds : Int
+}
+
+// Type aliases
+
+// Traits
+

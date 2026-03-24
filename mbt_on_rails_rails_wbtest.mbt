@@ -188,3 +188,23 @@ test "middleware fixtures seeds and turbo streams behave like rails runtime help
   assert_true(cable_summary([channel]).contains("PostsChannel"))
   assert_true(broadcast_summary(broadcast).contains("text/vnd.turbo-stream"))
 }
+
+///|
+test "production helpers render config health and logs" {
+  let config = default_production_config()
+  let checks = [
+    health_check("database", true, "ok"),
+    health_check("redis", false, "timeout"),
+  ]
+  let rule = rate_limit_rule("api", "/api", 60, 60)
+  let event = log_event("info", "request completed", Some("req_1"), [
+    ("path", "/api/posts"),
+    ("status", "200"),
+  ])
+
+  assert_true(config_summary(config).contains("production"))
+  assert_true(render_health_json(checks).contains("\"status\": \"degraded\""))
+  assert_true(rate_limit_summary(rule).contains("60/60s"))
+  assert_true(rate_limited(rule, 61))
+  assert_true(json_log(event).contains("\"request_id\": \"req_1\""))
+}

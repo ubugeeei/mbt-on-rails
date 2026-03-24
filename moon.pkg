@@ -13,6 +13,7 @@ import {
   "ubugeeei/mbt_on_rails/src/middleware" @middleware,
   "ubugeeei/mbt_on_rails/src/migration" @migration,
   "ubugeeei/mbt_on_rails/src/params" @params,
+  "ubugeeei/mbt_on_rails/src/production" @production,
   "ubugeeei/mbt_on_rails/src/support" @support,
   "ubugeeei/mbt_on_rails/src/turbo" @turbo,
   "ubugeeei/mbt_on_rails/src/view" @view,

@@ -9,6 +9,7 @@ moon run examples/resource_app
 moon run examples/orm_migration
 moon run examples/auth_policy
 moon run examples/rails_ops
+moon run examples/production_stack
 ```
 
 ## Included examples
@@ -24,6 +25,8 @@ moon run examples/rails_ops
   - Shows identities, sessions, CSRF validation, cookies, direct auth requirements, and policy-rule checks.
 - `examples/rails_ops`
   - Shows Strong Parameters, Action Cable, middleware, fixtures/seeds, Active Job, Action Mailer, Turbo Stream, and cache store helpers working together.
+- `examples/production_stack`
+  - Shows deployment config, health/readiness JSON, rate limiting, and structured logging helpers.
 
 ## Suggested reading order
 
@@ -31,4 +34,5 @@ moon run examples/rails_ops
 2. Read `examples/orm_migration/main.mbt` to understand the data layer.
 3. Read `examples/auth_policy/main.mbt` to understand the auth primitives.
 4. Read `examples/rails_ops/main.mbt` to understand the Rails-style operational helpers.
-5. Browse `examples/demo_blog/views/` to see the view and mailer assets used by `demo_blog_app()`.
+5. Read `examples/production_stack/main.mbt` for production-facing runtime helpers.
+6. Browse `examples/demo_blog/views/` to see the view and mailer assets used by `demo_blog_app()`.
