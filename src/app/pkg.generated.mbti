@@ -4,6 +4,7 @@ package "ubugeeei/mbt_on_rails/src/app"
 import {
   "ubugeeei/mbt_on_rails/src/active_record",
   "ubugeeei/mbt_on_rails/src/auth",
+  "ubugeeei/mbt_on_rails/src/cable",
   "ubugeeei/mbt_on_rails/src/cache",
   "ubugeeei/mbt_on_rails/src/controller",
   "ubugeeei/mbt_on_rails/src/fixture",
@@ -17,13 +18,15 @@ import {
 }
 
 // Values
-pub fn app(String, @auth.AuthConfig, Array[@active_record.ModelSchema], Array[@migration.Migration], Array[@middleware.Middleware], Array[@fixture.FixtureSet], Array[@fixture.SeedPlan], Array[@job.JobQueue], Array[@mailer.MailerDefinition], Array[@cache.CacheStore], Array[@controller.ControllerDefinition], Array[@http.RouteSpec], Array[@view.PageModule], Array[@view.ServerAction], Array[@generator.ScaffoldPlan]) -> MbtOnRailsApp
+pub fn app(String, @auth.AuthConfig, Array[@active_record.ModelSchema], Array[@migration.Migration], Array[@middleware.Middleware], Array[@fixture.FixtureSet], Array[@fixture.SeedPlan], Array[@cable.CableChannel], Array[@job.JobQueue], Array[@mailer.MailerDefinition], Array[@cache.CacheStore], Array[@controller.ControllerDefinition], Array[@http.RouteSpec], Array[@view.PageModule], Array[@view.ServerAction], Array[@generator.ScaffoldPlan]) -> MbtOnRailsApp
 
 pub fn demo_application_layout() -> @view.LayoutModule
 
 pub fn demo_application_layout_component() -> @view.VaporComponentRef
 
 pub fn demo_blog_app() -> MbtOnRailsApp
+
+pub fn demo_cable_channels() -> Array[@cable.CableChannel]
 
 pub fn demo_caches() -> Array[@cache.CacheStore]
 
@@ -88,6 +91,7 @@ pub struct MbtOnRailsApp {
   middlewares : Array[@middleware.Middleware]
   fixtures : Array[@fixture.FixtureSet]
   seeds : Array[@fixture.SeedPlan]
+  cable_channels : Array[@cable.CableChannel]
   job_queues : Array[@job.JobQueue]
   mailers : Array[@mailer.MailerDefinition]
   caches : Array[@cache.CacheStore]
@@ -97,6 +101,7 @@ pub struct MbtOnRailsApp {
   server_actions : Array[@view.ServerAction]
   scaffolds : Array[@generator.ScaffoldPlan]
 }
+pub fn MbtOnRailsApp::cable_table(Self) -> String
 pub fn MbtOnRailsApp::cache_table(Self) -> String
 pub fn MbtOnRailsApp::controller_table(Self) -> String
 pub fn MbtOnRailsApp::example_html(Self, String) -> String?

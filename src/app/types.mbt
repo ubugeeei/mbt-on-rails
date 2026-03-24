@@ -8,6 +8,7 @@ pub struct MbtOnRailsApp {
   middlewares : Array[@middleware.Middleware]
   fixtures : Array[@fixture.FixtureSet]
   seeds : Array[@fixture.SeedPlan]
+  cable_channels : Array[@cable.CableChannel]
   job_queues : Array[@job.JobQueue]
   mailers : Array[@mailer.MailerDefinition]
   caches : Array[@cache.CacheStore]
@@ -28,6 +29,7 @@ pub fn app(
   middlewares : Array[@middleware.Middleware],
   fixtures : Array[@fixture.FixtureSet],
   seeds : Array[@fixture.SeedPlan],
+  cable_channels : Array[@cable.CableChannel],
   job_queues : Array[@job.JobQueue],
   mailers : Array[@mailer.MailerDefinition],
   caches : Array[@cache.CacheStore],
@@ -45,6 +47,7 @@ pub fn app(
     middlewares,
     fixtures,
     seeds,
+    cable_channels,
     job_queues,
     mailers,
     caches,

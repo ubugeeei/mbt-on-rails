@@ -13,6 +13,19 @@ fn print_params_example() -> Unit {
 }
 
 ///|
+/// Prints an Action Cable-style channel and broadcast example.
+fn print_cable_example() -> Unit {
+  let channel = @mbor.cable_channel("PostsChannel", "posts", ["post_id"])
+  let broadcast = @mbor.broadcast_turbo(channel, [
+    @mbor.append_stream("posts", "<li>Broadcasted</li>"),
+  ])
+  println("Cable")
+  println(@mbor.cable_summary([channel]))
+  println(@mbor.broadcast_summary(broadcast))
+  println("")
+}
+
+///|
 /// Prints a Rack-style middleware example.
 fn print_middleware_example() -> Unit {
   let stack = [
@@ -132,6 +145,7 @@ fn main {
   println("=================")
   println("")
   print_params_example()
+  print_cable_example()
   print_middleware_example()
   print_fixture_example()
   print_job_and_mailer_example()

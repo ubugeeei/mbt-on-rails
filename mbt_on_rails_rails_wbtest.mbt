@@ -125,6 +125,7 @@ test "component contracts surface server client boundaries in manifests" {
   )
 
   let demo = demo_blog_app()
+  assert_true(demo.cable_table().contains("PostsChannel"))
   assert_true(demo.middleware_table().contains("security_headers"))
   assert_true(demo.fixture_table().contains("fixtures users"))
   assert_true(demo.seed_table().contains("seed bootstrap"))
@@ -179,4 +180,11 @@ test "middleware fixtures seeds and turbo streams behave like rails runtime help
   ])
   assert_true(render_response_body(turbo.body).contains("turbo-stream"))
   assert_eq(turbo.headers[0].1, "text/vnd.turbo-stream.html; charset=utf-8")
+
+  let channel = cable_channel("PostsChannel", "posts", ["post_id"])
+  let broadcast = broadcast_turbo(channel, [
+    append_stream("posts", "<li>Broadcast</li>"),
+  ])
+  assert_true(cable_summary([channel]).contains("PostsChannel"))
+  assert_true(broadcast_summary(broadcast).contains("text/vnd.turbo-stream"))
 }

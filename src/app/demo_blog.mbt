@@ -11,6 +11,7 @@ pub fn demo_blog_app() -> MbtOnRailsApp {
   let middlewares = demo_middlewares()
   let fixtures = demo_fixtures()
   let seeds = demo_seeds()
+  let cable_channels = demo_cable_channels()
   let job_queues = demo_job_queues()
   let mailers = demo_mailers()
   let caches = demo_caches()
@@ -31,6 +32,7 @@ pub fn demo_blog_app() -> MbtOnRailsApp {
     middlewares,
     fixtures,
     seeds,
+    cable_channels,
     job_queues,
     mailers,
     caches,

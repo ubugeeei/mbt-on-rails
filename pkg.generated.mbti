@@ -5,6 +5,7 @@ import {
   "ubugeeei/mbt_on_rails/src/active_record",
   "ubugeeei/mbt_on_rails/src/app",
   "ubugeeei/mbt_on_rails/src/auth",
+  "ubugeeei/mbt_on_rails/src/cable",
   "ubugeeei/mbt_on_rails/src/cache",
   "ubugeeei/mbt_on_rails/src/controller",
   "ubugeeei/mbt_on_rails/src/fixture",
@@ -36,7 +37,7 @@ pub fn all_http_methods() -> Array[@http.HttpMethod]
 
 pub fn allowed(@auth.Identity?, @auth.PolicyRule, String?) -> Bool
 
-pub fn app(String, @auth.AuthConfig, Array[@active_record.ModelSchema], Array[@migration.Migration], Array[@middleware.Middleware], Array[@fixture.FixtureSet], Array[@fixture.SeedPlan], Array[@job.JobQueue], Array[@mailer.MailerDefinition], Array[@cache.CacheStore], Array[@controller.ControllerDefinition], Array[@http.RouteSpec], Array[@view.PageModule], Array[@view.ServerAction], Array[@generator.ScaffoldPlan]) -> @app.MbtOnRailsApp
+pub fn app(String, @auth.AuthConfig, Array[@active_record.ModelSchema], Array[@migration.Migration], Array[@middleware.Middleware], Array[@fixture.FixtureSet], Array[@fixture.SeedPlan], Array[@cable.CableChannel], Array[@job.JobQueue], Array[@mailer.MailerDefinition], Array[@cache.CacheStore], Array[@controller.ControllerDefinition], Array[@http.RouteSpec], Array[@view.PageModule], Array[@view.ServerAction], Array[@generator.ScaffoldPlan]) -> @app.MbtOnRailsApp
 
 pub fn append_entries(Array[(String, String)], Array[(String, String)]) -> Array[(String, String)]
 
@@ -76,7 +77,17 @@ pub fn belongs_to(String, String, String) -> @active_record.Association
 
 pub fn boolean_column(String) -> @active_record.Column
 
+pub fn broadcast_summary(@cable.CableBroadcast) -> String
+
+pub fn broadcast_turbo(@cable.CableChannel, Array[@turbo.TurboStream]) -> @cable.CableBroadcast
+
 pub fn build_path(@http.RouteSpec, Array[(String, String)]) -> String
+
+pub fn cable_broadcast(@cable.CableChannel, String, String) -> @cable.CableBroadcast
+
+pub fn cable_channel(String, String, Array[String]) -> @cable.CableChannel
+
+pub fn cable_summary(Array[@cable.CableChannel]) -> String
 
 pub fn cache_delete(@cache.CacheStore, String) -> @cache.CacheStore
 
@@ -574,6 +585,10 @@ pub using @auth {type AuthRequirement}
 pub using @controller {type BeforeAction}
 
 pub using @view {type BoundaryKind}
+
+pub using @cable {type CableBroadcast}
+
+pub using @cable {type CableChannel}
 
 pub using @cache {type CacheEntry}
 

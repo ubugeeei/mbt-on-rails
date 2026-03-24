@@ -1,0 +1,38 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "ubugeeei/mbt_on_rails/src/cable"
+
+import {
+  "ubugeeei/mbt_on_rails/src/turbo",
+}
+
+// Values
+pub fn broadcast_summary(CableBroadcast) -> String
+
+pub fn broadcast_turbo(CableChannel, Array[@turbo.TurboStream]) -> CableBroadcast
+
+pub fn cable_broadcast(CableChannel, String, String) -> CableBroadcast
+
+pub fn cable_channel(String, String, Array[String]) -> CableChannel
+
+pub fn cable_summary(Array[CableChannel]) -> String
+
+// Errors
+
+// Types and methods
+pub struct CableBroadcast {
+  channel_name : String
+  stream_name : String
+  payload : String
+  content_type : String
+}
+
+pub struct CableChannel {
+  name : String
+  stream_name : String
+  topic_fields : Array[String]
+}
+
+// Type aliases
+
+// Traits
+

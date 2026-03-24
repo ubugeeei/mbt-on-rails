@@ -37,6 +37,7 @@ All implementation code now lives under `src/`, with the repository root exposin
 - Rails operational primitives
   - Strong Parameters-style filtering
   - Active Job-style queues, retries, and drain helpers
+  - Action Cable-style channel and broadcast descriptors
   - Action Mailer-style templates, composed deliveries, and queue integration
   - cache store helpers with namespaced keys, tags, and read-through fetch
   - fixture loading and `db:seed` style plans
@@ -78,6 +79,7 @@ That keeps the current codebase buildable while preserving the intended interfac
 - [`src/params/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/params/types.mbt), [`src/params/filtering.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/params/filtering.mbt): Strong Parameters-style filtering
 - [`src/middleware/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/middleware/types.mbt), [`src/middleware/runtime.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/middleware/runtime.mbt): Rack-style middleware layers and runtime application
 - [`src/fixture/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/fixture/types.mbt), [`src/fixture/load.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/fixture/load.mbt): fixtures and seed plans
+- [`src/cable/channel.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/cable/channel.mbt), [`src/cable/summary.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/cable/summary.mbt): Action Cable-style channels and Turbo Stream broadcasts
 - [`src/job/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/job/types.mbt), [`src/job/queue.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/job/queue.mbt): Active Job-style queueing and retries
 - [`src/mailer/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/mailer/types.mbt), [`src/mailer/delivery.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/mailer/delivery.mbt): Action Mailer-style templates and deliveries
 - [`src/cache/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/cache/types.mbt), [`src/cache/store.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/cache/store.mbt): cache stores, tags, and read-through fetch helpers

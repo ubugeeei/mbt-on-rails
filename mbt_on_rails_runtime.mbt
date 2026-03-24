@@ -2,6 +2,17 @@
 /// Runtime and delivery helpers that complement the main facade.
 
 ///|
+pub using @cable {
+  type CableBroadcast,
+  type CableChannel,
+  broadcast_summary,
+  broadcast_turbo,
+  cable_broadcast,
+  cable_channel,
+  cable_summary,
+}
+
+///|
 pub using @middleware {
   type Middleware,
   apply_request_middleware,

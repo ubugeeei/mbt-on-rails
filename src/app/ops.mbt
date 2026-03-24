@@ -1,4 +1,10 @@
 ///|
+/// Renders the configured cable channels in a CLI-friendly format.
+pub fn MbtOnRailsApp::cable_table(self : MbtOnRailsApp) -> String {
+  @cable.cable_summary(self.cable_channels)
+}
+
+///|
 /// Renders the configured middleware stack in a CLI-friendly format.
 pub fn MbtOnRailsApp::middleware_table(self : MbtOnRailsApp) -> String {
   @middleware.middleware_summary(self.middlewares)

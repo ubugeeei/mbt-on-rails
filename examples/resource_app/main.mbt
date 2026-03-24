@@ -205,6 +205,7 @@ fn note_app() -> @mbor.MbtOnRailsApp {
     [],
     [],
     [],
+    [],
     [@mbor.job_queue("default")],
     [],
     [@mbor.cache_store("notes")],

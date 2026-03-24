@@ -1,6 +1,7 @@
 import {
   "ubugeeei/mbt_on_rails/src/active_record" @orm,
   "ubugeeei/mbt_on_rails/src/auth" @auth,
+  "ubugeeei/mbt_on_rails/src/cable" @cable,
   "ubugeeei/mbt_on_rails/src/cache" @cache,
   "ubugeeei/mbt_on_rails/src/controller" @controller,
   "ubugeeei/mbt_on_rails/src/fixture" @fixture,
