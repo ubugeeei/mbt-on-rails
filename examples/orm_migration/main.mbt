@@ -26,7 +26,7 @@ fn print_relation_example(model : @mbor.ModelSchema) -> Unit {
         "%MoonBit%",
       ),
       "created_at",
-      true,
+      descending=true,
     ),
     5,
   )
@@ -36,18 +36,43 @@ fn print_relation_example(model : @mbor.ModelSchema) -> Unit {
 }
 
 ///|
+/// Builds a phased, deployment-safe migration example.
+fn publish_backfill_migration() -> @mbor.Migration {
+  @mbor.migration_plan("20260326030101", "backfill_post_published")
+  .add_column("posts", @mbor.nullable(@mbor.boolean_column("published")))
+  .change_default("posts", "published", None, Some("false"))
+  .change_null("posts", "published", false, backfill_value=Some("false"))
+  .add_index_concurrently("posts", "published", false)
+}
+
+///|
 /// Prints migration up/down SQL for the model.
 fn print_migration_example(model : @mbor.ModelSchema) -> Unit {
-  let migration = @mbor.migration_from_model(
+  let create_posts = @mbor.migration_from_model(
     "20260323040201", "create_posts", model,
   )
-  println("Migration Up")
-  for statement in @mbor.migration_up_sql(migration) {
+  let phased = publish_backfill_migration()
+
+  println("Create Migration Up")
+  for statement in @mbor.migration_up_sql(create_posts) {
     println(statement)
   }
   println("")
-  println("Migration Down")
-  for statement in @mbor.migration_down_sql(migration) {
+  println("Create Migration Down")
+  for statement in @mbor.migration_down_sql(create_posts) {
+    println(statement)
+  }
+  println("")
+  println("Phased Migration Safety")
+  println(@mbor.migration_safety_summary(phased))
+  println("")
+  println("Phased Migration Up")
+  for statement in @mbor.migration_up_sql(phased) {
+    println(statement)
+  }
+  println("")
+  println("Phased Migration Down")
+  for statement in @mbor.migration_down_sql(phased) {
     println(statement)
   }
 }

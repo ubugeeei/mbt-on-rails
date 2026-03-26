@@ -136,7 +136,7 @@ pub fn where_raw(relation : Relation, sql : String) -> Relation {
 pub fn order_by(
   relation : Relation,
   column : String,
-  descending : Bool,
+  descending? : Bool = false,
 ) -> Relation {
   let orderings = @support.clone_array(relation.orderings)
   orderings.push({ column, descending })

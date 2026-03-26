@@ -79,7 +79,7 @@ pub fn nullable(Column) -> Column
 
 pub fn offset_by(Relation, Int) -> Relation
 
-pub fn order_by(Relation, String, Bool) -> Relation
+pub fn order_by(Relation, String, descending? : Bool) -> Relation
 
 pub fn preload(Relation, String) -> Relation
 
@@ -294,7 +294,7 @@ pub struct Relation {
 pub fn Relation::join_relation(Self, String) -> Self
 pub fn Relation::limit_to(Self, Int) -> Self
 pub fn Relation::offset_by(Self, Int) -> Self
-pub fn Relation::order_by(Self, String, Bool) -> Self
+pub fn Relation::order_by(Self, String, descending? : Bool) -> Self
 pub fn Relation::preload(Self, String) -> Self
 pub fn Relation::select_columns(Self, Array[String]) -> Self
 pub fn Relation::where_eq(Self, String, String) -> Self

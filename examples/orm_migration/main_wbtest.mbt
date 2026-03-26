@@ -13,7 +13,7 @@ test "orm migration example builders keep relation migration and validation stab
         "%MoonBit%",
       ),
       "created_at",
-      true,
+      descending=true,
     ),
     5,
   )
@@ -32,6 +32,28 @@ test "orm migration example builders keep relation migration and validation stab
   assert_true(down_sql.contains("DROP INDEX idx_posts_slug"))
   assert_true(down_sql.contains("DROP INDEX idx_posts_author_id"))
   assert_eq(down_sql[down_sql.length() - 1], "DROP TABLE posts")
+
+  let phased = publish_backfill_migration()
+  let phased_up = @mbor.migration_up_sql(phased)
+  let phased_down = @mbor.migration_down_sql(phased)
+  assert_true(@mbor.migration_safe(phased))
+  assert_eq(@mbor.migration_risk_level(phased).to_string(), "Safe")
+  assert_true(
+    @mbor.migration_safety_summary(phased).contains(
+      "backfill_post_published [safe]",
+    ),
+  )
+  assert_true(
+    phased_up.contains(
+      "ALTER TABLE posts ALTER COLUMN published SET DEFAULT 'false'",
+    ),
+  )
+  assert_true(
+    phased_up.contains(
+      "UPDATE posts SET published = 'false' WHERE published IS NULL",
+    ),
+  )
+  assert_eq(phased_down[0], "DROP INDEX CONCURRENTLY idx_posts_published")
 
   let db = @mbor.insert_record(
     @mbor.empty_memory_database(),

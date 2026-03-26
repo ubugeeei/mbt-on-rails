@@ -149,7 +149,7 @@ pub fn Relation::where_raw(self : Relation, sql : String) -> Relation {
 pub fn Relation::order_by(
   self : Relation,
   column : String,
-  descending : Bool,
+  descending? : Bool = false,
 ) -> Relation {
   let orderings = @support.clone_array(self.orderings)
   orderings.push({ column, descending })

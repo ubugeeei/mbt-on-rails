@@ -8,7 +8,22 @@ import {
 // Values
 pub fn add_column_step(String, @active_record.Column) -> MigrationStep
 
+pub fn add_index_concurrently_step(String, String, Bool) -> MigrationStep
+
 pub fn add_index_step(String, String, Bool) -> MigrationStep
+
+#label_migration(column_name, allow_positional=true)
+#label_migration(table_name, allow_positional=true)
+#label_migration(target_table, allow_positional=true)
+pub fn add_reference_step(table_name~ : String, column_name~ : String, target_table~ : String, nullable? : Bool, unique? : Bool, default_value? : String?) -> MigrationStep
+
+pub fn add_timestamps_step(String, nullable? : Bool) -> MigrationStep
+
+pub fn analyze_migration(Migration) -> Array[MigrationSafetyIssue]
+
+pub fn change_default_step(String, String, String?, String?) -> MigrationStep
+
+pub fn change_null_step(String, String, Bool, backfill_value? : String?) -> MigrationStep
 
 pub fn create_table_step(@active_record.ModelSchema) -> MigrationStep
 
@@ -22,11 +37,27 @@ pub fn migration_down_sql(Migration) -> Array[String]
 
 pub fn migration_from_model(String, String, @active_record.ModelSchema) -> Migration
 
+pub fn migration_plan(String, String) -> Migration
+
+pub fn migration_risk_level(Migration) -> MigrationSafetyLevel
+
+pub fn migration_safe(Migration) -> Bool
+
+pub fn migration_safety_issue(Int, MigrationSafetyLevel, String, String, String) -> MigrationSafetyIssue
+
+pub fn migration_safety_summary(Migration) -> String
+
 pub fn migration_sql(Migration) -> Array[String]
 
 pub fn migration_up_sql(Migration) -> Array[String]
 
 pub fn remove_column_step(String, String) -> MigrationStep
+
+pub fn remove_index_concurrently_step(String, String, unique? : Bool) -> MigrationStep
+
+pub fn remove_index_step(String, String, unique? : Bool) -> MigrationStep
+
+pub fn rename_column_step(String, String, String) -> MigrationStep
 
 pub fn rename_table_step(String, String) -> MigrationStep
 
@@ -42,12 +73,53 @@ pub struct Migration {
   name : String
   steps : Array[MigrationStep]
 }
+pub fn Migration::add_column(Self, String, @active_record.Column) -> Self
+pub fn Migration::add_index(Self, String, String, Bool) -> Self
+pub fn Migration::add_index_concurrently(Self, String, String, Bool) -> Self
+pub fn Migration::add_reference(Self, String, String, String, nullable? : Bool, unique? : Bool, default_value? : String?) -> Self
+pub fn Migration::add_timestamps(Self, String, nullable? : Bool) -> Self
+pub fn Migration::change_default(Self, String, String, String?, String?) -> Self
+pub fn Migration::change_null(Self, String, String, Bool, backfill_value? : String?) -> Self
+pub fn Migration::create_table(Self, @active_record.ModelSchema) -> Self
+pub fn Migration::drop_table(Self, String) -> Self
+pub fn Migration::execute_sql(Self, String) -> Self
+pub fn Migration::remove_column(Self, String, String) -> Self
+pub fn Migration::remove_index(Self, String, String, unique? : Bool) -> Self
+pub fn Migration::remove_index_concurrently(Self, String, String, unique? : Bool) -> Self
+pub fn Migration::rename_column(Self, String, String, String) -> Self
+pub fn Migration::rename_table(Self, String, String) -> Self
+pub fn Migration::reversible(Self, String, String) -> Self
+pub fn Migration::with_step(Self, MigrationStep) -> Self
+
+pub struct MigrationSafetyIssue {
+  step_index : Int
+  level : MigrationSafetyLevel
+  title : String
+  detail : String
+  guidance : String
+}
+
+pub enum MigrationSafetyLevel {
+  Safe
+  Review
+  Dangerous
+}
+pub impl Eq for MigrationSafetyLevel
+pub impl Show for MigrationSafetyLevel
 
 pub enum MigrationStep {
   CreateTable(@active_record.ModelSchema)
   AddColumn(String, @active_record.Column)
+  AddReference(String, String, String, Bool, Bool, String?)
+  AddTimestamps(String, Bool)
   AddIndex(String, String, Bool)
+  AddIndexConcurrently(String, String, Bool)
+  RemoveIndex(String, String, Bool)
+  RemoveIndexConcurrently(String, String, Bool)
   RemoveColumn(String, String)
+  RenameColumn(String, String, String)
+  ChangeColumnDefault(String, String, String?, String?)
+  ChangeColumnNull(String, String, Bool, String?)
   RenameTable(String, String)
   DropTable(String)
   ExecuteSql(String)

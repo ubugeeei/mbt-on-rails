@@ -51,6 +51,13 @@ The source audit in this batch was anchored to the official Rails repository at:
 - `restful_controller_with_params(...)` lets generic resources opt into Rails-style strong params without hardcoded `title/body/slug`
 - Example type generation now emits typed server action helpers in addition to typed route helpers, so route params and mutation inputs can share one generated surface
 
+## Fifth batch added here
+
+- The migration layer now has a chainable `migration_plan(...)` builder for Rails-like, concise schema changes
+- Migration steps now cover opinionated `add_reference`, phased `add_timestamps`, concurrent index add/remove, column rename, default change, and nullability tightening
+- `analyze_migration(...)`, `migration_risk_level(...)`, and `migration_safety_summary(...)` add a Strong Migrations-style safety pass so deploy-hostile steps are surfaced early
+- The ORM example and tutorial now show the phased nullable/backfill/default/index pattern instead of only raw create-table output
+
 ## Biggest gaps still open
 
 - `activesupport`: concern/autoloading/deprecation/timezones/notifications subscribers

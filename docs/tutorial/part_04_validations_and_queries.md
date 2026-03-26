@@ -44,9 +44,11 @@ Example:
 let relation = relation_for(post_model)
   .where_eq("author_id", "7")
   .where_like("title", "%MoonBit%")
-  .order_by("created_at", true)
+  .order_by("created_at", descending=true)
   .limit_to(5)
 ```
+
+`descending` is labeled so the call site stays readable. Omit it to get ascending order.
 
 Render with `relation_to_sql(...)`.
 

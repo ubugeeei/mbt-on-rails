@@ -50,7 +50,7 @@ test "relation sql covers joins selects predicates counts and offsets" {
           "author",
         ),
         "title",
-        false,
+        descending=false,
       ),
       20,
     ),

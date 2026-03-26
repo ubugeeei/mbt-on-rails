@@ -33,7 +33,16 @@ pub fn action_plan(String) -> @controller.ActionDefinition
 
 pub fn add_column_step(String, @active_record.Column) -> @migration.MigrationStep
 
+pub fn add_index_concurrently_step(String, String, Bool) -> @migration.MigrationStep
+
 pub fn add_index_step(String, String, Bool) -> @migration.MigrationStep
+
+#label_migration(column_name, allow_positional=true)
+#label_migration(table_name, allow_positional=true)
+#label_migration(target_table, allow_positional=true)
+pub fn add_reference_step(table_name~ : String, column_name~ : String, target_table~ : String, nullable? : Bool, unique? : Bool, default_value? : String?) -> @migration.MigrationStep
+
+pub fn add_timestamps_step(String, nullable? : Bool) -> @migration.MigrationStep
 
 pub fn after_create(String) -> @active_record.Callback
 
@@ -44,6 +53,8 @@ pub fn after_save(String) -> @active_record.Callback
 pub fn all_http_methods() -> Array[@http.HttpMethod]
 
 pub fn allowed(@auth.Identity?, @auth.PolicyRule, String?) -> Bool
+
+pub fn analyze_migration(@migration.Migration) -> Array[@migration.MigrationSafetyIssue]
 
 pub fn app(String, @auth.AuthConfig, Array[@active_record.ModelSchema], Array[@migration.Migration], Array[@middleware.Middleware], Array[@fixture.FixtureSet], Array[@fixture.SeedPlan], Array[@cable.CableChannel], Array[@job.JobQueue], Array[@mailer.MailerDefinition], Array[@cache.CacheStore], Array[@controller.ControllerDefinition], Array[@http.RouteSpec], Array[@view.PageModule], Array[@view.ServerAction], Array[@generator.ScaffoldPlan]) -> @app.MbtOnRailsApp
 
@@ -135,6 +146,10 @@ pub fn cache_summary(@cache.CacheStore) -> String
 pub fn cache_write(@cache.CacheStore, String, String, String?, String?, Array[String]) -> @cache.CacheStore
 
 pub fn cache_write_with_notifications(store~ : @cache.CacheStore, key~ : String, value~ : String, version~ : String?, expires_at~ : String?, tags~ : Array[String], notifications~ : @support.Notifications) -> (@cache.CacheStore, @support.Notifications)
+
+pub fn change_default_step(String, String, String?, String?) -> @migration.MigrationStep
+
+pub fn change_null_step(String, String, Bool, backfill_value? : String?) -> @migration.MigrationStep
 
 pub fn classify(String) -> String
 
@@ -460,6 +475,16 @@ pub fn migration_down_sql(@migration.Migration) -> Array[String]
 
 pub fn migration_from_model(String, String, @active_record.ModelSchema) -> @migration.Migration
 
+pub fn migration_plan(String, String) -> @migration.Migration
+
+pub fn migration_risk_level(@migration.Migration) -> @migration.MigrationSafetyLevel
+
+pub fn migration_safe(@migration.Migration) -> Bool
+
+pub fn migration_safety_issue(Int, @migration.MigrationSafetyLevel, String, String, String) -> @migration.MigrationSafetyIssue
+
+pub fn migration_safety_summary(@migration.Migration) -> String
+
 pub fn migration_sql(@migration.Migration) -> Array[String]
 
 pub fn migration_up_sql(@migration.Migration) -> Array[String]
@@ -503,7 +528,7 @@ pub fn ok_text(String) -> @http.Response
 
 pub fn ok_turbo_stream(Array[@turbo.TurboStream]) -> @http.Response
 
-pub fn order_by(@active_record.Relation, String, Bool) -> @active_record.Relation
+pub fn order_by(@active_record.Relation, String, descending? : Bool) -> @active_record.Relation
 
 #label_migration(component, allow_positional=true)
 #label_migration(file_path, allow_positional=true)
@@ -580,7 +605,13 @@ pub fn release_task(String, String, Bool) -> @process.ReleaseTask
 
 pub fn remove_column_step(String, String) -> @migration.MigrationStep
 
+pub fn remove_index_concurrently_step(String, String, unique? : Bool) -> @migration.MigrationStep
+
+pub fn remove_index_step(String, String, unique? : Bool) -> @migration.MigrationStep
+
 pub fn remove_stream(String) -> @turbo.TurboStream
+
+pub fn rename_column_step(String, String, String) -> @migration.MigrationStep
 
 pub fn rename_table_step(String, String) -> @migration.MigrationStep
 
@@ -985,6 +1016,10 @@ pub using @metrics {type MetricsRegistry}
 pub using @middleware {type Middleware}
 
 pub using @migration {type Migration}
+
+pub using @migration {type MigrationSafetyIssue}
+
+pub using @migration {type MigrationSafetyLevel}
 
 pub using @migration {type MigrationStep}
 
