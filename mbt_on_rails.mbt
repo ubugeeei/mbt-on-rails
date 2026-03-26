@@ -102,3 +102,433 @@ pub using @auth {
   session_cookie,
   verify_password,
 }
+
+///|
+/// Re-exports controllers, models, and migrations for Rails-style backends.
+pub using @controller {
+  type ActionDefinition,
+  type ActionStep,
+  type BeforeAction,
+  type ControllerDefinition,
+  type ResponseFormat,
+  action,
+  action_plan,
+  authorize_step,
+  before_each,
+  before_action,
+  before_only,
+  controller,
+  controller_named,
+  controller_action,
+  controller_summary,
+  flash,
+  html_format,
+  invoke_server_action_step,
+  json_format,
+  load_collection_step,
+  load_member_step,
+  persist_model_step,
+  redirect_format,
+  redirect_to_step,
+  render_page_step,
+  require_auth,
+  restful_controller,
+  turbo_stream_format,
+}
+
+///|
+/// Re-exports the Active Record-inspired ORM surface.
+pub using @orm {
+  type Association,
+  type AssociationKind,
+  type Callback,
+  type Column,
+  type ColumnType,
+  type LifecycleHook,
+  type MemoryDatabase,
+  type MemoryTable,
+  type ModelSchema,
+  type OrderBy,
+  type Predicate,
+  type Record,
+  type Relation,
+  type SaveOutcome,
+  type Validation,
+  type ValidationRule,
+  after_create,
+  after_destroy,
+  after_save,
+  before_create,
+  before_destroy,
+  before_save,
+  before_validation,
+  belongs_to,
+  boolean_column,
+  column_definition_sql,
+  count_sql,
+  create_table_sql,
+  delete_sql,
+  empty_memory_database,
+  find_records,
+  has_and_belongs_to_many,
+  has_many,
+  has_one,
+  indexed,
+  index_statements,
+  insert_record,
+  insert_sql,
+  integer_column,
+  join_relation,
+  json_column,
+  limit_to,
+  model,
+  nullable,
+  offset_by,
+  order_by,
+  preload,
+  record,
+  references_column,
+  relation_for,
+  relation_to_sql,
+  save_record,
+  schema_dump,
+  select_columns,
+  string_column,
+  text_column,
+  timestamp_column,
+  unique,
+  update_sql,
+  upsert_sql,
+  validate_record,
+  validates_confirmation,
+  validates_format,
+  validates_inclusion,
+  validates_length_max,
+  validates_length_min,
+  validates_presence,
+  validates_uniqueness,
+  where_eq,
+  where_gt,
+  where_in,
+  where_like,
+  where_lt,
+  where_not_eq,
+  where_raw,
+  with_association,
+  with_callback,
+  with_default,
+  with_validation,
+}
+
+///|
+/// Re-exports the migration DSL.
+pub using @migration {
+  type Migration,
+  type MigrationStep,
+  add_column_step,
+  add_index_step,
+  create_table_step,
+  drop_table_step,
+  execute_sql_step,
+  migration,
+  migration_down_sql,
+  migration_from_model,
+  migration_sql,
+  migration_up_sql,
+  remove_column_step,
+  rename_table_step,
+  reversible_step,
+  schema_sql,
+}
+
+///|
+/// Runtime and delivery helpers that complement the main facade.
+pub using @cable {
+  type CableBroadcast,
+  type CableChannel,
+  broadcast_summary,
+  broadcast_turbo,
+  cable_broadcast,
+  cable_channel,
+  cable_summary,
+}
+
+///|
+pub using @middleware {
+  type Middleware,
+  apply_request_middleware,
+  apply_response_middleware,
+  halt_with_text,
+  middleware,
+  middleware_summary,
+  with_request_header,
+  with_response_header,
+}
+
+///|
+pub using @fixture {
+  type FixtureRow,
+  type FixtureSet,
+  type SeedPlan,
+  apply_seed,
+  fixture_row,
+  fixture_set,
+  fixture_summary,
+  load_fixture_set,
+  load_fixtures,
+  seed_plan,
+  seed_summary,
+}
+
+///|
+pub using @turbo {
+  type TurboStream,
+  type TurboStreamAction,
+  append_stream,
+  ok_turbo_stream,
+  prepend_stream,
+  remove_stream,
+  render_turbo_stream,
+  replace_stream,
+  turbo_stream,
+  update_stream,
+}
+
+///|
+/// Extra Rails-style surfaces that keep the main facade compact.
+pub using @controller {
+  deliver_mail_step,
+  enqueue_job_step,
+  permit_params_step,
+  touch_cache_step,
+}
+
+///|
+pub using @params {
+  type Parameters,
+  type PermittedParams,
+  merge_params,
+  param_value,
+  params,
+  permit,
+  permit_scope,
+  permitted_attributes,
+  permitted_summary,
+  permitted_value,
+  require_scope,
+}
+
+///|
+pub using @job {
+  type DrainedJobs,
+  type EnqueuedJob,
+  type JobDefinition,
+  type JobQueue,
+  drain_ready,
+  enqueue_at,
+  enqueue_now,
+  enqueued_job,
+  job,
+  job_queue,
+  job_ready,
+  job_summary,
+  retry_job,
+}
+
+///|
+pub using @mailer {
+  type MailDelivery,
+  type MailTemplate,
+  type MailerDefinition,
+  compose_mail,
+  delivery_job,
+  enqueue_delivery,
+  mail_template,
+  mailer,
+  mailer_summary,
+  with_bcc,
+  with_cc,
+}
+
+///|
+pub using @cache {
+  type CacheEntry,
+  type CacheFetchResult,
+  type CacheStore,
+  cache_delete,
+  cache_delete_tag,
+  cache_fetch,
+  cache_key,
+  cache_read,
+  cache_store,
+  cache_summary,
+  cache_write,
+}
+
+///|
+/// Production-oriented helpers for deployment, health, and logging.
+pub using @production {
+  type DeploymentConfig,
+  type Environment,
+  type HealthCheck,
+  type LogEvent,
+  type RateLimitRule,
+  config_summary,
+  default_development_config,
+  default_production_config,
+  default_staging_config,
+  default_test_config,
+  deployment_config,
+  health_response,
+  health_check,
+  json_api_document,
+  json_api_error,
+  json_api_ok,
+  json_log,
+  log_event,
+  metrics_response,
+  rate_limit_rule,
+  rate_limit_summary,
+  rate_limited,
+  readiness_response,
+  render_health_json,
+}
+
+///|
+/// Deployment topology helpers for web, worker, cable, and release processes.
+pub using @process {
+  type ProcessDefinition,
+  type ProcessRole,
+  type ReleaseTask,
+  cable_process,
+  env_keys_summary,
+  process_definition,
+  process_summary,
+  release_summary,
+  release_process,
+  release_task,
+  scheduler_process,
+  web_process,
+  worker_process,
+}
+
+///|
+/// Observability and secrets helpers for production deployments.
+pub using @metrics {
+  type MetricKind,
+  type MetricSample,
+  type MetricsRegistry,
+  counter,
+  gauge,
+  increment_metric,
+  metric_value,
+  metrics_registry,
+  metrics_summary,
+  render_prometheus,
+  set_metric,
+  with_metric,
+}
+
+///|
+pub using @secrets {
+  type SecretVar,
+  type SecretsConfig,
+  dotenv_preview,
+  masked_secret_summary,
+  missing_secrets,
+  secret_value,
+  secret_var,
+  secrets_config,
+  secrets_valid,
+}
+
+///|
+/// Re-exports the Vapor-facing view primitives.
+pub using @view {
+  type AssetManifest,
+  type BoundaryKind,
+  type ComponentContract,
+  type DynamicMode,
+  type FormBinding,
+  type HydrationMode,
+  type LayoutModule,
+  type LoaderModule,
+  type MountedComponent,
+  type PageModule,
+  type PropContract,
+  type RenderedPage,
+  type ServerAction,
+  type SuspenseBoundary,
+  type TemplateImport,
+  type VaporNode,
+  type VaporComponentRef,
+  asset_manifest,
+  client_component,
+  client_contract,
+  default_assets,
+  defer_on_server,
+  dynamic_auto,
+  dynamic_force_dynamic,
+  dynamic_force_static,
+  dynamic_revalidate,
+  form_binding,
+  hydrate_idle,
+  hydrate_load,
+  hydrate_manual,
+  hydrate_media,
+  hydrate_only,
+  hydrate_visible,
+  layout_module,
+  loader_module,
+  mount_import,
+  page_module,
+  prop_contract,
+  render_bundle_plan,
+  render_component_manifest,
+  render_form_manifest,
+  render_page,
+  render_page_manifest_entry,
+  render_route_tree,
+  render_router_manifest,
+  render_server_action_manifest,
+  server_action,
+  server_component,
+  server_contract,
+  suspense_boundary,
+  template_component_imports,
+  template_component_usages,
+  template_import,
+  validate_component_tree,
+  validate_page_tree,
+  validate_template_component_imports,
+  with_action_name,
+  with_assets,
+  with_child,
+  with_contract,
+  with_dynamic_mode,
+  with_fallback,
+  with_form,
+  with_island,
+  with_layout,
+  with_loader,
+  with_metadata,
+  with_template_import,
+}
+
+///|
+/// Re-exports scaffold generation helpers.
+pub using @generator {
+  type GeneratedArtifact,
+  type ScaffoldField,
+  type ScaffoldPlan,
+  scaffold_field,
+  scaffold_resource,
+  scaffold_summary,
+}
+
+///|
+/// Re-exports the high-level app runtime.
+pub using @app {type MbtOnRailsApp, app, app_named, handle_request}
+
+///|
+pub using @demo_blog {demo_blog_app}

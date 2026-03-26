@@ -2,7 +2,7 @@
 
 `mbt on rails` is a MoonBit-first framework scaffold that aims to feel like Ruby on Rails while keeping the client-server boundary friendly to `vapor-moon` and `luna` style UI authoring.
 
-All implementation code now lives under `src/`, with the repository root exposing a small public facade and tests. Each maintained source file is also kept within 300 lines so the framework stays easy to navigate.
+All implementation code now lives under `src/`, with the repository root exposing a single public facade. Public API tests now live under `tests/public/` so the top level stays thin. Each maintained source file is also kept within 300 lines so the framework stays easy to navigate.
 
 ## What is implemented
 
@@ -97,7 +97,8 @@ That keeps the current codebase buildable while preserving the intended interfac
 - [`src/generator/generator.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/generator/generator.mbt): scaffold planner
 - [`src/app/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/app/types.mbt), [`src/app/runtime.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/app/runtime.mbt), [`examples/demo_blog/app.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/examples/demo_blog/app.mbt): generic app runtime plus the integrated demo application now kept under `examples/demo_blog/`
 - [`src/view/assets/hydrate.js`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/assets/hydrate.js): small client bridge source
-- [`mbt_on_rails.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/mbt_on_rails.mbt), [`mbt_on_rails_modeling.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/mbt_on_rails_modeling.mbt), [`mbt_on_rails_web.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/mbt_on_rails_web.mbt): public facade files over the `src/*` packages
+- [`mbt_on_rails.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/mbt_on_rails.mbt): single public facade over the `src/*` packages
+- [`tests/public/prelude.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/tests/public/prelude.mbt): shared public test prelude so root does not need to host wbtest files
 
 ## Commands
 
