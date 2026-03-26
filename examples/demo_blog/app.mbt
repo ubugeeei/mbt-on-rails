@@ -1,6 +1,6 @@
 ///|
 /// Builds the integrated demo blog application.
-pub fn demo_blog_app() -> MbtOnRailsApp {
+pub fn demo_blog_app() -> @app.MbtOnRailsApp {
   let auth = @auth.default_auth_config()
   let user_model = demo_user_model()
   let session_model = demo_session_model()
@@ -24,22 +24,20 @@ pub fn demo_blog_app() -> MbtOnRailsApp {
   let layout = demo_application_layout()
   let pages = demo_pages(layout)
   let server_actions = demo_server_actions()
-  app(
-    "mbt on rails demo",
-    auth,
-    models,
-    migrations,
-    middlewares,
-    fixtures,
-    seeds,
-    cable_channels,
-    job_queues,
-    mailers,
-    caches,
-    controllers,
-    routes,
-    pages,
-    server_actions,
-    [post_scaffold],
-  )
+  @app.app_named("mbt on rails demo")
+  .with_auth(auth)
+  .with_models(models)
+  .with_migrations(migrations)
+  .with_middlewares(middlewares)
+  .with_fixtures(fixtures)
+  .with_seeds(seeds)
+  .with_cable_channels(cable_channels)
+  .with_job_queues(job_queues)
+  .with_mailers(mailers)
+  .with_caches(caches)
+  .with_controllers(controllers)
+  .with_routes(routes)
+  .with_pages(pages)
+  .with_server_actions(server_actions)
+  .with_scaffold(post_scaffold)
 }

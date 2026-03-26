@@ -4,28 +4,23 @@ fn note_app() -> @mbor.MbtOnRailsApp {
   let model = note_model()
   let controller = @mbor.restful_controller("notes", "notes")
   let layout = note_layout()
-  @mbor.app(
-    "notes example",
-    @mbor.default_auth_config(),
-    [model],
-    [@mbor.migration_from_model("20260323040101", "create_notes", model)],
-    [],
-    [],
-    [],
-    [],
-    [@mbor.job_queue("default")],
-    [],
-    [@mbor.cache_store("notes")],
-    [controller],
+  @mbor.app_named("notes example")
+  .with_model(model)
+  .with_migration(
+    @mbor.migration_from_model("20260323040101", "create_notes", model),
+  )
+  .with_job_queue(@mbor.job_queue("default"))
+  .with_cache(@mbor.cache_store("notes"))
+  .with_controller(controller)
+  .with_routes(
     @mbor.resources(
       "notes",
       controller.name,
       @mbor.default_resource_options("notes", Some("notes")),
     ),
-    note_pages(layout),
-    note_server_actions(),
-    [],
   )
+  .with_pages(note_pages(layout))
+  .with_server_actions(note_server_actions())
 }
 
 ///|

@@ -3,7 +3,7 @@
 pub struct MailTemplate {
   action_name : String
   subject : String
-  html_path : String
+  html_path : @support.MbtvPath
   text_path : String?
 }
 
@@ -34,7 +34,7 @@ pub struct MailDelivery {
 pub fn mail_template(
   action_name : String,
   subject : String,
-  html_path : String,
+  html_path : @support.MbtvPath,
   text_path : String?,
 ) -> MailTemplate {
   { action_name, subject, html_path, text_path }

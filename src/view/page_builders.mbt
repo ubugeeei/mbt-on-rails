@@ -3,7 +3,7 @@
 pub fn page_module(
   route_name : String,
   route_path : String,
-  file_path : String,
+  file_path : @support.MbtvPath,
   title : String,
   component : VaporComponentRef,
 ) -> PageModule {

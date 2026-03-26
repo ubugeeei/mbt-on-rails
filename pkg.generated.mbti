@@ -27,6 +27,8 @@ import {
 // Values
 pub fn action(String, Array[@controller.ActionStep], String?, Bool, Array[String], Array[@controller.ResponseFormat], Bool) -> @controller.ActionDefinition
 
+pub fn action_plan(String) -> @controller.ActionDefinition
+
 pub fn add_column_step(String, @active_record.Column) -> @migration.MigrationStep
 
 pub fn add_index_step(String, String, Bool) -> @migration.MigrationStep
@@ -42,6 +44,8 @@ pub fn all_http_methods() -> Array[@http.HttpMethod]
 pub fn allowed(@auth.Identity?, @auth.PolicyRule, String?) -> Bool
 
 pub fn app(String, @auth.AuthConfig, Array[@active_record.ModelSchema], Array[@migration.Migration], Array[@middleware.Middleware], Array[@fixture.FixtureSet], Array[@fixture.SeedPlan], Array[@cable.CableChannel], Array[@job.JobQueue], Array[@mailer.MailerDefinition], Array[@cache.CacheStore], Array[@controller.ControllerDefinition], Array[@http.RouteSpec], Array[@view.PageModule], Array[@view.ServerAction], Array[@generator.ScaffoldPlan]) -> @app.MbtOnRailsApp
+
+pub fn app_named(String) -> @app.MbtOnRailsApp
 
 pub fn append_entries(Array[(String, String)], Array[(String, String)]) -> Array[(String, String)]
 
@@ -72,6 +76,10 @@ pub fn before_action(String?, @auth.AuthRequirement?, Array[String]) -> @control
 pub fn before_create(String) -> @active_record.Callback
 
 pub fn before_destroy(String) -> @active_record.Callback
+
+pub fn before_each() -> @controller.BeforeAction
+
+pub fn before_only(String) -> @controller.BeforeAction
 
 pub fn before_save(String) -> @active_record.Callback
 
@@ -128,6 +136,8 @@ pub fn config_summary(@production.DeploymentConfig) -> String
 pub fn controller(String, String?, String, Array[@controller.BeforeAction], Array[@controller.ActionDefinition]) -> @controller.ControllerDefinition
 
 pub fn controller_action(@controller.ControllerDefinition, String) -> @controller.ActionDefinition?
+
+pub fn controller_named(String) -> @controller.ControllerDefinition
 
 pub fn controller_summary(@controller.ControllerDefinition) -> String
 

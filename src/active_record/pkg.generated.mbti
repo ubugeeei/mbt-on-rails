@@ -161,6 +161,10 @@ pub struct Column {
   indexed : Bool
   default_value : String?
 }
+pub fn Column::indexed(Self) -> Self
+pub fn Column::nullable(Self) -> Self
+pub fn Column::unique(Self) -> Self
+pub fn Column::with_default(Self, String) -> Self
 
 pub enum ColumnType {
   Varchar
@@ -206,6 +210,9 @@ pub struct ModelSchema {
   validations : Array[Validation]
   callbacks : Array[Callback]
 }
+pub fn ModelSchema::with_association(Self, Association) -> Self
+pub fn ModelSchema::with_callback(Self, Callback) -> Self
+pub fn ModelSchema::with_validation(Self, Validation) -> Self
 
 pub struct OrderBy {
   column : String
@@ -238,6 +245,19 @@ pub struct Relation {
   offset : Int?
   preloads : Array[String]
 }
+pub fn Relation::join_relation(Self, String) -> Self
+pub fn Relation::limit_to(Self, Int) -> Self
+pub fn Relation::offset_by(Self, Int) -> Self
+pub fn Relation::order_by(Self, String, Bool) -> Self
+pub fn Relation::preload(Self, String) -> Self
+pub fn Relation::select_columns(Self, Array[String]) -> Self
+pub fn Relation::where_eq(Self, String, String) -> Self
+pub fn Relation::where_gt(Self, String, String) -> Self
+pub fn Relation::where_in(Self, String, Array[String]) -> Self
+pub fn Relation::where_like(Self, String, String) -> Self
+pub fn Relation::where_lt(Self, String, String) -> Self
+pub fn Relation::where_not_eq(Self, String, String) -> Self
+pub fn Relation::where_raw(Self, String) -> Self
 
 pub enum SaveOutcome {
   Saved(MemoryDatabase, Record)

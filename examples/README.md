@@ -17,7 +17,7 @@ moon run examples/process_topology
 ## Included examples
 
 - `examples/demo_blog`
-  - The `.mbtv` assets used by the built-in `demo_blog_app()` that powers `moon run cmd/main`.
+  - The full built-in `demo_blog_app()` example, including MoonBit setup code and `.mbtv` assets.
 - `examples/resource_app`
   - A small Notes app built from the public `app`, `resources`, `restful_controller`, `page_module`, and `server_action` APIs.
   - Includes local `.mbtv` files so the example is self-contained.
@@ -43,4 +43,4 @@ moon run examples/process_topology
 5. Read `examples/production_stack/main.mbt` for production-facing runtime helpers.
 6. Read `examples/production_api/main.mbt` for API-only production helpers.
 7. Read `examples/process_topology/main.mbt` for deployment process planning.
-8. Browse `examples/demo_blog/views/` to see the view and mailer assets used by `demo_blog_app()`.
+8. Browse `examples/demo_blog/` to see the full demo app, then `examples/demo_blog/views/` for the view and mailer assets it renders.

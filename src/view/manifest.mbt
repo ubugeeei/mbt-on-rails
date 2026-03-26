@@ -33,12 +33,12 @@ pub fn render_route_tree(pages : Array[PageModule]) -> String {
 ///|
 /// Renders the component bundle plan needed by one page.
 pub fn render_bundle_plan(page : PageModule) -> String {
-  let sources : Array[String] = [page.component.source_path]
+  let sources : Array[String] = [page.component.source_path.as_string()]
   for layout in page.layouts {
-    sources.push(layout.file_path)
+    sources.push(layout.file_path.as_string())
   }
   for island in page.client_islands {
-    sources.push(island.source_path)
+    sources.push(island.source_path.as_string())
   }
   let json_sources : Array[String] = []
   for source in sources {
@@ -153,7 +153,7 @@ fn render_component_entry(component : VaporComponentRef) -> String {
   "\"name\": " +
   @support.json_string(component.name) +
   ", \"source_path\": " +
-  @support.json_string(component.source_path) +
+  @support.json_string(component.source_path.as_string()) +
   ", \"boundary\": " +
   @support.json_string(boundary) +
   ", \"transport\": " +

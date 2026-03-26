@@ -5,125 +5,84 @@ pub fn restful_controller(
   page_prefix : String,
 ) -> ControllerDefinition {
   let singular = @support.singularize(resource_name)
-  controller(
-    @support.classify(resource_name) + "Controller",
-    Some(resource_name),
-    "application",
-    [
-      before_action(Some("new"), Some(@auth.auth_required()), []),
-      before_action(Some("create"), Some(@auth.auth_required()), [
-        "title", "body", "slug",
-      ]),
-      before_action(Some("edit"), Some(@auth.auth_required()), []),
-      before_action(Some("update"), Some(@auth.auth_required()), [
-        "title", "body", "slug",
-      ]),
-      before_action(Some("destroy"), Some(@auth.auth_required()), []),
-    ],
-    [
-      action(
-        "index",
-        [
-          load_collection_step(resource_name),
-          render_page_step(page_prefix + "_index"),
-        ],
-        Some(page_prefix + "_index"),
-        false,
-        [],
-        [html_format(), json_format()],
-        false,
-      ),
-      action(
-        "show",
-        [
-          load_member_step(resource_name),
-          render_page_step(page_prefix + "_show"),
-        ],
-        Some(page_prefix + "_show"),
-        false,
-        [],
-        [html_format(), json_format()],
-        false,
-      ),
-      action(
-        "new",
-        [
-          require_auth(@auth.auth_required()),
-          render_page_step(page_prefix + "_new"),
-        ],
-        Some(page_prefix + "_new"),
-        false,
-        [],
-        [html_format()],
-        false,
-      ),
-      action(
-        "create",
-        [
-          require_auth(@auth.auth_required()),
-          authorize_step(resource_name, "create"),
-          permit_params_step(["title", "body", "slug"]),
-          persist_model_step(resource_name),
-          invoke_server_action_step(resource_name + ".create"),
-          enqueue_job_step(resource_name + ".reindex"),
-          touch_cache_step(resource_name),
-          redirect_to_step("/" + resource_name),
-        ],
-        None,
-        true,
-        ["title", "body", "slug"],
-        [redirect_format(), json_format()],
-        true,
-      ),
-      action(
-        "edit",
-        [
-          require_auth(@auth.auth_required()),
-          load_member_step(resource_name),
-          authorize_step(resource_name, "update"),
-          render_page_step(page_prefix + "_edit"),
-        ],
-        Some(page_prefix + "_edit"),
-        false,
-        [],
-        [html_format()],
-        false,
-      ),
-      action(
-        "update",
-        [
-          require_auth(@auth.auth_required()),
-          load_member_step(resource_name),
-          authorize_step(resource_name, "update"),
-          permit_params_step(["title", "body", "slug"]),
-          persist_model_step(resource_name),
-          invoke_server_action_step(resource_name + ".update"),
-          enqueue_job_step(resource_name + ".reindex"),
-          touch_cache_step(resource_name),
-          redirect_to_step("/" + resource_name + "/:" + singular + "_id"),
-        ],
-        None,
-        true,
-        ["title", "body", "slug"],
-        [redirect_format(), json_format()],
-        true,
-      ),
-      action(
-        "destroy",
-        [
-          require_auth(@auth.auth_required()),
-          load_member_step(resource_name),
-          authorize_step(resource_name, "destroy"),
-          invoke_server_action_step(resource_name + ".destroy"),
-          touch_cache_step(resource_name),
-          redirect_to_step("/" + resource_name),
-        ],
-        None,
-        true,
-        [],
-        [redirect_format(), json_format()],
-        true,
-      ),
-    ],
+  controller_named(@support.classify(resource_name) + "Controller")
+  .for_resource(resource_name)
+  .with_before_action(before_only("new").requiring(@auth.auth_required()))
+  .with_before_action(
+    before_only("create")
+    .requiring(@auth.auth_required())
+    .permitting(["title", "body", "slug"]),
+  )
+  .with_before_action(before_only("edit").requiring(@auth.auth_required()))
+  .with_before_action(
+    before_only("update")
+    .requiring(@auth.auth_required())
+    .permitting(["title", "body", "slug"]),
+  )
+  .with_before_action(before_only("destroy").requiring(@auth.auth_required()))
+  .with_action(
+    action_plan("index")
+    .load_collection(resource_name)
+    .render_page(page_prefix + "_index")
+    .json(),
+  )
+  .with_action(
+    action_plan("show")
+    .load_member(resource_name)
+    .render_page(page_prefix + "_show")
+    .json(),
+  )
+  .with_action(
+    action_plan("new")
+    .require_auth(@auth.auth_required())
+    .render_page(page_prefix + "_new"),
+  )
+  .with_action(
+    action_plan("create")
+    .require_auth(@auth.auth_required())
+    .authorize(resource_name, "create")
+    .permit_params(["title", "body", "slug"])
+    .persist_model(resource_name)
+    .invoke_server_action(resource_name + ".create")
+    .enqueue_job(resource_name + ".reindex")
+    .touch_cache(resource_name)
+    .redirect_to("/" + resource_name)
+    .json()
+    .as_mutation()
+    .as_transactional(),
+  )
+  .with_action(
+    action_plan("edit")
+    .require_auth(@auth.auth_required())
+    .load_member(resource_name)
+    .authorize(resource_name, "update")
+    .render_page(page_prefix + "_edit"),
+  )
+  .with_action(
+    action_plan("update")
+    .require_auth(@auth.auth_required())
+    .load_member(resource_name)
+    .authorize(resource_name, "update")
+    .permit_params(["title", "body", "slug"])
+    .persist_model(resource_name)
+    .invoke_server_action(resource_name + ".update")
+    .enqueue_job(resource_name + ".reindex")
+    .touch_cache(resource_name)
+    .redirect_to("/" + resource_name + "/:" + singular + "_id")
+    .json()
+    .as_mutation()
+    .as_transactional(),
+  )
+  .with_action(
+    action_plan("destroy")
+    .require_auth(@auth.auth_required())
+    .load_member(resource_name)
+    .authorize(resource_name, "destroy")
+    .invoke_server_action(resource_name + ".destroy")
+    .touch_cache(resource_name)
+    .redirect_to("/" + resource_name)
+    .json()
+    .as_mutation()
+    .as_transactional(),
   )
 }

@@ -31,6 +31,8 @@ pub struct Middleware {
   response_headers : Array[(String, String)]
   halt_response : @http.Response?
 }
+pub fn Middleware::with_request_header(Self, String, String) -> Self
+pub fn Middleware::with_response_header(Self, String, String) -> Self
 
 // Type aliases
 

@@ -80,7 +80,7 @@ pub fn mailer_summary(mailer : MailerDefinition) -> String {
       " subject=" +
       template.subject +
       " html=" +
-      template.html_path,
+      template.html_path.as_string(),
     )
   }
   lines.join("\n")

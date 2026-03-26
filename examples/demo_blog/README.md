@@ -1,5 +1,5 @@
-# Demo Blog Assets
+# Demo Blog
 
-These `.mbtv` files are the page, component, and mailer assets used by the built-in `demo_blog_app()` example inside the framework.
+This directory now holds the built-in `demo_blog_app()` example end to end: MoonBit app setup, supporting demo data/configuration, and the `.mbtv` page/component/mailer assets.
 
-They live under `./examples/demo_blog` so example UI assets stay outside `src/` and can be browsed independently from framework implementation code.
+That keeps demo-specific code out of `src/` so the framework implementation stays focused on reusable primitives.

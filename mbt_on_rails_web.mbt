@@ -61,4 +61,21 @@ pub using @generator {
 
 ///|
 /// Re-exports the high-level app runtime.
-pub using @app {type MbtOnRailsApp, app, demo_blog_app, handle_request}
+pub using @app {type MbtOnRailsApp, app, app_named, handle_request}
+
+///|
+pub using @demo_blog {demo_blog_app}
+
+///|
+/// View-layer contract helpers that complement the main facade.
+pub using @view {
+  type BoundaryKind,
+  type ComponentContract,
+  type PropContract,
+  client_contract,
+  prop_contract,
+  render_component_manifest,
+  server_contract,
+  with_contract,
+  with_fallback,
+}

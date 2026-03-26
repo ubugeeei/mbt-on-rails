@@ -20,63 +20,7 @@ import {
 // Values
 pub fn app(String, @auth.AuthConfig, Array[@active_record.ModelSchema], Array[@migration.Migration], Array[@middleware.Middleware], Array[@fixture.FixtureSet], Array[@fixture.SeedPlan], Array[@cable.CableChannel], Array[@job.JobQueue], Array[@mailer.MailerDefinition], Array[@cache.CacheStore], Array[@controller.ControllerDefinition], Array[@http.RouteSpec], Array[@view.PageModule], Array[@view.ServerAction], Array[@generator.ScaffoldPlan]) -> MbtOnRailsApp
 
-pub fn demo_application_layout() -> @view.LayoutModule
-
-pub fn demo_application_layout_component() -> @view.VaporComponentRef
-
-pub fn demo_blog_app() -> MbtOnRailsApp
-
-pub fn demo_cable_channels() -> Array[@cable.CableChannel]
-
-pub fn demo_caches() -> Array[@cache.CacheStore]
-
-pub fn demo_fixtures() -> Array[@fixture.FixtureSet]
-
-pub fn demo_home_page_component() -> @view.VaporComponentRef
-
-pub fn demo_job_queues() -> Array[@job.JobQueue]
-
-pub fn demo_like_button_island() -> @view.VaporComponentRef
-
-pub fn demo_mailers() -> Array[@mailer.MailerDefinition]
-
-pub fn demo_middlewares() -> Array[@middleware.Middleware]
-
-pub fn demo_migrations(@active_record.ModelSchema, @active_record.ModelSchema, @active_record.ModelSchema) -> Array[@migration.Migration]
-
-pub fn demo_pages(@view.LayoutModule) -> Array[@view.PageModule]
-
-pub fn demo_pages_controller() -> @controller.ControllerDefinition
-
-pub fn demo_post_composer_idle_island() -> @view.VaporComponentRef
-
-pub fn demo_post_composer_island(String) -> @view.VaporComponentRef
-
-pub fn demo_post_model(@generator.ScaffoldPlan) -> @active_record.ModelSchema
-
-pub fn demo_post_scaffold() -> @generator.ScaffoldPlan
-
-pub fn demo_posts_edit_page_component() -> @view.VaporComponentRef
-
-pub fn demo_posts_index_page_component() -> @view.VaporComponentRef
-
-pub fn demo_posts_new_page_component() -> @view.VaporComponentRef
-
-pub fn demo_posts_show_page_component() -> @view.VaporComponentRef
-
-pub fn demo_routes(String) -> Array[@http.RouteSpec]
-
-pub fn demo_seeds() -> Array[@fixture.SeedPlan]
-
-pub fn demo_server_actions() -> Array[@view.ServerAction]
-
-pub fn demo_session_model() -> @active_record.ModelSchema
-
-pub fn demo_sessions_controller() -> @controller.ControllerDefinition
-
-pub fn demo_sign_in_page_component() -> @view.VaporComponentRef
-
-pub fn demo_user_model() -> @active_record.ModelSchema
+pub fn app_named(String) -> MbtOnRailsApp
 
 pub fn handle_request(MbtOnRailsApp, @http.Request) -> @http.Response
 
@@ -116,6 +60,35 @@ pub fn MbtOnRailsApp::scaffold_table(Self) -> String
 pub fn MbtOnRailsApp::schema_dump(Self) -> String
 pub fn MbtOnRailsApp::schema_statements(Self) -> Array[String]
 pub fn MbtOnRailsApp::seed_table(Self) -> String
+pub fn MbtOnRailsApp::with_auth(Self, @auth.AuthConfig) -> Self
+pub fn MbtOnRailsApp::with_cable_channel(Self, @cable.CableChannel) -> Self
+pub fn MbtOnRailsApp::with_cable_channels(Self, Array[@cable.CableChannel]) -> Self
+pub fn MbtOnRailsApp::with_cache(Self, @cache.CacheStore) -> Self
+pub fn MbtOnRailsApp::with_caches(Self, Array[@cache.CacheStore]) -> Self
+pub fn MbtOnRailsApp::with_controller(Self, @controller.ControllerDefinition) -> Self
+pub fn MbtOnRailsApp::with_controllers(Self, Array[@controller.ControllerDefinition]) -> Self
+pub fn MbtOnRailsApp::with_fixture(Self, @fixture.FixtureSet) -> Self
+pub fn MbtOnRailsApp::with_fixtures(Self, Array[@fixture.FixtureSet]) -> Self
+pub fn MbtOnRailsApp::with_job_queue(Self, @job.JobQueue) -> Self
+pub fn MbtOnRailsApp::with_job_queues(Self, Array[@job.JobQueue]) -> Self
+pub fn MbtOnRailsApp::with_mailer(Self, @mailer.MailerDefinition) -> Self
+pub fn MbtOnRailsApp::with_mailers(Self, Array[@mailer.MailerDefinition]) -> Self
+pub fn MbtOnRailsApp::with_middleware(Self, @middleware.Middleware) -> Self
+pub fn MbtOnRailsApp::with_middlewares(Self, Array[@middleware.Middleware]) -> Self
+pub fn MbtOnRailsApp::with_migration(Self, @migration.Migration) -> Self
+pub fn MbtOnRailsApp::with_migrations(Self, Array[@migration.Migration]) -> Self
+pub fn MbtOnRailsApp::with_model(Self, @active_record.ModelSchema) -> Self
+pub fn MbtOnRailsApp::with_models(Self, Array[@active_record.ModelSchema]) -> Self
+pub fn MbtOnRailsApp::with_page(Self, @view.PageModule) -> Self
+pub fn MbtOnRailsApp::with_pages(Self, Array[@view.PageModule]) -> Self
+pub fn MbtOnRailsApp::with_route(Self, @http.RouteSpec) -> Self
+pub fn MbtOnRailsApp::with_routes(Self, Array[@http.RouteSpec]) -> Self
+pub fn MbtOnRailsApp::with_scaffold(Self, @generator.ScaffoldPlan) -> Self
+pub fn MbtOnRailsApp::with_scaffolds(Self, Array[@generator.ScaffoldPlan]) -> Self
+pub fn MbtOnRailsApp::with_seed(Self, @fixture.SeedPlan) -> Self
+pub fn MbtOnRailsApp::with_seeds(Self, Array[@fixture.SeedPlan]) -> Self
+pub fn MbtOnRailsApp::with_server_action(Self, @view.ServerAction) -> Self
+pub fn MbtOnRailsApp::with_server_actions(Self, Array[@view.ServerAction]) -> Self
 
 // Type aliases
 

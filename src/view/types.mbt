@@ -48,7 +48,7 @@ pub struct ComponentContract {
 /// References a Vapor-style component module and its props.
 pub struct VaporComponentRef {
   name : String
-  source_path : String
+  source_path : @support.MbtvPath
   props : Array[(String, String)]
   hydration : HydrationMode?
   is_server_component : Bool
@@ -79,7 +79,7 @@ pub struct LoaderModule {
 /// Describes a shared layout used by one or more pages.
 pub struct LayoutModule {
   name : String
-  file_path : String
+  file_path : @support.MbtvPath
   component : VaporComponentRef
 }
 
@@ -105,7 +105,7 @@ pub struct AssetManifest {
 pub struct PageModule {
   route_name : String
   route_path : String
-  file_path : String
+  file_path : @support.MbtvPath
   title : String
   component : VaporComponentRef
   layouts : Array[LayoutModule]

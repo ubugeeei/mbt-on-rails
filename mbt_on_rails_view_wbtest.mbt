@@ -9,38 +9,30 @@ test "rendered page includes islands forms and route tree data" {
       [],
     ),
   )
-  let page = with_form(
-    with_island(
-      with_dynamic_mode(
-        with_action_name(
-          with_loader(
-            with_layout(
-              page_module(
-                "posts_show",
-                "/posts/[id]",
-                "examples/demo_blog/views/pages/posts/show.mbtv",
-                "Post",
-                server_component(
-                  "PostsShowPage",
-                  "examples/demo_blog/views/pages/posts/show.mbtv",
-                  [],
-                ),
-              ),
-              layout,
-            ),
-            loader_module("load_post", "posts:show", Some(60), ["posts"]),
-          ),
-          "posts.update",
-        ),
-        dynamic_revalidate(60),
-      ),
-      client_component(
-        "LikeButton",
-        "examples/demo_blog/views/components/like_button.mbtv",
-        [("kind", "heart")],
-        hydrate_visible(),
-      ),
+  let page = page_module(
+    "posts_show",
+    "/posts/[id]",
+    "examples/demo_blog/views/pages/posts/show.mbtv",
+    "Post",
+    server_component(
+      "PostsShowPage",
+      "examples/demo_blog/views/pages/posts/show.mbtv",
+      [],
     ),
+  )
+  .with_layout(layout)
+  .with_loader(loader_module("load_post", "posts:show", Some(60), ["posts"]))
+  .with_action_name("posts.update")
+  .with_dynamic_mode(dynamic_revalidate(60))
+  .with_island(
+    client_component(
+      "LikeButton",
+      "examples/demo_blog/views/components/like_button.mbtv",
+      [("kind", "heart")],
+      hydrate_visible(),
+    ),
+  )
+  .with_form(
     form_binding(
       "post_update",
       "posts.update",

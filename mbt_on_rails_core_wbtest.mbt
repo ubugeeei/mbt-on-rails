@@ -14,15 +14,9 @@ test "resources and namespace routes recognize member and collection actions" {
     resources(
       "posts",
       "Admin::PostsController",
-      with_collection_action(
-        with_member_action(
-          default_resource_options("posts", Some("posts")),
-          "publish",
-          http_post(),
-        ),
-        "search",
-        http_get(),
-      ),
+      default_resource_options("posts", Some("posts"))
+      .with_member_action("publish", http_post())
+      .with_collection_action("search", http_get()),
     ),
   )
 
@@ -65,35 +59,25 @@ test "resources and namespace routes recognize member and collection actions" {
 
 ///|
 test "active record relation and validation cover rails-like basics" {
-  let user_model = with_validation(
-    with_validation(
-      with_validation(
-        model(
-          "User",
-          "users",
-          [
-            unique(indexed(string_column("email"))),
-            string_column("password"),
-            string_column("password_confirmation"),
-          ],
-          true,
-          false,
-        ),
-        validates_presence("email"),
-      ),
-      validates_uniqueness("email"),
-    ),
-    validates_confirmation("password", "password_confirmation"),
+  let user_model = model(
+    "User",
+    "users",
+    [
+      string_column("email").indexed().unique(),
+      string_column("password"),
+      string_column("password_confirmation"),
+    ],
+    true,
+    false,
   )
+  .with_validation(validates_presence("email"))
+  .with_validation(validates_uniqueness("email"))
+  .with_validation(validates_confirmation("password", "password_confirmation"))
 
-  let relation = limit_to(
-    order_by(
-      where_eq(relation_for(user_model), "email", "hello@example.com"),
-      "created_at",
-      true,
-    ),
-    10,
-  )
+  let relation = relation_for(user_model)
+    .where_eq("email", "hello@example.com")
+    .order_by("created_at", true)
+    .limit_to(10)
   assert_eq(
     relation_to_sql(relation),
     "SELECT * FROM users WHERE email = 'hello@example.com' ORDER BY created_at DESC LIMIT 10",
@@ -123,7 +107,7 @@ test "migration generation produces reversible down sql" {
   let user_model = model(
     "User",
     "users",
-    [unique(indexed(string_column("email"))), string_column("password_digest")],
+    [string_column("email").indexed().unique(), string_column("password_digest")],
     true,
     false,
   )
@@ -153,4 +137,42 @@ test "auth enforces roles and permissions" {
   assert_true(authorize(Some(user), auth_required()))
   assert_true(authorize(Some(user), permission_access("posts.publish")))
   assert_false(authorize(Some(user), role_access("admin")))
+}
+
+///|
+test "declarative controller and app builders preserve inferred metadata" {
+  let controller = controller_named("SessionsController")
+    .for_resource("sessions")
+    .with_before_action(
+      before_only("create")
+      .requiring(auth_guest_only())
+      .permitting(["email", "password"]),
+    )
+    .with_action(
+      action_plan("create")
+      .require_auth(auth_guest_only())
+      .permit_params(["email", "password"])
+      .invoke_server_action("sessions.create")
+      .redirect_to("/")
+      .json()
+      .as_mutation()
+      .as_transactional(),
+    )
+
+  match controller_action(controller, "create") {
+    Some(action) => {
+      assert_eq(action.page_name, None)
+      assert_true(action.mutation)
+      assert_true(action.transactional)
+      assert_eq(action.allowed_params, ["email", "password"])
+      assert_eq(action.formats.length(), 2)
+    }
+    None => assert_true(false)
+  }
+
+  let app = app_named("demo")
+    .with_controller(controller)
+    .with_route(route("sign_in", http_get(), "/sign-in", "SessionsController", "create", None))
+  assert_eq(app.controllers.length(), 1)
+  assert_eq(app.routes.length(), 1)
 }

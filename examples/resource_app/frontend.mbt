@@ -16,40 +16,32 @@ fn note_layout() -> @mbor.LayoutModule {
 /// Builds the page modules used by the example Notes app.
 fn note_pages(layout : @mbor.LayoutModule) -> Array[@mbor.PageModule] {
   [
-    @mbor.with_form(
-      @mbor.with_island(
-        @mbor.with_dynamic_mode(
-          @mbor.with_action_name(
-            @mbor.with_loader(
-              @mbor.with_layout(
-                @mbor.page_module(
-                  "notes_index",
-                  "/notes",
-                  "examples/resource_app/views/pages/notes/index.mbtv",
-                  "Notes",
-                  @mbor.server_component(
-                    "NotesIndexPage",
-                    "examples/resource_app/views/pages/notes/index.mbtv",
-                    [],
-                  ),
-                ),
-                layout,
-              ),
-              @mbor.loader_module("load_notes", "notes:index", Some(30), [
-                "notes",
-              ]),
-            ),
-            "notes.create",
-          ),
-          @mbor.dynamic_revalidate(30),
-        ),
-        @mbor.client_component(
-          "NoteCounter",
-          "examples/resource_app/views/components/note_counter.mbtv",
-          [("count", "12")],
-          @mbor.hydrate_visible(),
-        ),
+    @mbor.page_module(
+      "notes_index",
+      "/notes",
+      "examples/resource_app/views/pages/notes/index.mbtv",
+      "Notes",
+      @mbor.server_component(
+        "NotesIndexPage",
+        "examples/resource_app/views/pages/notes/index.mbtv",
+        [],
       ),
+    )
+    .with_layout(layout)
+    .with_loader(@mbor.loader_module("load_notes", "notes:index", Some(30), [
+      "notes",
+    ]))
+    .with_action_name("notes.create")
+    .with_dynamic_mode(@mbor.dynamic_revalidate(30))
+    .with_island(
+      @mbor.client_component(
+        "NoteCounter",
+        "examples/resource_app/views/components/note_counter.mbtv",
+        [("count", "12")],
+        @mbor.hydrate_visible(),
+      ),
+    )
+    .with_form(
       @mbor.form_binding(
         "note_create",
         "notes.create",
@@ -58,27 +50,23 @@ fn note_pages(layout : @mbor.LayoutModule) -> Array[@mbor.PageModule] {
         Some("/notes"),
       ),
     ),
-    @mbor.with_form(
-      @mbor.with_action_name(
-        @mbor.with_loader(
-          @mbor.with_layout(
-            @mbor.page_module(
-              "notes_show",
-              "/notes/[id]",
-              "examples/resource_app/views/pages/notes/show.mbtv",
-              "Note",
-              @mbor.server_component(
-                "NotesShowPage",
-                "examples/resource_app/views/pages/notes/show.mbtv",
-                [],
-              ),
-            ),
-            layout,
-          ),
-          @mbor.loader_module("load_note", "notes:show", None, ["notes"]),
-        ),
-        "notes.update",
+    @mbor.page_module(
+      "notes_show",
+      "/notes/[id]",
+      "examples/resource_app/views/pages/notes/show.mbtv",
+      "Note",
+      @mbor.server_component(
+        "NotesShowPage",
+        "examples/resource_app/views/pages/notes/show.mbtv",
+        [],
       ),
+    )
+    .with_layout(layout)
+    .with_loader(@mbor.loader_module("load_note", "notes:show", None, [
+      "notes",
+    ]))
+    .with_action_name("notes.update")
+    .with_form(
       @mbor.form_binding(
         "note_update",
         "notes.update",
@@ -87,21 +75,19 @@ fn note_pages(layout : @mbor.LayoutModule) -> Array[@mbor.PageModule] {
         Some("/notes/[id]"),
       ),
     ),
-    @mbor.with_form(
-      @mbor.with_layout(
-        @mbor.page_module(
-          "notes_new",
-          "/notes/new",
-          "examples/resource_app/views/pages/notes/new.mbtv",
-          "New Note",
-          @mbor.server_component(
-            "NotesNewPage",
-            "examples/resource_app/views/pages/notes/new.mbtv",
-            [],
-          ),
-        ),
-        layout,
+    @mbor.page_module(
+      "notes_new",
+      "/notes/new",
+      "examples/resource_app/views/pages/notes/new.mbtv",
+      "New Note",
+      @mbor.server_component(
+        "NotesNewPage",
+        "examples/resource_app/views/pages/notes/new.mbtv",
+        [],
       ),
+    )
+    .with_layout(layout)
+    .with_form(
       @mbor.form_binding(
         "note_new",
         "notes.create",
@@ -110,21 +96,19 @@ fn note_pages(layout : @mbor.LayoutModule) -> Array[@mbor.PageModule] {
         Some("/notes"),
       ),
     ),
-    @mbor.with_form(
-      @mbor.with_layout(
-        @mbor.page_module(
-          "notes_edit",
-          "/notes/[id]/edit",
-          "examples/resource_app/views/pages/notes/edit.mbtv",
-          "Edit Note",
-          @mbor.server_component(
-            "NotesEditPage",
-            "examples/resource_app/views/pages/notes/edit.mbtv",
-            [],
-          ),
-        ),
-        layout,
+    @mbor.page_module(
+      "notes_edit",
+      "/notes/[id]/edit",
+      "examples/resource_app/views/pages/notes/edit.mbtv",
+      "Edit Note",
+      @mbor.server_component(
+        "NotesEditPage",
+        "examples/resource_app/views/pages/notes/edit.mbtv",
+        [],
       ),
+    )
+    .with_layout(layout)
+    .with_form(
       @mbor.form_binding(
         "note_edit",
         "notes.update",

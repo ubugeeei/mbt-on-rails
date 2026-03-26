@@ -2,7 +2,7 @@
 /// Builds a server component reference.
 pub fn server_component(
   name : String,
-  source_path : String,
+  source_path : @support.MbtvPath,
   props : Array[(String, String)],
 ) -> VaporComponentRef {
   {
@@ -20,7 +20,7 @@ pub fn server_component(
 /// Builds a client island component reference.
 pub fn client_component(
   name : String,
-  source_path : String,
+  source_path : @support.MbtvPath,
   props : Array[(String, String)],
   hydration : HydrationMode,
 ) -> VaporComponentRef {
@@ -39,7 +39,7 @@ pub fn client_component(
 /// Builds a layout module descriptor.
 pub fn layout_module(
   name : String,
-  file_path : String,
+  file_path : @support.MbtvPath,
   component : VaporComponentRef,
 ) -> LayoutModule {
   { name, file_path, component }

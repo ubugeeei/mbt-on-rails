@@ -8,13 +8,21 @@ import {
 // Values
 pub fn action(String, Array[ActionStep], String?, Bool, Array[String], Array[ResponseFormat], Bool) -> ActionDefinition
 
+pub fn action_plan(String) -> ActionDefinition
+
 pub fn authorize_step(String, String) -> ActionStep
 
 pub fn before_action(String?, @auth.AuthRequirement?, Array[String]) -> BeforeAction
 
+pub fn before_each() -> BeforeAction
+
+pub fn before_only(String) -> BeforeAction
+
 pub fn controller(String, String?, String, Array[BeforeAction], Array[ActionDefinition]) -> ControllerDefinition
 
 pub fn controller_action(ControllerDefinition, String) -> ActionDefinition?
+
+pub fn controller_named(String) -> ControllerDefinition
 
 pub fn controller_summary(ControllerDefinition) -> String
 
@@ -64,6 +72,29 @@ pub struct ActionDefinition {
   formats : Array[ResponseFormat]
   transactional : Bool
 }
+pub fn ActionDefinition::as_mutation(Self) -> Self
+pub fn ActionDefinition::as_transactional(Self) -> Self
+pub fn ActionDefinition::authorize(Self, String, String) -> Self
+pub fn ActionDefinition::deliver_mail(Self, String) -> Self
+pub fn ActionDefinition::enqueue_job(Self, String) -> Self
+pub fn ActionDefinition::flash(Self, String, String) -> Self
+pub fn ActionDefinition::html(Self) -> Self
+pub fn ActionDefinition::invoke_server_action(Self, String) -> Self
+pub fn ActionDefinition::json(Self) -> Self
+pub fn ActionDefinition::load_collection(Self, String) -> Self
+pub fn ActionDefinition::load_member(Self, String) -> Self
+pub fn ActionDefinition::permit_params(Self, Array[String]) -> Self
+pub fn ActionDefinition::persist_model(Self, String) -> Self
+pub fn ActionDefinition::redirect_to(Self, String) -> Self
+pub fn ActionDefinition::redirects(Self) -> Self
+pub fn ActionDefinition::render_page(Self, String) -> Self
+pub fn ActionDefinition::require_auth(Self, @auth.AuthRequirement) -> Self
+pub fn ActionDefinition::respond_to(Self, ResponseFormat) -> Self
+pub fn ActionDefinition::touch_cache(Self, String) -> Self
+pub fn ActionDefinition::turbo_stream(Self) -> Self
+pub fn ActionDefinition::with_allowed_params(Self, Array[String]) -> Self
+pub fn ActionDefinition::with_page_name(Self, String) -> Self
+pub fn ActionDefinition::with_step(Self, ActionStep) -> Self
 
 pub enum ActionStep {
   RequireAuth(@auth.AuthRequirement)
@@ -87,6 +118,8 @@ pub struct BeforeAction {
   requirement : @auth.AuthRequirement?
   allowed_params : Array[String]
 }
+pub fn BeforeAction::permitting(Self, Array[String]) -> Self
+pub fn BeforeAction::requiring(Self, @auth.AuthRequirement) -> Self
 
 pub struct ControllerDefinition {
   name : String
@@ -95,6 +128,10 @@ pub struct ControllerDefinition {
   before_actions : Array[BeforeAction]
   actions : Array[ActionDefinition]
 }
+pub fn ControllerDefinition::for_resource(Self, String) -> Self
+pub fn ControllerDefinition::with_action(Self, ActionDefinition) -> Self
+pub fn ControllerDefinition::with_before_action(Self, BeforeAction) -> Self
+pub fn ControllerDefinition::with_layout(Self, String) -> Self
 
 pub enum ResponseFormat {
   HtmlFormat

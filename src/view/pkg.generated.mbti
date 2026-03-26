@@ -163,6 +163,14 @@ pub struct PageModule {
   dynamic_mode : DynamicMode
   assets : AssetManifest
 }
+pub fn PageModule::with_action_name(Self, String) -> Self
+pub fn PageModule::with_assets(Self, AssetManifest) -> Self
+pub fn PageModule::with_dynamic_mode(Self, DynamicMode) -> Self
+pub fn PageModule::with_form(Self, FormBinding) -> Self
+pub fn PageModule::with_island(Self, VaporComponentRef) -> Self
+pub fn PageModule::with_layout(Self, LayoutModule) -> Self
+pub fn PageModule::with_loader(Self, LoaderModule) -> Self
+pub fn PageModule::with_metadata(Self, String, String) -> Self
 
 pub struct PropContract {
   name : String
@@ -195,6 +203,8 @@ pub struct VaporComponentRef {
   contract : ComponentContract?
   fallback_html : String?
 }
+pub fn VaporComponentRef::with_contract(Self, ComponentContract) -> Self
+pub fn VaporComponentRef::with_fallback(Self, String) -> Self
 
 // Type aliases
 

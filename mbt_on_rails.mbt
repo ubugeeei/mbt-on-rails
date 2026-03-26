@@ -12,6 +12,7 @@
 
 ///|
 pub using @support {
+  type MbtvPath,
   append_entries,
   classify,
   clone_array,
@@ -21,6 +22,7 @@ pub using @support {
   hash_string,
   join_path_segments,
   json_string,
+  mbtv_path,
   normalize_path,
   singularize,
   split_path,

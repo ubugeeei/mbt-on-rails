@@ -1,47 +1,38 @@
 ///|
 /// Builds the demo `User` model schema.
 pub fn demo_user_model() -> @orm.ModelSchema {
-  @orm.with_validation(
-    @orm.with_validation(
-      @orm.with_validation(
-        @orm.model(
-          "User",
-          "users",
-          [
-            @orm.unique(@orm.indexed(@orm.string_column("email"))),
-            @orm.string_column("password_digest"),
-            @orm.with_default(@orm.string_column("role"), "user"),
-            @orm.nullable(@orm.string_column("display_name")),
-          ],
-          true,
-          false,
-        ),
-        @orm.validates_presence("email"),
-      ),
-      @orm.validates_uniqueness("email"),
-    ),
-    @orm.validates_format("email", "@"),
+  @orm.model(
+    "User",
+    "users",
+    [
+      @orm.string_column("email").indexed().unique(),
+      @orm.string_column("password_digest"),
+      @orm.string_column("role").with_default("user"),
+      @orm.string_column("display_name").nullable(),
+    ],
+    true,
+    false,
   )
+  .with_validation(@orm.validates_presence("email"))
+  .with_validation(@orm.validates_uniqueness("email"))
+  .with_validation(@orm.validates_format("email", "@"))
 }
 
 ///|
 /// Builds the demo `Session` model schema.
 pub fn demo_session_model() -> @orm.ModelSchema {
-  @orm.with_association(
-    @orm.model(
-      "Session",
-      "sessions",
-      [
-        @orm.references_column("user_id", "users"),
-        @orm.unique(@orm.string_column("csrf_token")),
-        @orm.timestamp_column("expires_at"),
-        @orm.json_column("meta"),
-      ],
-      true,
-      false,
-    ),
-    @orm.belongs_to("user", "User", "user_id"),
-  )
+  @orm.model(
+    "Session",
+    "sessions",
+    [
+      @orm.references_column("user_id", "users"),
+      @orm.string_column("csrf_token").unique(),
+      @orm.timestamp_column("expires_at"),
+      @orm.json_column("meta"),
+    ],
+    true,
+    false,
+  ).with_association(@orm.belongs_to("user", "User", "user_id"))
 }
 
 ///|
@@ -59,22 +50,12 @@ pub fn demo_post_scaffold() -> @generator.ScaffoldPlan {
 pub fn demo_post_model(
   post_scaffold : @generator.ScaffoldPlan,
 ) -> @orm.ModelSchema {
-  @orm.with_callback(
-    @orm.with_association(
-      @orm.with_association(
-        @orm.with_validation(
-          @orm.with_validation(
-            post_scaffold.model,
-            @orm.validates_presence("body"),
-          ),
-          @orm.validates_uniqueness("slug"),
-        ),
-        @orm.belongs_to("author", "User", "author_id"),
-      ),
-      @orm.has_many("comments", "Comment", "post_id"),
-    ),
-    @orm.before_validation("slugify_title"),
-  )
+  post_scaffold.model
+  .with_validation(@orm.validates_presence("body"))
+  .with_validation(@orm.validates_uniqueness("slug"))
+  .with_association(@orm.belongs_to("author", "User", "author_id"))
+  .with_association(@orm.has_many("comments", "Comment", "post_id"))
+  .with_callback(@orm.before_validation("slugify_title"))
 }
 
 ///|

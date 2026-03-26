@@ -95,7 +95,7 @@ That keeps the current codebase buildable while preserving the intended interfac
 - [`src/process/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/process/types.mbt), [`src/process/render.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/process/render.mbt): deploy process topology and release task helpers
 - [`src/view/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/types.mbt), [`src/view/component_builders.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/component_builders.mbt), [`src/view/page_builders.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/page_builders.mbt), [`src/view/modes.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/modes.mbt), [`src/view/contracts.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/contracts.mbt), [`src/view/render.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/render.mbt), [`src/view/manifest.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/manifest.mbt): server components, page builders, hydration modes, server/client contracts, SSR shell, and manifests
 - [`src/generator/generator.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/generator/generator.mbt): scaffold planner
-- [`src/app/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/app/types.mbt), [`src/app/runtime.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/app/runtime.mbt), [`src/app/demo_blog.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/app/demo_blog.mbt): integrated demo application and runtime
+- [`src/app/types.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/app/types.mbt), [`src/app/runtime.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/app/runtime.mbt), [`examples/demo_blog/app.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/examples/demo_blog/app.mbt): generic app runtime plus the integrated demo application now kept under `examples/demo_blog/`
 - [`src/view/assets/hydrate.js`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/src/view/assets/hydrate.js): small client bridge source
 - [`mbt_on_rails.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/mbt_on_rails.mbt), [`mbt_on_rails_modeling.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/mbt_on_rails_modeling.mbt), [`mbt_on_rails_web.mbt`](/Users/ubugeeei/Source/github.com/ubugeeei/mbt-on-rails/mbt_on_rails_web.mbt): public facade files over the `src/*` packages
 
@@ -140,3 +140,35 @@ This returns a rendered SSR HTML shell for the `posts_show` page and includes:
 - component contract manifest
 - island hydration metadata
 - a small client bridge script
+
+## Declarative builder style
+
+The public DSL also supports method chaining so app/controller/page setup can stay flat instead of turning into nested `with_*` calls:
+
+```moonbit nocheck
+///|
+let sessions = action_plan("create")
+  .require_auth(auth_guest_only())
+  .permit_params(["email", "password"])
+  .invoke_server_action("sessions.create")
+  .redirect_to("/")
+  .json()
+  .as_mutation()
+  .as_transactional()
+
+///|
+let controller = controller_named("SessionsController")
+  .for_resource("sessions")
+  .with_before_action(
+    before_only("create")
+      .requiring(auth_guest_only())
+      .permitting(["email", "password"]),
+  )
+  .with_action(sessions)
+
+///|
+let app = app_named("notes example")
+  .with_controller(controller)
+  .with_pages(note_pages(layout))
+  .with_server_actions(note_server_actions())
+```

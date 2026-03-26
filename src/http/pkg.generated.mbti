@@ -107,6 +107,10 @@ pub struct ResourceOptions {
   member_actions : Array[(String, HttpMethod)]
   collection_actions : Array[(String, HttpMethod)]
 }
+pub fn ResourceOptions::with_collection_action(Self, String, HttpMethod) -> Self
+pub fn ResourceOptions::with_member_action(Self, String, HttpMethod) -> Self
+pub fn ResourceOptions::with_only(Self, Array[String]) -> Self
+pub fn ResourceOptions::with_param_name(Self, String) -> Self
 
 pub struct Response {
   status : Int

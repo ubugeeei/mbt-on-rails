@@ -1,8 +1,7 @@
 ///|
 test "middleware fixtures seeds and turbo streams behave like rails runtime helpers" {
   let stack = [
-    with_response_header(
-      middleware("security", None, [], [], [], None),
+    middleware("security", None, [], [], [], None).with_response_header(
       "x-frame-options",
       "DENY",
     ),

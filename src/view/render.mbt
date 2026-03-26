@@ -125,7 +125,7 @@ pub fn render_page_manifest_entry(page : PageModule) -> String {
   ", \"route_path\": " +
   @support.json_string(page.route_path) +
   ", \"file_path\": " +
-  @support.json_string(page.file_path) +
+  @support.json_string(page.file_path.as_string()) +
   ", \"loader\": " +
   loader +
   ", \"action\": " +
@@ -144,7 +144,7 @@ fn render_layout_placeholder(layout : LayoutModule) -> String {
   "<div class=\"mbor-layout\" data-mbor-layout=\"" +
   @support.escape_html(layout.name) +
   "\" data-mbor-layout-source=\"" +
-  @support.escape_html(layout.file_path) +
+  @support.escape_html(layout.file_path.as_string()) +
   "\"></div>"
 }
 
@@ -161,7 +161,9 @@ fn render_component_placeholder(component : VaporComponentRef) -> String {
     "data-mbor-component=\"" + @support.escape_html(component.name) + "\" ",
   )
   attrs.write_string(
-    "data-mbor-source=\"" + @support.escape_html(component.source_path) + "\" ",
+    "data-mbor-source=\"" +
+    @support.escape_html(component.source_path.as_string()) +
+    "\" ",
   )
   attrs.write_string(
     "data-mbor-props='" + @support.escape_html(props_json) + "' ",

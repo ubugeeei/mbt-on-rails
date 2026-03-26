@@ -78,45 +78,32 @@ pub fn demo_server_actions() -> Array[@view.ServerAction] {
 ///|
 /// Builds the demo home page module.
 fn demo_home_page(layout : @view.LayoutModule) -> @view.PageModule {
-  @view.with_island(
-    @view.with_loader(
-      @view.with_metadata(
-        @view.with_layout(
-          @view.page_module(
-            "home",
-            "/",
-            "examples/demo_blog/views/pages/home.mbtv",
-            "mbt on rails",
-            demo_home_page_component(),
-          ),
-          layout,
-        ),
-        "description",
-        "MoonBit on Rails with Vapor Moon delivery",
-      ),
-      @view.loader_module("load_home", "home", Some(30), []),
-    ),
-    demo_post_composer_idle_island(),
+  @view.page_module(
+    "home",
+    "/",
+    "examples/demo_blog/views/pages/home.mbtv",
+    "mbt on rails",
+    demo_home_page_component(),
   )
+  .with_layout(layout)
+  .with_metadata("description", "MoonBit on Rails with Vapor Moon delivery")
+  .with_loader(@view.loader_module("load_home", "home", Some(30), []))
+  .with_island(demo_post_composer_idle_island())
 }
 
 ///|
 /// Builds the demo sign-in page module.
 fn demo_sign_in_page(layout : @view.LayoutModule) -> @view.PageModule {
-  @view.with_form(
-    @view.with_action_name(
-      @view.with_layout(
-        @view.page_module(
-          "sign_in",
-          "/sign-in",
-          "examples/demo_blog/views/pages/sign_in.mbtv",
-          "Sign In",
-          demo_sign_in_page_component(),
-        ),
-        layout,
-      ),
-      "sessions.create",
-    ),
+  @view.page_module(
+    "sign_in",
+    "/sign-in",
+    "examples/demo_blog/views/pages/sign_in.mbtv",
+    "Sign In",
+    demo_sign_in_page_component(),
+  )
+  .with_layout(layout)
+  .with_action_name("sessions.create")
+  .with_form(
     @view.form_binding("sign_in", "sessions.create", "POST", None, Some("/")),
   )
 }
@@ -124,29 +111,21 @@ fn demo_sign_in_page(layout : @view.LayoutModule) -> @view.PageModule {
 ///|
 /// Builds the demo posts index page module.
 fn demo_posts_index_page(layout : @view.LayoutModule) -> @view.PageModule {
-  @view.with_form(
-    @view.with_island(
-      @view.with_dynamic_mode(
-        @view.with_loader(
-          @view.with_action_name(
-            @view.with_layout(
-              @view.page_module(
-                "posts_index",
-                "/posts",
-                "examples/demo_blog/views/pages/posts/index.mbtv",
-                "Posts",
-                demo_posts_index_page_component(),
-              ),
-              layout,
-            ),
-            "posts.create",
-          ),
-          @view.loader_module("load_posts", "posts:index", Some(60), ["posts"]),
-        ),
-        @view.dynamic_revalidate(60),
-      ),
-      demo_post_composer_island("index"),
-    ),
+  @view.page_module(
+    "posts_index",
+    "/posts",
+    "examples/demo_blog/views/pages/posts/index.mbtv",
+    "Posts",
+    demo_posts_index_page_component(),
+  )
+  .with_layout(layout)
+  .with_action_name("posts.create")
+  .with_loader(@view.loader_module("load_posts", "posts:index", Some(60), [
+    "posts",
+  ]))
+  .with_dynamic_mode(@view.dynamic_revalidate(60))
+  .with_island(demo_post_composer_island("index"))
+  .with_form(
     @view.form_binding(
       "post_create",
       "posts.create",
@@ -160,28 +139,20 @@ fn demo_posts_index_page(layout : @view.LayoutModule) -> @view.PageModule {
 ///|
 /// Builds the demo posts show page module.
 fn demo_posts_show_page(layout : @view.LayoutModule) -> @view.PageModule {
-  @view.with_form(
-    @view.with_island(
-      @view.with_loader(
-        @view.with_action_name(
-          @view.with_layout(
-            @view.page_module(
-              "posts_show",
-              "/posts/[id]",
-              "examples/demo_blog/views/pages/posts/show.mbtv",
-              "Post",
-              demo_posts_show_page_component(),
-            ),
-            layout,
-          ),
-          "posts.update",
-        ),
-        @view.loader_module("load_post", "posts:show", None, [
-          "posts", "authors",
-        ]),
-      ),
-      demo_like_button_island(),
-    ),
+  @view.page_module(
+    "posts_show",
+    "/posts/[id]",
+    "examples/demo_blog/views/pages/posts/show.mbtv",
+    "Post",
+    demo_posts_show_page_component(),
+  )
+  .with_layout(layout)
+  .with_action_name("posts.update")
+  .with_loader(@view.loader_module("load_post", "posts:show", None, [
+    "posts", "authors",
+  ]))
+  .with_island(demo_like_button_island())
+  .with_form(
     @view.form_binding(
       "post_update",
       "posts.update",
@@ -195,17 +166,15 @@ fn demo_posts_show_page(layout : @view.LayoutModule) -> @view.PageModule {
 ///|
 /// Builds the demo posts new page module.
 fn demo_posts_new_page(layout : @view.LayoutModule) -> @view.PageModule {
-  @view.with_form(
-    @view.with_layout(
-      @view.page_module(
-        "posts_new",
-        "/posts/new",
-        "examples/demo_blog/views/pages/posts/new.mbtv",
-        "New Post",
-        demo_posts_new_page_component(),
-      ),
-      layout,
-    ),
+  @view.page_module(
+    "posts_new",
+    "/posts/new",
+    "examples/demo_blog/views/pages/posts/new.mbtv",
+    "New Post",
+    demo_posts_new_page_component(),
+  )
+  .with_layout(layout)
+  .with_form(
     @view.form_binding(
       "post_create_page",
       "posts.create",
@@ -219,20 +188,18 @@ fn demo_posts_new_page(layout : @view.LayoutModule) -> @view.PageModule {
 ///|
 /// Builds the demo posts edit page module.
 fn demo_posts_edit_page(layout : @view.LayoutModule) -> @view.PageModule {
-  @view.with_form(
-    @view.with_loader(
-      @view.with_layout(
-        @view.page_module(
-          "posts_edit",
-          "/posts/[id]/edit",
-          "examples/demo_blog/views/pages/posts/edit.mbtv",
-          "Edit Post",
-          demo_posts_edit_page_component(),
-        ),
-        layout,
-      ),
-      @view.loader_module("load_post_for_edit", "posts:edit", None, ["posts"]),
-    ),
+  @view.page_module(
+    "posts_edit",
+    "/posts/[id]/edit",
+    "examples/demo_blog/views/pages/posts/edit.mbtv",
+    "Edit Post",
+    demo_posts_edit_page_component(),
+  )
+  .with_layout(layout)
+  .with_loader(@view.loader_module("load_post_for_edit", "posts:edit", None, [
+    "posts",
+  ]))
+  .with_form(
     @view.form_binding(
       "post_edit",
       "posts.update",

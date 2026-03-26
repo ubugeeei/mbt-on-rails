@@ -2,24 +2,12 @@
 /// Builds the middleware stack configured by the demo app.
 pub fn demo_middlewares() -> Array[@middleware.Middleware] {
   [
-    @middleware.with_request_header(
-      @middleware.with_response_header(
-        @middleware.middleware("request_id", None, [], [], [], None),
-        "x-request-id",
-        "demo-" + @support.hash_string("/"),
-      ),
-      "x-request-start",
-      "2026-03-25T00:00:00Z",
-    ),
-    @middleware.with_response_header(
-      @middleware.with_response_header(
-        @middleware.middleware("security_headers", None, [], [], [], None),
-        "x-frame-options",
-        "DENY",
-      ),
-      "x-content-type-options",
-      "nosniff",
-    ),
+    @middleware.middleware("request_id", None, [], [], [], None)
+    .with_response_header("x-request-id", "demo-" + @support.hash_string("/"))
+    .with_request_header("x-request-start", "2026-03-25T00:00:00Z"),
+    @middleware.middleware("security_headers", None, [], [], [], None)
+    .with_response_header("x-frame-options", "DENY")
+    .with_response_header("x-content-type-options", "nosniff"),
     @middleware.halt_with_text(
       "internal_guard",
       "/_internal",
