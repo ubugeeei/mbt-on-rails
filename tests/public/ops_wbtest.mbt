@@ -136,6 +136,62 @@ test "job failure policies support retry_on discard_on and queue overrides" {
 }
 
 ///|
+test "job adapters and serialized jobs preserve queue contracts" {
+  let adapter = solid_queue_adapter(queue_prefix=Some("solid"))
+  let definition = job(
+    name="SearchIndexJob",
+    queue="default",
+    argument_types=[
+      ("id", "String"),
+      ("published", "Bool"),
+      ("title", "String"),
+    ],
+    retry_limit=3,
+    unique_key=Some("search:index"),
+  )
+  let queue = enqueue_at_with_adapter(
+    job_queue(name="default"),
+    definition,
+    [("id", "42"), ("published", "true"), ("title", "MoonBit \"Rails\"")],
+    "2026-03-27T09:00:00Z",
+    adapter,
+  )
+
+  assert_eq(queue.name, "solid:default")
+  assert_eq(queue.jobs[0].queue, "solid:default")
+  assert_eq(queue.jobs[0].argument_types.length(), 3)
+  assert_true(job_adapter_summary(adapter).contains("kind=solid_queue"))
+
+  let serialized = serialize_job(queue.jobs[0], adapter)
+  assert_true(serialized_job_summary(serialized).contains("via solid_queue"))
+  assert_true(
+    render_serialized_job(serialized).contains("\"queue\": \"solid:default\""),
+  )
+
+  match deserialize_payload(serialized.payload_json) {
+    Some(payload) => {
+      assert_eq(find_entry(payload, "id"), Some("42"))
+      assert_eq(find_entry(payload, "published"), Some("true"))
+      assert_eq(find_entry(payload, "title"), Some("MoonBit \"Rails\""))
+    }
+    None => assert_true(false)
+  }
+
+  match restore_enqueued_job(serialized) {
+    Some(restored) => {
+      assert_eq(restored.queue, "solid:default")
+      assert_eq(restored.unique_key, Some("search:index"))
+      assert_eq(restored.argument_types[1].1, "Bool")
+      assert_eq(
+        find_entry(restored.payload, "title"),
+        Some("MoonBit \"Rails\""),
+      )
+    }
+    None => assert_true(false)
+  }
+}
+
+///|
 test "component contracts surface server client boundaries in manifests" {
   let action = server_action(
     name="posts.create",

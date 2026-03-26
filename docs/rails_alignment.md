@@ -85,9 +85,15 @@ The source audit in this batch was anchored to the official Rails repository at:
 
 ## Tenth batch added here
 
- - The validation layer now has reusable `validator(...)` objects that can be attached with `FieldSchema::apply_validator(...)`
+- The validation layer now has reusable `validator(...)` objects that can be attached with `FieldSchema::apply_validator(...)`
 - Custom validation messages now interpolate placeholders such as `%{minimum}`, `%{pattern}`, `%{attribute}`, and `%{validator}`
 - Active Record models can now bridge reusable validators with `validates_with(...)` in addition to raw `validates(...)`
+
+## Eleventh batch added here
+
+- The Active Job layer now has explicit adapter contracts such as `inline_adapter()`, `async_adapter()`, `test_adapter()`, and `solid_queue_adapter()`
+- Jobs now retain their argument type contract after enqueue, so serialized envelopes can round-trip that metadata
+- `serialize_job(...)`, `render_serialized_job(...)`, `deserialize_payload(...)`, and `restore_enqueued_job(...)` add explicit serialization contracts for queue backends and persistence
 
 ## Biggest gaps still open
 
@@ -96,12 +102,12 @@ The source audit in this batch was anchored to the official Rails repository at:
 - `activerecord`: callback chains/database adapters/query execution
 - `actionpack`: cookies/session store/responders/request forgery strategy
 - `actionview`: helpers/template lookup
-- `activejob`: adapters/serialization
+- `activejob`: execution backends/monitoring depth
 - `actioncable`: connection lifecycle and richer subscription adapters
 - `railties`: generators/initializers/config loading/engines
 
 ## Recommended next batches
 
-1. Add Active Job adapters and serialization contracts.
-2. Add more Action View helper coverage on top of the new partial/form-builder metadata.
-3. Add typed attribute/serialization support on top of the validation layer.
+1. Add more Action View helper coverage on top of the new partial/form-builder metadata.
+2. Add typed attribute/serialization support on top of the validation layer.
+3. Add deeper Active Job execution backend and monitoring behavior.

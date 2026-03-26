@@ -6,6 +6,12 @@ import {
 }
 
 // Values
+pub fn apply_job_adapter(JobDefinition, JobAdapter) -> JobDefinition
+
+pub fn async_adapter() -> JobAdapter
+
+pub fn deserialize_payload(String) -> Array[(String, String)]?
+
 #label_migration(exception_name, allow_positional=true)
 pub fn discard_on(exception_name~ : String, report? : Bool) -> JobFailurePolicy
 
@@ -15,9 +21,13 @@ pub fn drain_ready_with_notifications(queue~ : JobQueue, now~ : String, notifica
 
 pub fn enqueue_at(JobQueue, JobDefinition, Array[(String, String)], String) -> JobQueue
 
+pub fn enqueue_at_with_adapter(JobQueue, JobDefinition, Array[(String, String)], String, JobAdapter) -> JobQueue
+
 pub fn enqueue_at_with_notifications(queue~ : JobQueue, definition~ : JobDefinition, payload~ : Array[(String, String)], run_at~ : String, notifications~ : @support.Notifications) -> (JobQueue, @support.Notifications)
 
 pub fn enqueue_now(JobQueue, JobDefinition, Array[(String, String)]) -> JobQueue
+
+pub fn enqueue_now_with_adapter(JobQueue, JobDefinition, Array[(String, String)], JobAdapter) -> JobQueue
 
 pub fn enqueue_now_with_notifications(queue~ : JobQueue, definition~ : JobDefinition, payload~ : Array[(String, String)], notifications~ : @support.Notifications) -> (JobQueue, @support.Notifications)
 
@@ -34,10 +44,14 @@ pub fn handle_job_failure(EnqueuedJob, String, String) -> JobFailureOutcome
 
 pub fn handle_job_failure_with_notifications(job~ : EnqueuedJob, error_name~ : String, now~ : String, notifications~ : @support.Notifications) -> (JobFailureOutcome, @support.Notifications)
 
+pub fn inline_adapter() -> JobAdapter
+
 #label_migration(argument_types, allow_positional=true)
 #label_migration(name, allow_positional=true)
 #label_migration(queue, allow_positional=true)
 pub fn job(name~ : String, queue~ : String, argument_types~ : Array[(String, String)], retry_limit? : Int, unique_key? : String?, failure_policies? : Array[JobFailurePolicy]) -> JobDefinition
+
+pub fn job_adapter_summary(JobAdapter) -> String
 
 #label_migration(name, allow_positional=true)
 pub fn job_queue(name~ : String) -> JobQueue
@@ -48,12 +62,33 @@ pub fn job_summary(JobQueue) -> String
 
 pub fn polynomially_longer() -> RetryWait
 
+pub fn render_serialized_job(SerializedJob) -> String
+
+pub fn restore_enqueued_job(SerializedJob) -> EnqueuedJob?
+
 pub fn retry_job(EnqueuedJob, String) -> EnqueuedJob?
 
 pub fn retry_job_with_notifications(job~ : EnqueuedJob, next_run_at~ : String, notifications~ : @support.Notifications) -> (EnqueuedJob?, @support.Notifications)
 
 #label_migration(exception_name, allow_positional=true)
 pub fn retry_on(exception_name~ : String, attempts? : Int, wait? : RetryWait, queue? : String?, report? : Bool) -> JobFailurePolicy
+
+pub fn serialize_job(EnqueuedJob, JobAdapter) -> SerializedJob
+
+pub fn serialize_payload(Array[(String, String)]) -> String
+
+#label_migration(adapter, allow_positional=true)
+#label_migration(attempts, allow_positional=true)
+#label_migration(definition, allow_positional=true)
+#label_migration(payload_json, allow_positional=true)
+#label_migration(run_at, allow_positional=true)
+pub fn serialized_job(adapter~ : JobAdapter, definition~ : JobDefinition, payload_json~ : String, run_at~ : String, attempts~ : Int) -> SerializedJob
+
+pub fn serialized_job_summary(SerializedJob) -> String
+
+pub fn solid_queue_adapter(queue_prefix? : String?) -> JobAdapter
+
+pub fn test_adapter() -> JobAdapter
 
 // Errors
 
@@ -66,6 +101,7 @@ pub struct DrainedJobs {
 pub struct EnqueuedJob {
   name : String
   queue : String
+  argument_types : Array[(String, String)]
   payload : Array[(String, String)]
   run_at : String
   attempts : Int
@@ -80,6 +116,26 @@ pub enum FailureDisposition {
 }
 pub impl Eq for FailureDisposition
 pub impl Show for FailureDisposition
+
+pub struct JobAdapter {
+  kind : JobAdapterKind
+  name : String
+  queue_prefix : String?
+  persistent : Bool
+  inline_execution : Bool
+  supports_scheduling : Bool
+  supports_retries : Bool
+}
+pub fn JobAdapter::queue_name(Self, String) -> String
+
+pub enum JobAdapterKind {
+  InlineAdapter
+  AsyncAdapter
+  TestAdapter
+  SolidQueueAdapter
+}
+pub impl Eq for JobAdapterKind
+pub impl Show for JobAdapterKind
 
 pub struct JobDefinition {
   name : String
@@ -121,6 +177,14 @@ pub enum RetryWait {
 }
 pub impl Eq for RetryWait
 pub impl Show for RetryWait
+
+pub struct SerializedJob {
+  adapter : JobAdapter
+  definition : JobDefinition
+  payload_json : String
+  run_at : String
+  attempts : Int
+}
 
 // Type aliases
 

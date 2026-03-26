@@ -14,12 +14,44 @@ pub struct JobDefinition {
 pub struct EnqueuedJob {
   name : String
   queue : String
+  argument_types : Array[(String, String)]
   payload : Array[(String, String)]
   run_at : String
   attempts : Int
   retry_limit : Int
   unique_key : String?
   failure_policies : Array[JobFailurePolicy]
+}
+
+///|
+/// Describes the adapter backing Active Job-style enqueues.
+pub enum JobAdapterKind {
+  InlineAdapter
+  AsyncAdapter
+  TestAdapter
+  SolidQueueAdapter
+} derive(Eq, Show)
+
+///|
+/// Captures the delivery contract for one job adapter.
+pub struct JobAdapter {
+  kind : JobAdapterKind
+  name : String
+  queue_prefix : String?
+  persistent : Bool
+  inline_execution : Bool
+  supports_scheduling : Bool
+  supports_retries : Bool
+}
+
+///|
+/// Stores one serialized job envelope ready for transport or persistence.
+pub struct SerializedJob {
+  adapter : JobAdapter
+  definition : JobDefinition
+  payload_json : String
+  run_at : String
+  attempts : Int
 }
 
 ///|
@@ -108,6 +140,7 @@ pub fn enqueued_job(
   {
     name: definition.name,
     queue: definition.queue,
+    argument_types: definition.argument_types,
     payload,
     run_at,
     attempts,
@@ -115,6 +148,81 @@ pub fn enqueued_job(
     unique_key: definition.unique_key,
     failure_policies: definition.failure_policies,
   }
+}
+
+///|
+/// Builds the Rails-like inline adapter.
+pub fn inline_adapter() -> JobAdapter {
+  {
+    kind: InlineAdapter,
+    name: "inline",
+    queue_prefix: None,
+    persistent: false,
+    inline_execution: true,
+    supports_scheduling: false,
+    supports_retries: false,
+  }
+}
+
+///|
+/// Builds the default async adapter contract.
+pub fn async_adapter() -> JobAdapter {
+  {
+    kind: AsyncAdapter,
+    name: "async",
+    queue_prefix: None,
+    persistent: false,
+    inline_execution: false,
+    supports_scheduling: true,
+    supports_retries: true,
+  }
+}
+
+///|
+/// Builds the in-memory test adapter contract.
+pub fn test_adapter() -> JobAdapter {
+  {
+    kind: TestAdapter,
+    name: "test",
+    queue_prefix: Some("test"),
+    persistent: false,
+    inline_execution: false,
+    supports_scheduling: true,
+    supports_retries: true,
+  }
+}
+
+///|
+/// Builds a Solid Queue-like persistent adapter contract.
+pub fn solid_queue_adapter(
+  queue_prefix? : String? = Some("solid"),
+) -> JobAdapter {
+  {
+    kind: SolidQueueAdapter,
+    name: "solid_queue",
+    queue_prefix,
+    persistent: true,
+    inline_execution: false,
+    supports_scheduling: true,
+    supports_retries: true,
+  }
+}
+
+///|
+/// Builds one serialized job envelope.
+#label_migration(adapter, allow_positional=true)
+#label_migration(definition, allow_positional=true)
+#label_migration(payload_json, allow_positional=true)
+#label_migration(run_at, allow_positional=true)
+#label_migration(attempts, allow_positional=true)
+pub fn serialized_job(
+  adapter~ : JobAdapter,
+  definition~ : JobDefinition,
+  payload_json~ : String,
+  run_at~ : String,
+  attempts~ : Int,
+) -> SerializedJob {
+  { adapter, definition, payload_json, run_at, attempts }
 }
 
 ///|
@@ -175,7 +283,7 @@ pub fn JobDefinition::with_failure_policy(
 ) -> JobDefinition {
   let failure_policies = @support.clone_array(self.failure_policies)
   failure_policies.push(policy)
-  { ..self, failure_policies }
+  { ..self, failure_policies, }
 }
 
 ///|
@@ -189,13 +297,7 @@ pub fn JobDefinition::retry_on(
   report? : Bool = false,
 ) -> JobDefinition {
   self.with_failure_policy(
-    retry_on(
-      exception_name=exception_name,
-      attempts=attempts,
-      wait=wait,
-      queue=queue,
-      report=report,
-    ),
+    retry_on(exception_name~, attempts~, wait~, queue~, report~),
   )
 }
 
@@ -206,9 +308,7 @@ pub fn JobDefinition::discard_on(
   exception_name : String,
   report? : Bool = false,
 ) -> JobDefinition {
-  self.with_failure_policy(
-    discard_on(exception_name=exception_name, report=report),
-  )
+  self.with_failure_policy(discard_on(exception_name~, report~))
 }
 
 ///|

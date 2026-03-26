@@ -70,6 +70,8 @@ pub fn append_entries(Array[(String, String)], Array[(String, String)]) -> Array
 
 pub fn append_stream(String, String) -> @turbo.TurboStream
 
+pub fn apply_job_adapter(@job.JobDefinition, @job.JobAdapter) -> @job.JobDefinition
+
 pub fn apply_request_middleware(Array[@middleware.Middleware], @http.Request) -> (@http.Request, @http.Response?)
 
 pub fn apply_response_middleware(Array[@middleware.Middleware], @http.Request, @http.Response) -> @http.Response
@@ -85,6 +87,8 @@ pub fn around_only(String) -> @controller.AroundAction
 #label_migration(script_urls, allow_positional=true)
 #label_migration(style_urls, allow_positional=true)
 pub fn asset_manifest(style_urls~ : Array[String], script_urls~ : Array[String]) -> @view.AssetManifest
+
+pub fn async_adapter() -> @job.JobAdapter
 
 pub fn auth_guest_only() -> @auth.AuthRequirement
 
@@ -248,6 +252,8 @@ pub fn demo_blog_app() -> @app.MbtOnRailsApp
 #label_migration(trust_proxy, allow_positional=true)
 pub fn deployment_config(environment~ : @production.Environment, host~ : String, port~ : Int, force_ssl~ : Bool, trust_proxy~ : Bool, asset_host~ : String?, health_path~ : String, ready_path~ : String) -> @production.DeploymentConfig
 
+pub fn deserialize_payload(String) -> Array[(String, String)]?
+
 pub fn digest_password(String, String) -> String
 
 pub fn dirty_new_record(@active_record.Record) -> @active_record.DirtyRecord
@@ -281,6 +287,8 @@ pub fn empty_memory_database() -> @active_record.MemoryDatabase
 
 pub fn enqueue_at(@job.JobQueue, @job.JobDefinition, Array[(String, String)], String) -> @job.JobQueue
 
+pub fn enqueue_at_with_adapter(@job.JobQueue, @job.JobDefinition, Array[(String, String)], String, @job.JobAdapter) -> @job.JobQueue
+
 pub fn enqueue_at_with_notifications(queue~ : @job.JobQueue, definition~ : @job.JobDefinition, payload~ : Array[(String, String)], run_at~ : String, notifications~ : @support.Notifications) -> (@job.JobQueue, @support.Notifications)
 
 pub fn enqueue_delivery(@job.JobQueue, @mailer.MailDelivery, String?) -> @job.JobQueue
@@ -290,6 +298,8 @@ pub fn enqueue_delivery_with_notifications(queue~ : @job.JobQueue, delivery~ : @
 pub fn enqueue_job_step(String) -> @controller.ActionStep
 
 pub fn enqueue_now(@job.JobQueue, @job.JobDefinition, Array[(String, String)]) -> @job.JobQueue
+
+pub fn enqueue_now_with_adapter(@job.JobQueue, @job.JobDefinition, Array[(String, String)], @job.JobAdapter) -> @job.JobQueue
 
 pub fn enqueue_now_with_notifications(queue~ : @job.JobQueue, definition~ : @job.JobDefinition, payload~ : Array[(String, String)], notifications~ : @support.Notifications) -> (@job.JobQueue, @support.Notifications)
 
@@ -425,6 +435,8 @@ pub fn index_statements(@active_record.ModelSchema) -> Array[String]
 
 pub fn indexed(@active_record.Column) -> @active_record.Column
 
+pub fn inline_adapter() -> @job.JobAdapter
+
 pub fn insert_record(@active_record.MemoryDatabase, @active_record.Record) -> @active_record.MemoryDatabase
 
 pub fn insert_sql(@active_record.ModelSchema, @active_record.Record) -> String
@@ -443,6 +455,8 @@ pub fn issue_session(String, String) -> @auth.Session
 #label_migration(name, allow_positional=true)
 #label_migration(queue, allow_positional=true)
 pub fn job(name~ : String, queue~ : String, argument_types~ : Array[(String, String)], retry_limit? : Int, unique_key? : String?, failure_policies? : Array[@job.JobFailurePolicy]) -> @job.JobDefinition
+
+pub fn job_adapter_summary(@job.JobAdapter) -> String
 
 #label_migration(name, allow_positional=true)
 pub fn job_queue(name~ : String) -> @job.JobQueue
@@ -727,6 +741,8 @@ pub fn render_route_tree(Array[@view.PageModule]) -> String
 
 pub fn render_router_manifest(Array[@view.PageModule]) -> String
 
+pub fn render_serialized_job(@job.SerializedJob) -> String
+
 pub fn render_server_action_manifest(Array[@view.ServerAction]) -> String
 
 pub fn render_turbo_stream(Array[@turbo.TurboStream]) -> String
@@ -752,6 +768,8 @@ pub fn resources(String, String, @http.ResourceOptions) -> Array[@http.RouteSpec
 pub fn restful_controller(String, String) -> @controller.ControllerDefinition
 
 pub fn restful_controller_with_params(String, String, Array[String]) -> @controller.ControllerDefinition
+
+pub fn restore_enqueued_job(@job.SerializedJob) -> @job.EnqueuedJob?
 
 pub fn retry_job(@job.EnqueuedJob, String) -> @job.EnqueuedJob?
 
@@ -819,6 +837,19 @@ pub fn seed_summary(@fixture.SeedPlan) -> String
 
 pub fn select_columns(@active_record.Relation, Array[String]) -> @active_record.Relation
 
+pub fn serialize_job(@job.EnqueuedJob, @job.JobAdapter) -> @job.SerializedJob
+
+pub fn serialize_payload(Array[(String, String)]) -> String
+
+#label_migration(adapter, allow_positional=true)
+#label_migration(attempts, allow_positional=true)
+#label_migration(definition, allow_positional=true)
+#label_migration(payload_json, allow_positional=true)
+#label_migration(run_at, allow_positional=true)
+pub fn serialized_job(adapter~ : @job.JobAdapter, definition~ : @job.JobDefinition, payload_json~ : String, run_at~ : String, attempts~ : Int) -> @job.SerializedJob
+
+pub fn serialized_job_summary(@job.SerializedJob) -> String
+
 #label_migration(csrf_protected, allow_positional=true)
 #label_migration(input_fields, allow_positional=true)
 #label_migration(name, allow_positional=true)
@@ -844,6 +875,8 @@ pub fn set_metric(@metrics.MetricsRegistry, String, Array[(String, String)], Int
 
 pub fn singularize(String) -> String
 
+pub fn solid_queue_adapter(queue_prefix? : String?) -> @job.JobAdapter
+
 pub fn split_path(String) -> Array[String]
 
 pub fn string_column(String) -> @active_record.Column
@@ -858,6 +891,8 @@ pub fn template_component_imports(String) -> Array[String]
 pub fn template_component_usages(String) -> Array[String]
 
 pub fn template_import(local_name~ : String, component~ : @view.VaporComponentRef) -> @view.TemplateImport
+
+pub fn test_adapter() -> @job.JobAdapter
 
 pub fn text_column(String) -> @active_record.Column
 
@@ -1118,6 +1153,10 @@ pub using @view {type HydrationMode}
 
 pub using @auth {type Identity}
 
+pub using @job {type JobAdapter}
+
+pub using @job {type JobAdapterKind}
+
 pub using @job {type JobDefinition}
 
 pub using @job {type JobFailureOutcome}
@@ -1241,6 +1280,8 @@ pub using @secrets {type SecretVar}
 pub using @secrets {type SecretsConfig}
 
 pub using @fixture {type SeedPlan}
+
+pub using @job {type SerializedJob}
 
 pub using @view {type ServerAction}
 
