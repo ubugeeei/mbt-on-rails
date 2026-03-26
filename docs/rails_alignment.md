@@ -32,10 +32,17 @@ The source audit in this batch was anchored to the official Rails repository at:
 - `perform_start.active_job`
 - `process.action_mailer`
 
+## Second batch added here
+
+- `ActiveModel::Errors`-like typed validation results via `ValidationError`, `ValidationErrors`, and `validate_record_errors`
+- A valibot-like validation layer in `src/validation` with composable `object_schema` / `string_field` / `FieldRule`
+- `ActiveRecord` validation wrappers can now bridge to generic rules through `validates(field=..., rule=...)`
+- Validation constructors and association constructors now support labelled arguments for a more declarative API
+
 ## Biggest gaps still open
 
 - `activesupport`: concern/autoloading/deprecation/timezones/notifications subscribers
-- `activemodel`: typed attributes/errors/serialization/validator objects
+- `activemodel`: typed attributes/serialization/validator objects
 - `activerecord`: transactions/dirty tracking/query interface/scopes/callback chains
 - `actionpack`: cookies/session store/responders/after_action/around_action/request forgery strategy
 - `actionview`: partials/helpers/form builders/template lookup
@@ -45,7 +52,7 @@ The source audit in this batch was anchored to the official Rails repository at:
 
 ## Recommended next batches
 
-1. Add `ActiveModel::Errors`-like typed validation results.
-2. Add `after_action` and `around_action` style controller callbacks.
+1. Add `after_action` and `around_action` style controller callbacks.
+2. Expand the validation library with reusable validator objects and richer message customization.
 3. Add `retry_on` / `discard_on` style job policy structs.
 4. Add partial rendering and a small helper/form-builder layer.

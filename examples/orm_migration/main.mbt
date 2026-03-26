@@ -11,9 +11,11 @@ fn post_model() -> @mbor.ModelSchema {
       @mbor.references_column("author_id", "users"),
     ],
   )
-  .with_validation(@mbor.validates_presence("title"))
-  .with_validation(@mbor.validates_uniqueness("slug"))
-  .with_association(@mbor.belongs_to("author", "User", "author_id"))
+  .with_validation(@mbor.validates_presence(field="title"))
+  .with_validation(@mbor.validates_uniqueness(field="slug"))
+  .with_association(
+    @mbor.belongs_to(name="author", target="User", foreign_key="author_id"),
+  )
   .with_callback(@mbor.before_validation("slugify_title"))
 }
 

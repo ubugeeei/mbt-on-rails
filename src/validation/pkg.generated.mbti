@@ -1,0 +1,103 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "ubugeeei/mbt_on_rails/src/validation"
+
+// Values
+#label_migration(pattern, allow_positional=true)
+pub fn contains(pattern~ : String) -> FieldRule
+
+#label_migration(values, allow_positional=true)
+pub fn included_in(values~ : Array[String]) -> FieldRule
+
+#label_migration(maximum, allow_positional=true)
+pub fn max_length(maximum~ : Int) -> FieldRule
+
+#label_migration(minimum, allow_positional=true)
+pub fn min_length(minimum~ : Int) -> FieldRule
+
+#label_migration(name, allow_positional=true)
+pub fn object_schema(name~ : String) -> ObjectSchema
+
+pub fn required() -> FieldRule
+
+#label_migration(other_field, allow_positional=true)
+pub fn same_as(other_field~ : String) -> FieldRule
+
+#label_migration(name, allow_positional=true)
+pub fn string_field(name~ : String) -> FieldSchema
+
+pub fn validate_object(ObjectSchema, Array[(String, String)]) -> ValidationReport
+
+#label_migration(details, allow_positional=true)
+#label_migration(kind, allow_positional=true)
+#label_migration(message, allow_positional=true)
+#label_migration(path, allow_positional=true)
+pub fn validation_issue(path~ : String, kind~ : RuleKind, message~ : String, details~ : Array[(String, String)]) -> ValidationIssue
+
+#label_migration(schema_name, allow_positional=true)
+pub fn validation_report(schema_name~ : String) -> ValidationReport
+
+// Errors
+
+// Types and methods
+pub struct FieldRule {
+  kind : RuleKind
+  message : String?
+}
+pub fn FieldRule::with_message(Self, String) -> Self
+pub impl Show for FieldRule
+
+pub struct FieldSchema {
+  name : String
+  rules : Array[FieldRule]
+}
+pub fn FieldSchema::contains(Self, String) -> Self
+pub fn FieldSchema::included_in(Self, Array[String]) -> Self
+pub fn FieldSchema::max_length(Self, Int) -> Self
+pub fn FieldSchema::min_length(Self, Int) -> Self
+pub fn FieldSchema::required(Self) -> Self
+pub fn FieldSchema::same_as(Self, String) -> Self
+pub fn FieldSchema::with_rule(Self, FieldRule) -> Self
+
+pub struct ObjectSchema {
+  name : String
+  fields : Array[FieldSchema]
+}
+pub fn ObjectSchema::with_field(Self, FieldSchema) -> Self
+
+pub enum RuleKind {
+  Required
+  MinLength(Int)
+  MaxLength(Int)
+  IncludedIn(Array[String])
+  SameAs(String)
+  Contains(String)
+}
+pub impl Show for RuleKind
+
+pub struct ValidationIssue {
+  path : String
+  kind : RuleKind
+  message : String
+  details : Array[(String, String)]
+}
+pub fn ValidationIssue::detail(Self, String) -> String?
+pub fn ValidationIssue::full_message(Self) -> String
+
+pub struct ValidationReport {
+  schema_name : String
+  issues : Array[ValidationIssue]
+}
+pub fn ValidationReport::add(Self, ValidationIssue) -> Self
+pub fn ValidationReport::contains_path(Self, String) -> Bool
+pub fn ValidationReport::for_path(Self, String) -> Array[ValidationIssue]
+pub fn ValidationReport::full_messages(Self) -> Array[String]
+pub fn ValidationReport::is_empty(Self) -> Bool
+pub fn ValidationReport::merge(Self, Self) -> Self
+pub fn ValidationReport::messages(Self) -> Array[String]
+pub fn ValidationReport::size(Self) -> Int
+pub fn ValidationReport::summary(Self) -> String
+
+// Type aliases
+
+// Traits
+

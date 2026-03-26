@@ -14,6 +14,7 @@ import {
   "ubugeeei/mbt_on_rails/src/mailer",
   "ubugeeei/mbt_on_rails/src/middleware",
   "ubugeeei/mbt_on_rails/src/migration",
+  "ubugeeei/mbt_on_rails/src/support",
   "ubugeeei/mbt_on_rails/src/view",
 }
 
@@ -23,6 +24,8 @@ pub fn app(String, @auth.AuthConfig, Array[@active_record.ModelSchema], Array[@m
 pub fn app_named(String) -> MbtOnRailsApp
 
 pub fn handle_request(MbtOnRailsApp, @http.Request) -> @http.Response
+
+pub fn handle_request_with_notifications(app~ : MbtOnRailsApp, incoming~ : @http.Request, notifications~ : @support.Notifications) -> (@http.Response, @support.Notifications)
 
 // Errors
 

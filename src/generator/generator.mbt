@@ -47,7 +47,7 @@ pub fn scaffold_resource(
         table=resource_name,
         columns=columns,
       ),
-      @orm.validates_presence("title"),
+      @orm.validates_presence(field="title"),
     ),
     @orm.before_save("normalize_" + @support.singularize(resource_name)),
   )

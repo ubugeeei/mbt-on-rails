@@ -1,6 +1,10 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "ubugeeei/mbt_on_rails/src/active_record"
 
+import {
+  "ubugeeei/mbt_on_rails/src/validation",
+}
+
 // Values
 pub fn after_create(String) -> Callback
 
@@ -16,7 +20,10 @@ pub fn before_save(String) -> Callback
 
 pub fn before_validation(String) -> Callback
 
-pub fn belongs_to(String, String, String) -> Association
+#label_migration(foreign_key, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(target, allow_positional=true)
+pub fn belongs_to(name~ : String, target~ : String, foreign_key~ : String) -> Association
 
 pub fn boolean_column(String) -> Column
 
@@ -32,11 +39,20 @@ pub fn empty_memory_database() -> MemoryDatabase
 
 pub fn find_records(MemoryDatabase, String, String, String) -> Array[Record]
 
-pub fn has_and_belongs_to_many(String, String, String) -> Association
+#label_migration(foreign_key, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(target, allow_positional=true)
+pub fn has_and_belongs_to_many(name~ : String, target~ : String, foreign_key~ : String) -> Association
 
-pub fn has_many(String, String, String) -> Association
+#label_migration(foreign_key, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(target, allow_positional=true)
+pub fn has_many(name~ : String, target~ : String, foreign_key~ : String) -> Association
 
-pub fn has_one(String, String, String) -> Association
+#label_migration(foreign_key, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(target, allow_positional=true)
+pub fn has_one(name~ : String, target~ : String, foreign_key~ : String) -> Association
 
 pub fn index_statements(ModelSchema) -> Array[String]
 
@@ -95,19 +111,46 @@ pub fn upsert_sql(ModelSchema, Record, String) -> String
 
 pub fn validate_record(ModelSchema, Record, MemoryDatabase) -> Array[String]
 
-pub fn validates_confirmation(String, String) -> Validation
+pub fn validate_record_errors(ModelSchema, Record, MemoryDatabase) -> ValidationErrors
 
-pub fn validates_format(String, String) -> Validation
+#label_migration(field, allow_positional=true)
+#label_migration(rule, allow_positional=true)
+pub fn validates(field~ : String, rule~ : @validation.FieldRule) -> Validation
 
-pub fn validates_inclusion(String, Array[String]) -> Validation
+#label_migration(confirmation_field, allow_positional=true)
+#label_migration(field, allow_positional=true)
+pub fn validates_confirmation(field~ : String, confirmation_field~ : String) -> Validation
 
-pub fn validates_length_max(String, Int) -> Validation
+#label_migration(field, allow_positional=true)
+#label_migration(pattern, allow_positional=true)
+pub fn validates_format(field~ : String, pattern~ : String) -> Validation
 
-pub fn validates_length_min(String, Int) -> Validation
+#label_migration(field, allow_positional=true)
+#label_migration(values, allow_positional=true)
+pub fn validates_inclusion(field~ : String, values~ : Array[String]) -> Validation
 
-pub fn validates_presence(String) -> Validation
+#label_migration(field, allow_positional=true)
+#label_migration(maximum, allow_positional=true)
+pub fn validates_length_max(field~ : String, maximum~ : Int) -> Validation
 
-pub fn validates_uniqueness(String) -> Validation
+#label_migration(field, allow_positional=true)
+#label_migration(minimum, allow_positional=true)
+pub fn validates_length_min(field~ : String, minimum~ : Int) -> Validation
+
+#label_migration(field, allow_positional=true)
+pub fn validates_presence(field~ : String) -> Validation
+
+#label_migration(field, allow_positional=true)
+pub fn validates_uniqueness(field~ : String) -> Validation
+
+#label_migration(attribute, allow_positional=true)
+#label_migration(details, allow_positional=true)
+#label_migration(kind, allow_positional=true)
+#label_migration(message, allow_positional=true)
+pub fn validation_error(attribute~ : String, kind~ : ValidationErrorKind, message~ : String, details~ : Array[(String, String)]) -> ValidationError
+
+#label_migration(model_name, allow_positional=true)
+pub fn validation_errors(model_name~ : String) -> ValidationErrors
 
 pub fn where_eq(Relation, String, String) -> Relation
 
@@ -264,13 +307,51 @@ pub fn Relation::where_raw(Self, String) -> Self
 
 pub enum SaveOutcome {
   Saved(MemoryDatabase, Record)
-  ValidationFailed(Array[String])
+  ValidationFailed(ValidationErrors)
 }
 
 pub struct Validation {
   field : String
   rule : ValidationRule
+  message : String?
 }
+pub fn Validation::with_message(Self, String) -> Self
+
+pub struct ValidationError {
+  attribute : String
+  kind : ValidationErrorKind
+  message : String
+  details : Array[(String, String)]
+}
+pub fn ValidationError::detail(Self, String) -> String?
+pub fn ValidationError::full_message(Self) -> String
+
+pub enum ValidationErrorKind {
+  Blank
+  Taken
+  TooShort(Int)
+  TooLong(Int)
+  NotIncluded
+  ConfirmationMismatch(String)
+  InvalidFormat(String)
+}
+pub impl Eq for ValidationErrorKind
+pub impl Show for ValidationErrorKind
+
+pub struct ValidationErrors {
+  model_name : String
+  errors : Array[ValidationError]
+}
+pub fn ValidationErrors::add(Self, ValidationError) -> Self
+pub fn ValidationErrors::contains_attribute(Self, String) -> Bool
+pub fn ValidationErrors::for_attribute(Self, String) -> Array[ValidationError]
+pub fn ValidationErrors::full_messages(Self) -> Array[String]
+pub fn ValidationErrors::full_messages_for(Self, String) -> Array[String]
+pub fn ValidationErrors::is_empty(Self) -> Bool
+pub fn ValidationErrors::merge(Self, Self) -> Self
+pub fn ValidationErrors::messages(Self) -> Array[String]
+pub fn ValidationErrors::size(Self) -> Int
+pub fn ValidationErrors::summary(Self) -> String
 
 pub enum ValidationRule {
   Presence
@@ -280,6 +361,7 @@ pub enum ValidationRule {
   Inclusion(Array[String])
   Confirmation(String)
   Format(String)
+  WrappedRule(@validation.FieldRule)
 }
 pub impl Show for ValidationRule
 

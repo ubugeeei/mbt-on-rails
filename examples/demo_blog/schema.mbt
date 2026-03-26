@@ -11,9 +11,9 @@ pub fn demo_user_model() -> @orm.ModelSchema {
       @orm.string_column("display_name").nullable(),
     ],
   )
-  .with_validation(@orm.validates_presence("email"))
-  .with_validation(@orm.validates_uniqueness("email"))
-  .with_validation(@orm.validates_format("email", "@"))
+  .with_validation(@orm.validates_presence(field="email"))
+  .with_validation(@orm.validates_uniqueness(field="email"))
+  .with_validation(@orm.validates_format(field="email", pattern="@"))
 }
 
 ///|
@@ -28,7 +28,9 @@ pub fn demo_session_model() -> @orm.ModelSchema {
       @orm.timestamp_column("expires_at"),
       @orm.json_column("meta"),
     ],
-  ).with_association(@orm.belongs_to("user", "User", "user_id"))
+  ).with_association(
+    @orm.belongs_to(name="user", target="User", foreign_key="user_id"),
+  )
 }
 
 ///|
@@ -47,10 +49,14 @@ pub fn demo_post_model(
   post_scaffold : @generator.ScaffoldPlan,
 ) -> @orm.ModelSchema {
   post_scaffold.model
-  .with_validation(@orm.validates_presence("body"))
-  .with_validation(@orm.validates_uniqueness("slug"))
-  .with_association(@orm.belongs_to("author", "User", "author_id"))
-  .with_association(@orm.has_many("comments", "Comment", "post_id"))
+  .with_validation(@orm.validates_presence(field="body"))
+  .with_validation(@orm.validates_uniqueness(field="slug"))
+  .with_association(
+    @orm.belongs_to(name="author", target="User", foreign_key="author_id"),
+  )
+  .with_association(
+    @orm.has_many(name="comments", target="Comment", foreign_key="post_id"),
+  )
   .with_callback(@orm.before_validation("slugify_title"))
 }
 

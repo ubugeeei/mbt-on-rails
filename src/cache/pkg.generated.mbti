@@ -1,22 +1,36 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "ubugeeei/mbt_on_rails/src/cache"
 
+import {
+  "ubugeeei/mbt_on_rails/src/support",
+}
+
 // Values
 pub fn cache_delete(CacheStore, String) -> CacheStore
 
 pub fn cache_delete_tag(CacheStore, String) -> CacheStore
 
+pub fn cache_delete_tag_with_notifications(store~ : CacheStore, tag~ : String, notifications~ : @support.Notifications) -> (CacheStore, @support.Notifications)
+
+pub fn cache_delete_with_notifications(store~ : CacheStore, key~ : String, notifications~ : @support.Notifications) -> (CacheStore, @support.Notifications)
+
 pub fn cache_fetch(CacheStore, String, String, String?, String?, Array[String], String?) -> CacheFetchResult
+
+pub fn cache_fetch_with_notifications(store~ : CacheStore, key~ : String, fallback~ : String, version~ : String?, expires_at~ : String?, tags~ : Array[String], now~ : String?, notifications~ : @support.Notifications) -> (CacheFetchResult, @support.Notifications)
 
 pub fn cache_key(Array[String]) -> String
 
 pub fn cache_read(CacheStore, String, String?) -> String?
+
+pub fn cache_read_with_notifications(store~ : CacheStore, key~ : String, now~ : String?, notifications~ : @support.Notifications) -> (String?, @support.Notifications)
 
 pub fn cache_store(String) -> CacheStore
 
 pub fn cache_summary(CacheStore) -> String
 
 pub fn cache_write(CacheStore, String, String, String?, String?, Array[String]) -> CacheStore
+
+pub fn cache_write_with_notifications(store~ : CacheStore, key~ : String, value~ : String, version~ : String?, expires_at~ : String?, tags~ : Array[String], notifications~ : @support.Notifications) -> (CacheStore, @support.Notifications)
 
 // Errors
 

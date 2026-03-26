@@ -68,9 +68,14 @@ test "active record relation and validation cover rails-like basics" {
       string_column("password_confirmation"),
     ],
   )
-  .with_validation(validates_presence("email"))
-  .with_validation(validates_uniqueness("email"))
-  .with_validation(validates_confirmation("password", "password_confirmation"))
+  .with_validation(validates_presence(field="email"))
+  .with_validation(validates_uniqueness(field="email"))
+  .with_validation(
+    validates_confirmation(
+      field="password",
+      confirmation_field="password_confirmation",
+    ),
+  )
 
   let relation = relation_for(user_model)
     .where_eq("email", "hello@example.com")

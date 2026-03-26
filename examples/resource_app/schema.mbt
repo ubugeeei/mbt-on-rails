@@ -10,6 +10,6 @@ fn note_model() -> @mbor.ModelSchema {
       @mbor.string_column("slug").indexed(),
     ],
   )
-  .with_validation(@mbor.validates_presence("title"))
-  .with_validation(@mbor.validates_length_min("body", 10))
+  .with_validation(@mbor.validates_presence(field="title"))
+  .with_validation(@mbor.validates_length_min(field="body", minimum=10))
 }

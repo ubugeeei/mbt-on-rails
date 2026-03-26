@@ -20,5 +20,6 @@ import {
   "ubugeeei/mbt_on_rails/src/secrets" @secrets,
   "ubugeeei/mbt_on_rails/src/support" @support,
   "ubugeeei/mbt_on_rails/src/turbo" @turbo,
+  "ubugeeei/mbt_on_rails/src/validation" @validation,
   "ubugeeei/mbt_on_rails/src/view" @view,
 }

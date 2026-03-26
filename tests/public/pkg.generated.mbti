@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "ubugeeei/mbt_on_rails"
+package "ubugeeei/mbt_on_rails/tests/public"
 
 import {
   "ubugeeei/mbt_on_rails/src/active_record",
@@ -436,8 +436,6 @@ pub fn metrics_summary(@metrics.MetricsRegistry) -> String
 
 pub fn middleware(String, String?, Array[@http.HttpMethod], Array[(String, String)], Array[(String, String)], @http.Response?) -> @middleware.Middleware
 
-pub fn middleware_summary(Array[@middleware.Middleware]) -> String
-
 pub fn migration(String, String, Array[@migration.MigrationStep]) -> @migration.Migration
 
 pub fn migration_down_sql(@migration.Migration) -> Array[String]
@@ -595,8 +593,6 @@ pub fn render_router_manifest(Array[@view.PageModule]) -> String
 pub fn render_server_action_manifest(Array[@view.ServerAction]) -> String
 
 pub fn render_turbo_stream(Array[@turbo.TurboStream]) -> String
-
-pub fn replace_stream(String, String) -> @turbo.TurboStream
 
 #label_migration(body, allow_positional=true)
 #label_migration(form, allow_positional=true)
@@ -800,8 +796,6 @@ pub fn with_action_name(@view.PageModule, String) -> @view.PageModule
 
 pub fn with_assets(@view.PageModule, @view.AssetManifest) -> @view.PageModule
 
-pub fn with_association(@active_record.ModelSchema, @active_record.Association) -> @active_record.ModelSchema
-
 pub fn with_bcc(@mailer.MailDelivery, Array[String]) -> @mailer.MailDelivery
 
 pub fn with_callback(@active_record.ModelSchema, @active_record.Callback) -> @active_record.ModelSchema
@@ -914,8 +908,6 @@ pub using @fixture {type FixtureRow}
 pub using @fixture {type FixtureSet}
 
 pub using @view {type FormBinding}
-
-pub using @generator {type GeneratedArtifact}
 
 pub using @production {type HealthCheck}
 

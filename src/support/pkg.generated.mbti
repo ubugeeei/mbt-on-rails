@@ -30,6 +30,10 @@ pub fn mbtv_path(String) -> MbtvPath
 
 pub fn normalize_path(String) -> String
 
+pub fn notification_event(name~ : String, payload~ : Array[(String, String)]) -> NotificationEvent
+
+pub fn notifications() -> Notifications
+
 pub fn remove_query_string(String) -> String
 
 pub fn singularize(String) -> String
@@ -47,6 +51,22 @@ pub struct MbtvPath {
 pub fn MbtvPath::as_string(Self) -> String
 pub impl Eq for MbtvPath
 pub impl Show for MbtvPath
+
+pub struct NotificationEvent {
+  name : String
+  payload : Array[(String, String)]
+}
+pub fn NotificationEvent::payload_value(Self, String) -> String?
+
+pub struct Notifications {
+  events : Array[NotificationEvent]
+}
+pub fn Notifications::append(Self, NotificationEvent) -> Self
+pub fn Notifications::instrument(Self, name~ : String, payload~ : Array[(String, String)]) -> Self
+pub fn Notifications::merge(Self, Self) -> Self
+pub fn Notifications::named(Self, String) -> Array[NotificationEvent]
+pub fn Notifications::prefixed(Self, String) -> Array[NotificationEvent]
+pub fn Notifications::summary(Self) -> String
 
 // Type aliases
 

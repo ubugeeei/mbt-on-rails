@@ -141,6 +141,28 @@ pub using @controller {
 }
 
 ///|
+/// Re-exports the valibot-like validation surface.
+pub using @validation {
+  type FieldRule,
+  type FieldSchema,
+  type ObjectSchema,
+  type RuleKind,
+  type ValidationIssue,
+  type ValidationReport,
+  contains,
+  included_in,
+  max_length,
+  min_length,
+  object_schema,
+  required,
+  same_as,
+  string_field,
+  validate_object,
+  validation_issue,
+  validation_report,
+}
+
+///|
 /// Re-exports the Active Record-inspired ORM surface.
 pub using @orm {
   type Association,
@@ -158,6 +180,9 @@ pub using @orm {
   type Relation,
   type SaveOutcome,
   type Validation,
+  type ValidationError,
+  type ValidationErrorKind,
+  type ValidationErrors,
   type ValidationRule,
   after_create,
   after_destroy,
@@ -203,7 +228,9 @@ pub using @orm {
   unique,
   update_sql,
   upsert_sql,
+  validate_record_errors,
   validate_record,
+  validates,
   validates_confirmation,
   validates_format,
   validates_inclusion,
@@ -211,6 +238,8 @@ pub using @orm {
   validates_length_min,
   validates_presence,
   validates_uniqueness,
+  validation_error,
+  validation_errors,
   where_eq,
   where_gt,
   where_in,

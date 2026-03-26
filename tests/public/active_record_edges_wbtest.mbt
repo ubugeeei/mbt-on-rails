@@ -7,52 +7,62 @@ fn account_schema() -> ModelSchema {
     columns=[string_column("title")],
     timestamps=false,
   )
-  let with_presence = with_validation(base, validates_presence("title"))
+  let with_presence = with_validation(base, validates_presence(field="title"))
   let with_required_category = with_validation(
     with_presence,
-    validates_presence("category"),
+    validates_presence(field="category"),
   )
   let with_unique_slug = with_validation(
     with_required_category,
-    validates_uniqueness("slug"),
+    validates_uniqueness(field="slug"),
   )
   let with_min_body = with_validation(
     with_unique_slug,
-    validates_length_min("body", 10),
+    validates_length_min(field="body", minimum=10),
   )
   let with_max_summary = with_validation(
     with_min_body,
-    validates_length_max("summary", 5),
+    validates_length_max(field="summary", maximum=5),
   )
   let with_inclusion = with_validation(
     with_max_summary,
-    validates_inclusion("state", ["published", "archived"]),
+    validates_inclusion(field="state", values=["published", "archived"]),
   )
   let with_confirmation = with_validation(
     with_inclusion,
-    validates_confirmation("password", "password_confirmation"),
+    validates_confirmation(
+      field="password",
+      confirmation_field="password_confirmation",
+    ),
   )
-  with_validation(with_confirmation, validates_format("email", "@"))
+  with_validation(
+    with_confirmation,
+    validates_format(field="email", pattern="@"),
+  )
 }
 
 ///|
 test "active record constructors expose association validation and callback metadata" {
-  let profile = has_one("profile", "Profile", "user_id")
-  let groups = has_and_belongs_to_many("groups", "Group", "user_id")
+  let profile = has_one(name="profile", target="Profile", foreign_key="user_id")
+  let groups = has_and_belongs_to_many(
+    name="groups",
+    target="Group",
+    foreign_key="user_id",
+  )
   assert_eq(profile.kind.to_string(), "HasOne")
   assert_true(profile.optional)
   assert_eq(groups.kind.to_string(), "HasAndBelongsToMany")
   assert_true(groups.optional)
 
-  match validates_length_min("body", 10).rule {
+  match validates_length_min(field="body", minimum=10).rule {
     LengthMin(limit) => assert_eq(limit, 10)
     _ => assert_true(false)
   }
-  match validates_length_max("summary", 5).rule {
+  match validates_length_max(field="summary", maximum=5).rule {
     LengthMax(limit) => assert_eq(limit, 5)
     _ => assert_true(false)
   }
-  match validates_inclusion("state", ["draft", "published"]).rule {
+  match validates_inclusion(field="state", values=["draft", "published"]).rule {
     Inclusion(values) => assert_eq(values.length(), 2)
     _ => assert_true(false)
   }
@@ -96,6 +106,21 @@ test "memory validation reports rich errors across edge branches" {
   assert_true(missing_errors.contains("state is not included in the list"))
   assert_true(missing_errors.contains("password confirmation does not match"))
   assert_true(missing_errors.contains("email has invalid format"))
+
+  let typed_missing = validate_record_errors(schema, missing, db)
+  assert_eq(typed_missing.model_name, "Account")
+  assert_true(typed_missing.contains_attribute("title"))
+  match typed_missing.for_attribute("summary")[0].kind {
+    TooLong(limit) => assert_eq(limit, 5)
+    _ => assert_true(false)
+  }
+  assert_eq(
+    typed_missing.for_attribute("summary")[0].detail("maximum"),
+    Some("5"),
+  )
+  assert_true(
+    typed_missing.full_messages_for("email").contains("email has invalid format"),
+  )
 
   let duplicate = record("accounts", [
     ("title", "Launch"),
@@ -145,7 +170,7 @@ test "save_record persists valid rows and preserves other tables" {
   ])
   match save_record(schema, expanded, invalid) {
     ValidationFailed(errors) =>
-      assert_true(errors.contains("slug must be unique"))
+      assert_true(errors.full_messages().contains("slug must be unique"))
     Saved(_, _) => assert_true(false)
   }
 

@@ -9,9 +9,13 @@ import {
 // Values
 pub fn compose_mail(MailerDefinition, String, Array[String], Array[(String, String)]) -> MailDelivery?
 
+pub fn compose_mail_with_notifications(mailer~ : MailerDefinition, action_name~ : String, to~ : Array[String], assigns~ : Array[(String, String)], notifications~ : @support.Notifications) -> (MailDelivery?, @support.Notifications)
+
 pub fn delivery_job(MailDelivery, String, String?) -> @job.EnqueuedJob
 
 pub fn enqueue_delivery(@job.JobQueue, MailDelivery, String?) -> @job.JobQueue
+
+pub fn enqueue_delivery_with_notifications(queue~ : @job.JobQueue, delivery~ : MailDelivery, run_at~ : String?, notifications~ : @support.Notifications) -> (@job.JobQueue, @support.Notifications)
 
 #label_migration(action_name, allow_positional=true)
 #label_migration(html_path, allow_positional=true)
