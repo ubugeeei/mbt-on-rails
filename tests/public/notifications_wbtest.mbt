@@ -140,6 +140,9 @@ test "notifications capture job and mailer instrumentation" {
 
 ///|
 test "notifications capture controller and view rendering events" {
+  let config = default_auth_config()
+  let session = issue_session("7", "browser")
+  let session_value = session_cookie(config~, session~, remember_me=false).value
   let page = page_module(
     route_name="home",
     route_path="/",
@@ -166,13 +169,17 @@ test "notifications capture controller and view rendering events" {
 
   let (response, recorded) = handle_request_with_notifications(
     app~,
-    incoming=request(
-      verb=http_get(),
-      path="/",
-      query=[],
-      form=[],
-      session_id=None,
-      body="",
+    incoming=append_request_header(
+      request(
+        verb=http_get(),
+        path="/",
+        query=[],
+        form=[],
+        session_id=None,
+        body="",
+      ),
+      "Cookie",
+      config.session_cookie + "=" + session_value,
     ),
     notifications=notifications(),
   )
@@ -186,6 +193,13 @@ test "notifications capture controller and view rendering events" {
       "controller",
     ) {
     Some(value) => assert_eq(value, "PagesController")
+    None => assert_true(false)
+  }
+  match
+    recorded.named("process_action.action_controller")[0].payload_value(
+      "session_id",
+    ) {
+    Some(value) => assert_eq(value, session.id)
     None => assert_true(false)
   }
 }

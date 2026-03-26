@@ -5,18 +5,19 @@ pub fn handle_request_with_notifications(
   incoming~ : @http.Request,
   notifications~ : @support.Notifications,
 ) -> (@http.Response, @support.Notifications) {
+  let prepared = prepare_request_for_auth(incoming, app.auth)
   let started = notifications.instrument(
     name="start_processing.action_controller",
     payload=[
-      ("method", http_method_name(incoming.verb)),
-      ("path", incoming.path),
+      ("method", http_method_name(prepared.verb)),
+      ("path", prepared.path),
     ],
   )
   let request_result = @middleware.apply_request_middleware(
     app.middlewares,
-    incoming,
+    prepared,
   )
-  let request = request_result.0
+  let request = prepare_request_for_auth(request_result.0, app.auth)
   match request_result.1 {
     Some(response) => {
       let final_response = @middleware.apply_response_middleware(
@@ -214,7 +215,7 @@ fn controller_payload(
   request~ : @http.Request,
   response~ : @http.Response,
 ) -> Array[(String, String)] {
-  [
+  let payload : Array[(String, String)] = [
     ("controller", controller),
     ("action", action),
     ("method", http_method_name(request.verb)),
@@ -222,6 +223,11 @@ fn controller_payload(
     ("status", response.status.to_string()),
     ("format", response_format_name(response.body)),
   ]
+  match request.session_id {
+    Some(session_id) => payload.push(("session_id", session_id))
+    None => ()
+  }
+  payload
 }
 
 ///|

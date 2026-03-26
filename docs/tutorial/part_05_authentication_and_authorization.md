@@ -32,6 +32,11 @@ Session helpers include:
 - `session_store_for_config(...)`
 - `session_cookie(...)`
 - `session_cookie_with_store(...)`
+- `request_header(...)`
+- `request_cookie(...)`
+- `request_session_id(...)`
+- `with_request_session(...)`
+- `request_csrf_token(...)`
 - `csrf_valid(...)`
 - `protect_from_forgery(...)`
 - `signed_cookie(...)`
@@ -44,7 +49,9 @@ The current implementation is still lightweight, but it now models:
 - typed cookie SameSite policies
 - explicit cookie / cache / redis session stores
 - signed cookie values
+- request-side cookie and session resolution helpers
 - explicit forgery strategies such as exception, null-session, and reset-session
+- Action Pack-style response helpers such as `append_set_cookie(...)`, `see_other_response(...)`, and `unprocessable_entity_response(...)`
 
 Example:
 
@@ -60,7 +67,24 @@ let cookie = session_cookie(
 )
 let checked = protect_from_forgery(
   Some(session),
-  Some(session.csrf_token),
+  request_csrf_token(
+    with_request_session(
+      append_request_header(
+        request(
+          verb=http_post(),
+          path="/posts",
+          query=[],
+          form=[],
+          session_id=None,
+          body="",
+        ),
+        "X-CSRF-Token",
+        session.csrf_token,
+      ),
+      store~,
+    ),
+    config,
+  ),
   request_forgery_exception(),
 )
 ```

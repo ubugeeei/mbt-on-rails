@@ -1,16 +1,30 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "ubugeeei/mbt_on_rails/src/http"
 
+import {
+  "ubugeeei/mbt_on_rails/src/auth",
+}
+
 // Values
+pub fn accepted_json(String) -> Response
+
 pub fn all_http_methods() -> Array[HttpMethod]
 
 pub fn append_request_header(Request, String, String) -> Request
 
 pub fn append_response_headers(Response, Array[(String, String)]) -> Response
 
+pub fn append_set_cookie(Response, @auth.AuthCookie) -> Response
+
+pub fn append_set_cookies(Response, Array[@auth.AuthCookie]) -> Response
+
 pub fn build_path(RouteSpec, Array[(String, String)]) -> String
 
+pub fn created_json(String, location? : String?) -> Response
+
 pub fn default_resource_options(String, String?) -> ResourceOptions
+
+pub fn forbidden_response(message? : String) -> Response
 
 pub fn http_delete() -> HttpMethod
 
@@ -58,6 +72,16 @@ pub fn render_response_body(ResponseBody) -> String
 #label_migration(verb, allow_positional=true)
 pub fn request(verb~ : HttpMethod, path~ : String, query~ : Array[(String, String)], form~ : Array[(String, String)], session_id~ : String?, body~ : String) -> Request
 
+pub fn request_cookie(Request, String) -> String?
+
+pub fn request_cookies(Request) -> Array[(String, String)]
+
+pub fn request_csrf_token(Request, @auth.AuthConfig) -> String?
+
+pub fn request_header(Request, String) -> String?
+
+pub fn request_session_id(Request, @auth.SessionStore) -> String?
+
 pub fn resources(String, String, ResourceOptions) -> Array[RouteSpec]
 
 #label_migration(action, allow_positional=true)
@@ -70,9 +94,17 @@ pub fn route(name~ : String, verb~ : HttpMethod, path~ : String, controller~ : S
 
 pub fn scope_routes(String, String, Array[RouteSpec]) -> Array[RouteSpec]
 
+pub fn see_other_response(String) -> Response
+
+pub fn signed_request_cookie(Request, String, String) -> String?
+
 pub fn text_response(Int, String) -> Response
 
 pub fn typed_text_response(Int, String, String) -> Response
+
+pub fn unauthorized_response(message? : String) -> Response
+
+pub fn unprocessable_entity_response(message? : String) -> Response
 
 pub fn with_collection_action(ResourceOptions, String, HttpMethod) -> ResourceOptions
 
@@ -81,6 +113,9 @@ pub fn with_member_action(ResourceOptions, String, HttpMethod) -> ResourceOption
 pub fn with_only(ResourceOptions, Array[String]) -> ResourceOptions
 
 pub fn with_param_name(ResourceOptions, String) -> ResourceOptions
+
+#label_migration(store, allow_positional=true)
+pub fn with_request_session(Request, store~ : @auth.SessionStore, fallback_store? : @auth.SessionStore?) -> Request
 
 // Errors
 
@@ -111,6 +146,7 @@ pub struct Request {
   session_id : String?
   body : String
 }
+pub fn Request::with_session_id(Self, String?) -> Self
 
 pub struct ResourceOptions {
   only : Array[String]

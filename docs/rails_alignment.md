@@ -113,12 +113,18 @@ The source audit in this batch was anchored to the official Rails repository at:
 - `cookie_session_store(...)`, `cache_session_store(...)`, `redis_session_store(...)`, `session_store_for_config(...)`, and `session_cookie_with_store(...)` make cookie/session persistence explicit instead of hiding it behind one demo helper
 - `signed_cookie(...)`, `sign_cookie_value(...)`, `verify_signed_cookie_value(...)`, `parse_cookie_header(...)`, and `protect_from_forgery(...)` add the signed-cookie and forgery-strategy surface needed for a more production-shaped Action Pack layer
 
+## Fifteenth batch added here
+
+- The HTTP layer now resolves request headers, cookies, signed cookies, CSRF tokens, and session ids through `request_header(...)`, `request_cookie(...)`, `request_session_id(...)`, `request_csrf_token(...)`, and `with_request_session(...)`
+- The runtime now hydrates `Request.session_id` from configured signed session cookies before controller work and exposes that in controller notifications
+- Response helpers such as `created_json(...)`, `accepted_json(...)`, `append_set_cookie(...)`, `see_other_response(...)`, `unauthorized_response(...)`, `forbidden_response(...)`, and `unprocessable_entity_response(...)` cover a more realistic Action Pack responder surface
+
 ## Biggest gaps still open
 
 - `activesupport`: concern/autoloading/deprecation/timezones/notifications subscribers
 - `activemodel`: typed attributes/serialization
 - `activerecord`: callback chains/database adapters/query execution
-- `actionpack`: responders/request forgery depth beyond the current typed cookie/session strategy layer
+- `actionpack`: flash/request variants/content negotiation depth beyond the current typed cookie/session and responder layer
 - `actionview`: helper breadth/template lookup
 - `activejob`: execution backends/monitoring depth
 - `actioncable`: connection lifecycle and richer subscription adapters
@@ -128,4 +134,4 @@ The source audit in this batch was anchored to the official Rails repository at:
 
 1. Add typed attribute/serialization support on top of the validation layer.
 2. Add deeper Active Job execution backend and monitoring behavior.
-3. Add Action Pack responder and session/request integration depth on top of the new cookie/session primitives.
+3. Add deeper Action Pack request variants, flash, and richer content negotiation on top of the new session/request integration layer.

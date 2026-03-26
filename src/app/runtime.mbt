@@ -4,11 +4,12 @@ pub fn handle_request(
   app : MbtOnRailsApp,
   incoming : @http.Request,
 ) -> @http.Response {
+  let prepared = prepare_request_for_auth(incoming, app.auth)
   let request_result = @middleware.apply_request_middleware(
     app.middlewares,
-    incoming,
+    prepared,
   )
-  let request = request_result.0
+  let request = prepare_request_for_auth(request_result.0, app.auth)
   match request_result.1 {
     Some(response) =>
       return @middleware.apply_response_middleware(

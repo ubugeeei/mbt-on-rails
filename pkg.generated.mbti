@@ -27,6 +27,8 @@ import {
 }
 
 // Values
+pub fn accepted_json(String) -> @http.Response
+
 pub fn action(String, Array[@controller.ActionStep], String?, Bool, Array[String], Array[@controller.ResponseFormat], Bool) -> @controller.ActionDefinition
 
 pub fn action_plan(String) -> @controller.ActionDefinition
@@ -67,6 +69,14 @@ pub fn app(String, @auth.AuthConfig, Array[@active_record.ModelSchema], Array[@m
 pub fn app_named(String) -> @app.MbtOnRailsApp
 
 pub fn append_entries(Array[(String, String)], Array[(String, String)]) -> Array[(String, String)]
+
+pub fn append_request_header(@http.Request, String, String) -> @http.Request
+
+pub fn append_response_headers(@http.Response, Array[(String, String)]) -> @http.Response
+
+pub fn append_set_cookie(@http.Response, @auth.AuthCookie) -> @http.Response
+
+pub fn append_set_cookies(@http.Response, Array[@auth.AuthCookie]) -> @http.Response
 
 pub fn append_stream(String, String) -> @turbo.TurboStream
 
@@ -237,6 +247,8 @@ pub fn create_table_sql(@active_record.ModelSchema) -> String
 
 pub fn create_table_step(@active_record.ModelSchema) -> @migration.MigrationStep
 
+pub fn created_json(String, location? : String?) -> @http.Response
+
 pub fn csrf_valid(@auth.Session?, String?) -> Bool
 
 pub fn default_assets() -> @view.AssetManifest
@@ -366,6 +378,8 @@ pub fn fixture_set(String, String, Array[@fixture.FixtureRow]) -> @fixture.Fixtu
 pub fn fixture_summary(@fixture.FixtureSet) -> String
 
 pub fn flash(String, String) -> @controller.ActionStep
+
+pub fn forbidden_response(message? : String) -> @http.Response
 
 pub fn forgery_strategy_summary(@auth.RequestForgeryStrategy) -> String
 
@@ -815,11 +829,21 @@ pub fn replace_stream(String, String) -> @turbo.TurboStream
 #label_migration(verb, allow_positional=true)
 pub fn request(verb~ : @http.HttpMethod, path~ : String, query~ : Array[(String, String)], form~ : Array[(String, String)], session_id~ : String?, body~ : String) -> @http.Request
 
+pub fn request_cookie(@http.Request, String) -> String?
+
+pub fn request_cookies(@http.Request) -> Array[(String, String)]
+
+pub fn request_csrf_token(@http.Request, @auth.AuthConfig) -> String?
+
 pub fn request_forgery_exception() -> @auth.RequestForgeryStrategy
 
 pub fn request_forgery_null_session() -> @auth.RequestForgeryStrategy
 
 pub fn request_forgery_reset_session() -> @auth.RequestForgeryStrategy
+
+pub fn request_header(@http.Request, String) -> String?
+
+pub fn request_session_id(@http.Request, @auth.SessionStore) -> String?
 
 pub fn require_auth(@auth.AuthRequirement) -> @controller.ActionStep
 
@@ -899,6 +923,8 @@ pub fn secrets_config(Array[@secrets.SecretVar]) -> @secrets.SecretsConfig
 
 pub fn secrets_valid(@secrets.SecretsConfig) -> Bool
 
+pub fn see_other_response(String) -> @http.Response
+
 pub fn seed_plan(String, Array[@active_record.Record], Array[@job.EnqueuedJob]) -> @fixture.SeedPlan
 
 pub fn seed_summary(@fixture.SeedPlan) -> String
@@ -960,6 +986,8 @@ pub fn sign_cookie_value(String, String, String) -> String
 #label_migration(value, allow_positional=true)
 pub fn signed_cookie(name~ : String, value~ : String, secret~ : String, path? : String, domain? : String?, http_only? : Bool, secure? : Bool, same_site? : @auth.CookieSameSite, max_age_seconds? : Int?, expires_at? : String?) -> @auth.AuthCookie
 
+pub fn signed_request_cookie(@http.Request, String, String) -> String?
+
 pub fn singularize(String) -> String
 
 #label_migration(name, allow_positional=true)
@@ -994,6 +1022,8 @@ pub fn text_column(String) -> @active_record.Column
 
 pub fn text_field(name~ : String, label~ : String, required? : Bool, placeholder? : String?, value? : String?, autocomplete? : String?, help_text? : String?) -> @view.FormField
 
+pub fn text_response(Int, String) -> @http.Response
+
 pub fn textarea_field(name~ : String, label~ : String, required? : Bool, placeholder? : String?, value? : String?, autocomplete? : String?, help_text? : String?) -> @view.FormField
 
 pub fn timestamp_column(String) -> @active_record.Column
@@ -1008,7 +1038,13 @@ pub fn turbo_stream(@turbo.TurboStreamAction, String, String) -> @turbo.TurboStr
 
 pub fn turbo_stream_format() -> @controller.ResponseFormat
 
+pub fn typed_text_response(Int, String, String) -> @http.Response
+
+pub fn unauthorized_response(message? : String) -> @http.Response
+
 pub fn unique(@active_record.Column) -> @active_record.Column
+
+pub fn unprocessable_entity_response(message? : String) -> @http.Response
 
 pub fn update_sql(@active_record.ModelSchema, @active_record.Record, String) -> String
 
@@ -1155,6 +1191,9 @@ pub fn with_param_name(@http.ResourceOptions, String) -> @http.ResourceOptions
 pub fn with_partial(@view.VaporComponentRef, @view.TemplateImport) -> @view.VaporComponentRef
 
 pub fn with_request_header(@middleware.Middleware, String, String) -> @middleware.Middleware
+
+#label_migration(store, allow_positional=true)
+pub fn with_request_session(@http.Request, store~ : @auth.SessionStore, fallback_store? : @auth.SessionStore?) -> @http.Request
 
 pub fn with_response_header(@middleware.Middleware, String, String) -> @middleware.Middleware
 
