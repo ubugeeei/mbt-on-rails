@@ -40,7 +40,7 @@ pub fn save_record(
   row : Record,
 ) -> SaveOutcome {
   let current = resolve_current_record(schema, db, row)
-  let candidate = merge_persisted_record(current, row)
+  let candidate = normalize_persisted_record(schema, current, row)
   let errors = validate_record_errors(schema, candidate, db)
   if not(errors.is_empty()) {
     return ValidationFailed(errors)
@@ -96,15 +96,6 @@ fn resolve_current_record(
   match @support.find_entry(row.fields, schema.primary_key) {
     Some(value) => find_record_by_primary_key(schema, db, value)
     None => None
-  }
-}
-
-///|
-fn merge_persisted_record(current : Record?, row : Record) -> Record {
-  match current {
-    Some(existing) =>
-      record(row.table, merge_fields(existing.fields, row.fields))
-    None => row
   }
 }
 

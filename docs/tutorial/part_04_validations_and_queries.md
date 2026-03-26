@@ -118,6 +118,7 @@ The persistence path is also less toy-like now:
 - partial updates merge into the persisted row instead of dropping untouched fields
 - uniqueness validations ignore the record currently being updated
 - `string_column(...).unique()` and other unique column metadata are enforced by the in-memory adapter even before a real database exists
+- `with_default(...)` columns and `timestamps=true` are applied during persistence, so examples get schema-shaped rows without a real database
 - `destroy_record(...)` removes rows or writes a `deleted_at` tombstone for soft-delete models
 
 Example:

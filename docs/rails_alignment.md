@@ -124,6 +124,7 @@ The source audit in this batch was anchored to the official Rails repository at:
 - `save_record(...)` now behaves more like a real persistence layer: when a primary key is present it merges changes into the current row instead of blindly inserting a duplicate
 - Uniqueness validations now ignore the row currently being updated, so partial updates do not fail on their own unique attributes
 - Schema-level `unique()` column metadata is now enforced by the in-memory validation path too, so migration intent and example persistence behavior stay aligned
+- Schema column defaults and `timestamps=true` are now applied by the in-memory persistence path, which keeps examples closer to the SQL schema they generate
 - `find_record_by_primary_key(...)` and `destroy_record(...)` add the basic lookup and destroy lifecycle expected from an Active Record-style adapter, including soft-delete aware tombstones
 
 ## Biggest gaps still open
