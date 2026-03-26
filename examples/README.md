@@ -22,7 +22,7 @@ moon run examples/process_topology
   - A small Notes app built from the public `app`, `resources`, `restful_controller`, `page_module`, and `server_action` APIs.
   - Includes local `.mbtv` files so the example is self-contained.
 - `examples/orm_migration`
-  - Shows model schema design, relation SQL generation, create-table migrations, phased migration plans, safety summaries, and the in-memory validation flow.
+  - Shows model schema design, relation SQL generation, create-table migrations, phased migration plans, typed attribute casting/serialization, safety summaries, and the in-memory validation flow.
 - `examples/auth_policy`
   - Shows identities, sessions, CSRF validation, cookies, direct auth requirements, and policy-rule checks.
 - `examples/rails_ops`

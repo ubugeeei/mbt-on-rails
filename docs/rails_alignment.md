@@ -133,11 +133,17 @@ The source audit in this batch was anchored to the official Rails repository at:
 - Phased constraint APIs now cover `add_check_constraint(..., validate=false)` / `validate_check_constraint(...)` and `add_foreign_key(..., validate=false)` / `validate_foreign_key(...)`
 - Safety analysis treats `NOT VALID` constraint rollout as safe while still flagging immediately validated constraints and constraint removals for review
 
+## Eighteenth batch added here
+
+- The Active Record layer now has schema-aware typed attributes via `AttributeValue`, `TypedRecord`, `cast_record(...)`, and `serialize_record_json(...)`
+- Generated attributes such as the primary key, `created_at` / `updated_at`, and soft-delete `deleted_at` are recognized during casting so adapter-facing rows do not need a second schema
+- `AttributeCastError` keeps serialization failures as inspectable data, which makes tutorials, generators, and tests safer than ad-hoc string coercion
+
 ## Biggest gaps still open
 
 - `activesupport`: concern/autoloading/deprecation/timezones/notifications subscribers
-- `activemodel`: typed attributes/serialization
-- `activerecord`: callback chains/database adapters/query execution and typed attributes
+- `activemodel`: richer serializer contracts and adapter-facing model coercion beyond the current flat record layer
+- `activerecord`: callback chains/database adapters/query execution
 - `actionpack`: flash/request variants/content negotiation depth beyond the current typed cookie/session and responder layer
 - `actionview`: helper breadth/template lookup
 - `activejob`: execution backends/monitoring depth
@@ -146,6 +152,6 @@ The source audit in this batch was anchored to the official Rails repository at:
 
 ## Recommended next batches
 
-1. Add typed attribute/serialization support on top of the stronger in-memory persistence layer.
+1. Add adapter-backed query execution and a real database abstraction on top of the stronger in-memory persistence layer.
 2. Add deeper Active Job execution backend and monitoring behavior.
 3. Add deeper Action Pack request variants, flash, and richer content negotiation on top of the new session/request integration layer.

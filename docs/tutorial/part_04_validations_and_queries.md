@@ -9,6 +9,8 @@ Understand validations, in-memory persistence, and the relation builder.
 - [`../../src/active_record/relation.mbt`](../../src/active_record/relation.mbt)
 - [`../../src/active_record/sql.mbt`](../../src/active_record/sql.mbt)
 - [`../../src/active_record/memory.mbt`](../../src/active_record/memory.mbt)
+- [`../../src/active_record/attributes.mbt`](../../src/active_record/attributes.mbt)
+- [`../../src/active_record/serialization.mbt`](../../src/active_record/serialization.mbt)
 - [`../../tests/public/active_record_edges_wbtest.mbt`](../../tests/public/active_record_edges_wbtest.mbt)
 
 ## Validations
@@ -143,6 +145,83 @@ let updated = save_record(
 let removed = destroy_record(schema, db, "1")
 ```
 
+## Typed Attributes and Serialization
+
+The ORM now has a schema-aware casting layer for transport boundaries:
+
+- `cast_record(...)`
+- `serialize_record_json(...)`
+- `find_column(...)`
+- `attribute_type_name(...)`
+- `TypedRecord::to_record()`
+- `TypedRecord::to_json()`
+- `AttributeCastError::message()`
+
+This is useful when a row arrives as stringly data from forms, fixtures, or adapters,
+but the rest of the app wants explicit types and predictable JSON.
+
+```moonbit
+let schema = model(
+  name="Post",
+  table="posts",
+  columns=[
+    string_column("title"),
+    integer_column("views"),
+    boolean_column("published"),
+    json_column("meta"),
+    references_column("author_id", "users"),
+  ],
+  soft_delete=true,
+)
+
+let row = record("posts", [
+  ("id", "1"),
+  ("title", "Launch"),
+  ("views", "42"),
+  ("published", "true"),
+  ("meta", "{\"tags\":[\"moonbit\"]}"),
+  ("author_id", "7"),
+  ("created_at", "2026-03-27T00:00:00Z"),
+  ("deleted_at", "null"),
+])
+
+match cast_record(schema, row) {
+  CastedRecord(current) => println(current.to_json())
+  CastRecordFailed(errors) =>
+    for error in errors {
+      println(error.message())
+    }
+}
+```
+
+`cast_record(...)` understands generated attributes too:
+
+- the primary key such as `id`
+- `created_at` / `updated_at` when `timestamps=true`
+- `deleted_at` when `soft_delete=true`
+
+That keeps example code closer to what a real adapter would hand back.
+
+When coercion fails, the result is still data:
+
+```moonbit
+let invalid = record("posts", [
+  ("views", "forty-two"),
+  ("published", "maybe"),
+])
+
+match serialize_record_json(schema, invalid) {
+  SerializedRecordJson(json) => println(json)
+  SerializeRecordFailed(errors) =>
+    for error in errors {
+      println("- " + error.message())
+    }
+}
+```
+
+`attribute_type_name(...)` is also handy for generators and docs because it renders
+the expected MoonBit-facing type for a schema column such as `Int`, `Bool?`, or `Json`.
+
 ## Rails Gap
 
 - no adapter-backed query execution yet
@@ -156,6 +235,8 @@ See [`../rails_alignment.md`](../rails_alignment.md).
 - Create an invalid record with a duplicate slug
 - Run `validate_record(...)`
 - Confirm the error list is data, not exceptions
+- Cast a record with `created_at` and `deleted_at`
+- Confirm `deleted_at = "null"` becomes `NullAttribute`
 
 ## Next
 
