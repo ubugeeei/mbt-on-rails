@@ -25,6 +25,26 @@ Validation rules are explicit values:
 
 Attach them with `.with_validation(...)`.
 
+When a rule should be reused, wrap it once as a validator object:
+
+```moonbit
+let email_like = validator(
+  name="email_like",
+  rule=contains(pattern="@").with_message_template(
+    "must include %{pattern} for %{attribute}",
+  ),
+)
+
+let schema = model(
+  name="Account",
+  table="accounts",
+  columns=[string_column("email")],
+  timestamps=false,
+).with_validation(validates_with(field="email", validator=email_like))
+```
+
+Message templates can interpolate details like `%{minimum}`, `%{pattern}`, `%{attribute}`, and `%{validator}`.
+
 ## Query Building
 
 Relations are immutable builders:

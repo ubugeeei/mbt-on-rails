@@ -83,10 +83,16 @@ The source audit in this batch was anchored to the official Rails repository at:
 - Page modules can now carry typed `form_builder(...)` metadata with field descriptors such as `email_field`, `password_field`, `text_field`, and `textarea_field`
 - `render_page(...)` now emits a form-builder manifest so page HTML can ship richer end-to-end UI metadata alongside action and component manifests
 
+## Tenth batch added here
+
+ - The validation layer now has reusable `validator(...)` objects that can be attached with `FieldSchema::apply_validator(...)`
+- Custom validation messages now interpolate placeholders such as `%{minimum}`, `%{pattern}`, `%{attribute}`, and `%{validator}`
+- Active Record models can now bridge reusable validators with `validates_with(...)` in addition to raw `validates(...)`
+
 ## Biggest gaps still open
 
 - `activesupport`: concern/autoloading/deprecation/timezones/notifications subscribers
-- `activemodel`: typed attributes/serialization/validator objects
+- `activemodel`: typed attributes/serialization
 - `activerecord`: callback chains/database adapters/query execution
 - `actionpack`: cookies/session store/responders/request forgery strategy
 - `actionview`: helpers/template lookup
@@ -96,6 +102,6 @@ The source audit in this batch was anchored to the official Rails repository at:
 
 ## Recommended next batches
 
-1. Expand the validation library with reusable validator objects and richer message customization.
-2. Add Active Job adapters and serialization contracts.
-3. Add more Action View helper coverage on top of the new partial/form-builder metadata.
+1. Add Active Job adapters and serialization contracts.
+2. Add more Action View helper coverage on top of the new partial/form-builder metadata.
+3. Add typed attribute/serialization support on top of the validation layer.

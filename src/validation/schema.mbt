@@ -14,7 +14,15 @@ pub enum RuleKind {
 pub struct FieldRule {
   kind : RuleKind
   message : String?
+  validator_name : String?
 } derive(Show)
+
+///|
+/// Wraps one reusable validator object around a field rule.
+pub struct ValidatorObject {
+  name : String
+  rule : FieldRule
+}
 
 ///|
 /// Describes one string field in an object schema.
@@ -63,48 +71,71 @@ pub fn string_field(name~ : String) -> FieldSchema {
 ///|
 /// Builds a required-field rule.
 pub fn required() -> FieldRule {
-  { kind: Required, message: None }
+  { kind: Required, message: None, validator_name: None }
 }
 
 ///|
 /// Builds a minimum-length rule.
 #label_migration(minimum, allow_positional=true)
 pub fn min_length(minimum~ : Int) -> FieldRule {
-  { kind: MinLength(minimum), message: None }
+  { kind: MinLength(minimum), message: None, validator_name: None }
 }
 
 ///|
 /// Builds a maximum-length rule.
 #label_migration(maximum, allow_positional=true)
 pub fn max_length(maximum~ : Int) -> FieldRule {
-  { kind: MaxLength(maximum), message: None }
+  { kind: MaxLength(maximum), message: None, validator_name: None }
 }
 
 ///|
 /// Builds an inclusion rule.
 #label_migration(values, allow_positional=true)
 pub fn included_in(values~ : Array[String]) -> FieldRule {
-  { kind: IncludedIn(values), message: None }
+  { kind: IncludedIn(values), message: None, validator_name: None }
 }
 
 ///|
 /// Builds a cross-field equality rule.
 #label_migration(other_field, allow_positional=true)
 pub fn same_as(other_field~ : String) -> FieldRule {
-  { kind: SameAs(other_field), message: None }
+  { kind: SameAs(other_field), message: None, validator_name: None }
 }
 
 ///|
 /// Builds a lightweight substring check.
 #label_migration(pattern, allow_positional=true)
 pub fn contains(pattern~ : String) -> FieldRule {
-  { kind: Contains(pattern), message: None }
+  { kind: Contains(pattern), message: None, validator_name: None }
+}
+
+///|
+/// Builds one reusable validator object from a configured field rule.
+#label_migration(name, allow_positional=true)
+#label_migration(rule, allow_positional=true)
+pub fn validator(name~ : String, rule~ : FieldRule) -> ValidatorObject {
+  { name, rule: rule.named(name) }
 }
 
 ///|
 /// Overrides the default message for a field rule.
 pub fn FieldRule::with_message(self : FieldRule, message : String) -> FieldRule {
   { ..self, message: Some(message) }
+}
+
+///|
+/// Assigns a reusable validator name to a field rule.
+pub fn FieldRule::named(self : FieldRule, name : String) -> FieldRule {
+  { ..self, validator_name: Some(name) }
+}
+
+///|
+/// Treats the custom message as an interpolated template.
+pub fn FieldRule::with_message_template(
+  self : FieldRule,
+  template : String,
+) -> FieldRule {
+  self.with_message(template)
 }
 
 ///|
@@ -127,6 +158,15 @@ pub fn FieldSchema::with_rule(
   let rules = @support.clone_array(self.rules)
   rules.push(rule)
   { ..self, rules, }
+}
+
+///|
+/// Applies a reusable validator object to a field schema.
+pub fn FieldSchema::apply_validator(
+  self : FieldSchema,
+  validator : ValidatorObject,
+) -> FieldSchema {
+  self.with_rule(validator.rule)
 }
 
 ///|
@@ -452,9 +492,28 @@ fn issue_for(
   default_message : String,
   details : Array[(String, String)],
 ) -> ValidationIssue {
-  let message = match rule.message {
-    Some(message) => message
-    None => default_message
+  let context = @support.clone_array(details)
+  context.push(("path", path))
+  context.push(("attribute", path))
+  match rule.validator_name {
+    Some(name) => context.push(("validator", name))
+    None => ()
   }
-  validation_issue(path~, kind~, message~, details~)
+  let message = match rule.message {
+    Some(message) => interpolate_message_template(message, context)
+    None => interpolate_message_template(default_message, context)
+  }
+  validation_issue(path~, kind~, message~, details=context)
+}
+
+///|
+fn interpolate_message_template(
+  template : String,
+  details : Array[(String, String)],
+) -> String {
+  let mut rendered = template
+  for detail in details {
+    rendered = rendered.replace(old="%{" + detail.0 + "}", new=detail.1)
+  }
+  rendered
 }

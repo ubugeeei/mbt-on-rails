@@ -155,7 +155,10 @@ fn validate_uniqueness_rule(
           validation_error(
             attribute=validation.field,
             kind=Taken,
-            message=resolve_message(validation, "must be unique"),
+            message=resolve_message(validation, "must be unique", [
+              ("value", value),
+              ("attribute", validation.field),
+            ]),
             details=[("value", value)],
           ),
         )
@@ -234,9 +237,20 @@ fn rule_kind_to_error_kind(kind : @validation.RuleKind) -> ValidationErrorKind {
 }
 
 ///|
-fn resolve_message(validation : Validation, default_message : String) -> String {
-  match validation.message {
+fn resolve_message(
+  validation : Validation,
+  default_message : String,
+  details : Array[(String, String)],
+) -> String {
+  let template = match validation.message {
     Some(message) => message
     None => default_message
   }
+  let context = @support.clone_array(details)
+  context.push(("path", validation.field))
+  let mut rendered = template
+  for detail in context {
+    rendered = rendered.replace(old="%{" + detail.0 + "}", new=detail.1)
+  }
+  rendered
 }

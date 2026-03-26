@@ -927,6 +927,10 @@ pub fn validates_presence(field~ : String) -> @active_record.Validation
 #label_migration(field, allow_positional=true)
 pub fn validates_uniqueness(field~ : String) -> @active_record.Validation
 
+#label_migration(field, allow_positional=true)
+#label_migration(validator, allow_positional=true)
+pub fn validates_with(field~ : String, validator~ : @validation.ValidatorObject) -> @active_record.Validation
+
 #label_migration(attribute, allow_positional=true)
 #label_migration(details, allow_positional=true)
 #label_migration(kind, allow_positional=true)
@@ -944,6 +948,10 @@ pub fn validation_issue(path~ : String, kind~ : @validation.RuleKind, message~ :
 
 #label_migration(schema_name, allow_positional=true)
 pub fn validation_report(schema_name~ : String) -> @validation.ValidationReport
+
+#label_migration(name, allow_positional=true)
+#label_migration(rule, allow_positional=true)
+pub fn validator(name~ : String, rule~ : @validation.FieldRule) -> @validation.ValidatorObject
 
 pub fn verify_password(String, String, String) -> Bool
 
@@ -1263,6 +1271,8 @@ pub using @validation {type ValidationIssue}
 pub using @validation {type ValidationReport}
 
 pub using @active_record {type ValidationRule}
+
+pub using @validation {type ValidatorObject}
 
 pub using @view {type VaporComponentRef}
 

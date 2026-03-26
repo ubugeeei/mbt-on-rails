@@ -36,20 +36,28 @@ pub fn validation_issue(path~ : String, kind~ : RuleKind, message~ : String, det
 #label_migration(schema_name, allow_positional=true)
 pub fn validation_report(schema_name~ : String) -> ValidationReport
 
+#label_migration(name, allow_positional=true)
+#label_migration(rule, allow_positional=true)
+pub fn validator(name~ : String, rule~ : FieldRule) -> ValidatorObject
+
 // Errors
 
 // Types and methods
 pub struct FieldRule {
   kind : RuleKind
   message : String?
+  validator_name : String?
 }
+pub fn FieldRule::named(Self, String) -> Self
 pub fn FieldRule::with_message(Self, String) -> Self
+pub fn FieldRule::with_message_template(Self, String) -> Self
 pub impl Show for FieldRule
 
 pub struct FieldSchema {
   name : String
   rules : Array[FieldRule]
 }
+pub fn FieldSchema::apply_validator(Self, ValidatorObject) -> Self
 pub fn FieldSchema::contains(Self, String) -> Self
 pub fn FieldSchema::included_in(Self, Array[String]) -> Self
 pub fn FieldSchema::max_length(Self, Int) -> Self
@@ -96,6 +104,11 @@ pub fn ValidationReport::merge(Self, Self) -> Self
 pub fn ValidationReport::messages(Self) -> Array[String]
 pub fn ValidationReport::size(Self) -> Int
 pub fn ValidationReport::summary(Self) -> String
+
+pub struct ValidatorObject {
+  name : String
+  rule : FieldRule
+}
 
 // Type aliases
 

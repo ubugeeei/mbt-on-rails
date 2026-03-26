@@ -185,6 +185,10 @@ pub fn validates_presence(field~ : String) -> Validation
 #label_migration(field, allow_positional=true)
 pub fn validates_uniqueness(field~ : String) -> Validation
 
+#label_migration(field, allow_positional=true)
+#label_migration(validator, allow_positional=true)
+pub fn validates_with(field~ : String, validator~ : @validation.ValidatorObject) -> Validation
+
 #label_migration(attribute, allow_positional=true)
 #label_migration(details, allow_positional=true)
 #label_migration(kind, allow_positional=true)

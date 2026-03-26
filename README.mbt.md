@@ -24,7 +24,7 @@ moon run examples/demo_blog
 
 - Routing with `resources`, `scope`, and `namespace`
 - Declarative controllers, before/after/around callback metadata, and action plans
-- Active Record-style schema, scopes, relations, validations, dirty tracking, in-memory transactions, and opinionated migration plans with safety analysis
+- Active Record-style schema, scopes, relations, reusable validators, dirty tracking, in-memory transactions, and opinionated migration plans with safety analysis
 - Auth, sessions, policies, and CSRF helpers
 - `.mbtv` pages, layouts, partials, server components, client islands, and suspense-like boundaries
 - Server actions, form bindings, typed form builders, and generated typed route/action helpers

@@ -206,6 +206,17 @@ pub fn validates(field~ : String, rule~ : @validation.FieldRule) -> Validation {
 }
 
 ///|
+/// Applies one reusable validator object to an Active Record field.
+#label_migration(field, allow_positional=true)
+#label_migration(validator, allow_positional=true)
+pub fn validates_with(
+  field~ : String,
+  validator~ : @validation.ValidatorObject,
+) -> Validation {
+  validates(field~, rule=validator.rule)
+}
+
+///|
 /// Overrides the default message for a validation rule.
 pub fn Validation::with_message(
   self : Validation,

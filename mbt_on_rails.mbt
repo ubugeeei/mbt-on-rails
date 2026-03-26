@@ -158,6 +158,7 @@ pub using @validation {
   type RuleKind,
   type ValidationIssue,
   type ValidationReport,
+  type ValidatorObject,
   contains,
   included_in,
   max_length,
@@ -167,6 +168,7 @@ pub using @validation {
   same_as,
   string_field,
   validate_object,
+  validator,
   validation_issue,
   validation_report,
 }
@@ -272,6 +274,7 @@ pub using @orm {
   validates_length_max,
   validates_length_min,
   validates_presence,
+  validates_with,
   validates_uniqueness,
   validation_error,
   validation_errors,
