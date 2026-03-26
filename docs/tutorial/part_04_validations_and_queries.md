@@ -33,6 +33,15 @@ Relations are immutable builders:
 - `where_like`
 - `where_in`
 - `order_by`
+- `reorder_by`
+- `reverse_order`
+- `distinct_records`
+- `group_by`
+- `having_raw`
+- `merge_relation`
+- `pluck_sql`
+- `exists_sql`
+- `none_relation`
 - `limit_to`
 - `offset_by`
 - `preload`
@@ -50,7 +59,13 @@ let relation = relation_for(post_model)
 
 `descending` is labeled so the call site stays readable. Omit it to get ascending order.
 
-Render with `relation_to_sql(...)`.
+Render with `relation_to_sql(...)`, `pluck_sql(...)`, or `exists_sql(...)`.
+
+Model scopes are also data:
+
+- `scope(...)`
+- `.with_scope(...)`
+- `find_scope(...)`
 
 ## In-Memory Adapter
 
@@ -88,7 +103,7 @@ let tx = empty_memory_database()
 
 ## Rails Gap
 
-- no full query interface yet
+- no adapter-backed query execution yet
 - no callback chain execution yet
 - no database adapter abstraction yet
 

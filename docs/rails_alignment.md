@@ -65,11 +65,17 @@ The source audit in this batch was anchored to the official Rails repository at:
 - The in-memory adapter now includes a transaction surface with `begin_transaction(...)`, savepoints, rollback, commit, and validation-aware `transaction_save(...)`
 - Public tests now lock in savepoint rollback behavior and dirty-state reset semantics
 
+## Seventh batch added here
+
+- The relation builder now supports `distinct_records`, `group_by`, `having_raw`, `reorder_by`, `reverse_order`, `merge_relation`, `pluck_sql`, `exists_sql`, and `none_relation`
+- `ModelSchema` now carries named `scope(...)` definitions, with `with_scope(...)` and `find_scope(...)` for reuse
+- Public relation tests now cover grouped SQL, merged scopes, and existence/pluck rendering
+
 ## Biggest gaps still open
 
 - `activesupport`: concern/autoloading/deprecation/timezones/notifications subscribers
 - `activemodel`: typed attributes/serialization/validator objects
-- `activerecord`: query interface/scopes/callback chains/database adapters
+- `activerecord`: callback chains/database adapters/query execution
 - `actionpack`: cookies/session store/responders/after_action/around_action/request forgery strategy
 - `actionview`: partials/helpers/form builders/template lookup
 - `activejob`: adapters/serialization

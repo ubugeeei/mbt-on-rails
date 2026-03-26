@@ -45,9 +45,17 @@ pub fn dirty_new_record(Record) -> DirtyRecord
 
 pub fn dirty_record(Record, Record) -> DirtyRecord
 
+pub fn distinct_records(Relation) -> Relation
+
 pub fn empty_memory_database() -> MemoryDatabase
 
+pub fn exists_sql(Relation) -> String
+
 pub fn find_records(MemoryDatabase, String, String, String) -> Array[Record]
+
+pub fn find_scope(ModelSchema, String) -> ScopeDefinition?
+
+pub fn group_by(Relation, Array[String]) -> Relation
 
 #label_migration(foreign_key, allow_positional=true)
 #label_migration(name, allow_positional=true)
@@ -63,6 +71,8 @@ pub fn has_many(name~ : String, target~ : String, foreign_key~ : String) -> Asso
 #label_migration(name, allow_positional=true)
 #label_migration(target, allow_positional=true)
 pub fn has_one(name~ : String, target~ : String, foreign_key~ : String) -> Association
+
+pub fn having_raw(Relation, String) -> Relation
 
 pub fn index_statements(ModelSchema) -> Array[String]
 
@@ -80,16 +90,22 @@ pub fn json_column(String) -> Column
 
 pub fn limit_to(Relation, Int) -> Relation
 
+pub fn merge_relation(Relation, Relation) -> Relation
+
 #label_migration(columns, allow_positional=true)
 #label_migration(name, allow_positional=true)
 #label_migration(table, allow_positional=true)
 pub fn model(name~ : String, table~ : String, columns~ : Array[Column], timestamps? : Bool, soft_delete? : Bool) -> ModelSchema
+
+pub fn none_relation(Relation) -> Relation
 
 pub fn nullable(Column) -> Column
 
 pub fn offset_by(Relation, Int) -> Relation
 
 pub fn order_by(Relation, String, descending? : Bool) -> Relation
+
+pub fn pluck_sql(Relation, Array[String]) -> String
 
 pub fn preload(Relation, String) -> Relation
 
@@ -101,6 +117,10 @@ pub fn relation_for(ModelSchema) -> Relation
 
 pub fn relation_to_sql(Relation) -> String
 
+pub fn reorder_by(Relation, String, descending? : Bool) -> Relation
+
+pub fn reverse_order(Relation) -> Relation
+
 pub fn rollback_to_savepoint(MemoryTransaction, String) -> MemoryTransaction
 
 pub fn rollback_transaction(MemoryTransaction) -> MemoryDatabase
@@ -108,6 +128,10 @@ pub fn rollback_transaction(MemoryTransaction) -> MemoryDatabase
 pub fn save_record(ModelSchema, MemoryDatabase, Record) -> SaveOutcome
 
 pub fn schema_dump(Array[ModelSchema]) -> String
+
+#label_migration(name, allow_positional=true)
+#label_migration(relation, allow_positional=true)
+pub fn scope(name~ : String, relation~ : Relation) -> ScopeDefinition
 
 pub fn select_columns(Relation, Array[String]) -> Relation
 
@@ -189,6 +213,8 @@ pub fn with_association(ModelSchema, Association) -> ModelSchema
 pub fn with_callback(ModelSchema, Callback) -> ModelSchema
 
 pub fn with_default(Column, String) -> Column
+
+pub fn with_scope(ModelSchema, ScopeDefinition) -> ModelSchema
 
 pub fn with_validation(ModelSchema, Validation) -> ModelSchema
 
@@ -305,12 +331,14 @@ pub struct ModelSchema {
   columns : Array[Column]
   timestamps : Bool
   soft_delete : Bool
+  scopes : Array[ScopeDefinition]
   associations : Array[Association]
   validations : Array[Validation]
   callbacks : Array[Callback]
 }
 pub fn ModelSchema::with_association(Self, Association) -> Self
 pub fn ModelSchema::with_callback(Self, Callback) -> Self
+pub fn ModelSchema::with_scope(Self, ScopeDefinition) -> Self
 pub fn ModelSchema::with_validation(Self, Validation) -> Self
 
 pub struct OrderBy {
@@ -341,15 +369,26 @@ pub struct Relation {
   predicates : Array[Predicate]
   orderings : Array[OrderBy]
   joins : Array[String]
+  groupings : Array[String]
+  having_clauses : Array[String]
+  distinct : Bool
+  none : Bool
   limit : Int?
   offset : Int?
   preloads : Array[String]
 }
+pub fn Relation::distinct_records(Self) -> Self
+pub fn Relation::group_by(Self, Array[String]) -> Self
+pub fn Relation::having_raw(Self, String) -> Self
 pub fn Relation::join_relation(Self, String) -> Self
 pub fn Relation::limit_to(Self, Int) -> Self
+pub fn Relation::merge_relation(Self, Self) -> Self
+pub fn Relation::none_relation(Self) -> Self
 pub fn Relation::offset_by(Self, Int) -> Self
 pub fn Relation::order_by(Self, String, descending? : Bool) -> Self
 pub fn Relation::preload(Self, String) -> Self
+pub fn Relation::reorder_by(Self, String, descending? : Bool) -> Self
+pub fn Relation::reverse_order(Self) -> Self
 pub fn Relation::select_columns(Self, Array[String]) -> Self
 pub fn Relation::where_eq(Self, String, String) -> Self
 pub fn Relation::where_gt(Self, String, String) -> Self
@@ -362,6 +401,11 @@ pub fn Relation::where_raw(Self, String) -> Self
 pub enum SaveOutcome {
   Saved(MemoryDatabase, Record)
   ValidationFailed(ValidationErrors)
+}
+
+pub struct ScopeDefinition {
+  name : String
+  relation : Relation
 }
 
 pub enum TransactionSaveOutcome {

@@ -69,6 +69,60 @@ test "relation sql covers joins selects predicates counts and offsets" {
 }
 
 ///|
+test "relation sql covers distinct grouping merge pluck exists and none" {
+  let schema = model(name="Post", table="posts", columns=[
+    string_column("title"),
+  ])
+  let aggregated = relation_for(schema)
+    .select_columns(["posts.author_id", "COUNT(*) AS total"])
+    .distinct_records()
+    .group_by(["posts.author_id"])
+    .having_raw("COUNT(*) > 1")
+
+  assert_eq(
+    relation_to_sql(aggregated),
+    "SELECT DISTINCT posts.author_id, COUNT(*) AS total FROM posts GROUP BY posts.author_id HAVING COUNT(*) > 1",
+  )
+
+  let merged = merge_relation(
+    relation_for(schema)
+    .where_eq("state", "published")
+    .order_by("created_at", descending=true)
+    .preload("author"),
+    relation_for(schema)
+    .where_like("title", "%MoonBit%")
+    .reorder_by("id", descending=true)
+    .limit_to(3),
+  )
+
+  assert_eq(
+    relation_to_sql(merged),
+    "SELECT * FROM posts WHERE state = 'published' AND title LIKE '%MoonBit%' ORDER BY created_at DESC, id DESC LIMIT 3",
+  )
+  assert_eq(merged.preloads[0], "author")
+
+  let reversed = reverse_order(
+    relation_for(schema)
+    .order_by("created_at", descending=true)
+    .order_by("title"),
+  )
+  assert_eq(
+    relation_to_sql(reversed),
+    "SELECT * FROM posts ORDER BY created_at ASC, title DESC",
+  )
+
+  let titles = relation_for(schema).where_eq("state", "published")
+  assert_eq(
+    pluck_sql(titles, ["title", "slug"]),
+    "SELECT title, slug FROM posts WHERE state = 'published'",
+  )
+  assert_eq(
+    exists_sql(none_relation(titles)),
+    "SELECT 1 AS one FROM posts WHERE 1=0 AND state = 'published' LIMIT 1",
+  )
+}
+
+///|
 test "render_page covers hydration variants assets metadata and dynamic modes" {
   let layout = render_test_layout()
   let base = with_assets(

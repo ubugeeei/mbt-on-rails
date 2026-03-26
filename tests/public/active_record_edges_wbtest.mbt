@@ -81,6 +81,41 @@ test "active record constructors expose association validation and callback meta
   assert_eq(callbacks[4].hook.to_string(), "AfterCreate")
   assert_eq(callbacks[5].hook.to_string(), "BeforeDestroy")
   assert_eq(callbacks[6].hook.to_string(), "AfterDestroy")
+
+  let post_base = model(
+    name="Post",
+    table="posts",
+    columns=[string_column("title")],
+    timestamps=false,
+  )
+  let scoped = post_base
+    .with_scope(
+      scope(
+        name="published",
+        relation=relation_for(post_base).where_eq("state", "published"),
+      ),
+    )
+    .with_scope(
+      scope(
+        name="recent",
+        relation=relation_for(post_base)
+          .order_by("created_at", descending=true)
+          .limit_to(5),
+      ),
+    )
+  assert_eq(scoped.scopes.length(), 2)
+  match find_scope(scoped, "published") {
+    Some(found) =>
+      assert_eq(
+        relation_to_sql(found.relation),
+        "SELECT * FROM posts WHERE state = 'published'",
+      )
+    None => assert_true(false)
+  }
+  match find_scope(scoped, "missing") {
+    Some(_) => assert_true(false)
+    None => assert_true(true)
+  }
 }
 
 ///|

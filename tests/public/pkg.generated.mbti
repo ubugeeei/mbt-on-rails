@@ -243,6 +243,8 @@ pub fn dirty_record(@active_record.Record, @active_record.Record) -> @active_rec
 #label_migration(exception_name, allow_positional=true)
 pub fn discard_on(exception_name~ : String, report? : Bool) -> @job.JobFailurePolicy
 
+pub fn distinct_records(@active_record.Relation) -> @active_record.Relation
+
 pub fn dotenv_preview(@secrets.SecretsConfig) -> String
 
 pub fn drain_ready(@job.JobQueue, String) -> @job.DrainedJobs
@@ -289,9 +291,13 @@ pub fn escape_html(String) -> String
 
 pub fn execute_sql_step(String) -> @migration.MigrationStep
 
+pub fn exists_sql(@active_record.Relation) -> String
+
 pub fn find_entry(Array[(String, String)], String) -> String?
 
 pub fn find_records(@active_record.MemoryDatabase, String, String, String) -> Array[@active_record.Record]
+
+pub fn find_scope(@active_record.ModelSchema, String) -> @active_record.ScopeDefinition?
 
 #label_migration(seconds, allow_positional=true)
 pub fn fixed_wait(seconds~ : Int) -> @job.RetryWait
@@ -312,6 +318,8 @@ pub fn flash(String, String) -> @controller.ActionStep
 pub fn form_binding(name~ : String, action_name~ : String, verb~ : String, optimistic_key~ : String?, redirect_to~ : String?) -> @view.FormBinding
 
 pub fn gauge(String, Array[(String, String)], Int) -> @metrics.MetricSample
+
+pub fn group_by(@active_record.Relation, Array[String]) -> @active_record.Relation
 
 pub fn halt_with_text(String, String, Array[@http.HttpMethod], Int, String) -> @middleware.Middleware
 
@@ -339,6 +347,8 @@ pub fn has_many(name~ : String, target~ : String, foreign_key~ : String) -> @act
 pub fn has_one(name~ : String, target~ : String, foreign_key~ : String) -> @active_record.Association
 
 pub fn hash_string(String) -> String
+
+pub fn having_raw(@active_record.Relation, String) -> @active_record.Relation
 
 #label_migration(detail, allow_positional=true)
 #label_migration(name, allow_positional=true)
@@ -480,6 +490,8 @@ pub fn mbtv_path(String) -> @support.MbtvPath
 
 pub fn merge_params(Array[(String, String)], Array[(String, String)], Array[(String, String)]) -> @params.Parameters
 
+pub fn merge_relation(@active_record.Relation, @active_record.Relation) -> @active_record.Relation
+
 pub fn metric_value(@metrics.MetricsRegistry, String, Array[(String, String)]) -> Int
 
 pub fn metrics_registry() -> @metrics.MetricsRegistry
@@ -525,6 +537,8 @@ pub fn mount_import(import_name~ : String, props~ : Array[(String, String)]) -> 
 pub fn namespace_routes(String, Array[@http.RouteSpec]) -> Array[@http.RouteSpec]
 
 pub fn no_content_response() -> @http.Response
+
+pub fn none_relation(@active_record.Relation) -> @active_record.Relation
 
 pub fn normalize_path(String) -> String
 
@@ -579,6 +593,8 @@ pub fn permitted_summary(@params.PermittedParams) -> String
 pub fn permitted_value(@params.PermittedParams, String) -> String?
 
 pub fn persist_model_step(String) -> @controller.ActionStep
+
+pub fn pluck_sql(@active_record.Relation, Array[String]) -> String
 
 #label_migration(action, allow_positional=true)
 #label_migration(allow_owner, allow_positional=true)
@@ -678,6 +694,8 @@ pub fn render_server_action_manifest(Array[@view.ServerAction]) -> String
 
 pub fn render_turbo_stream(Array[@turbo.TurboStream]) -> String
 
+pub fn reorder_by(@active_record.Relation, String, descending? : Bool) -> @active_record.Relation
+
 #label_migration(body, allow_positional=true)
 #label_migration(form, allow_positional=true)
 #label_migration(path, allow_positional=true)
@@ -704,6 +722,8 @@ pub fn retry_job_with_notifications(job~ : @job.EnqueuedJob, next_run_at~ : Stri
 
 #label_migration(exception_name, allow_positional=true)
 pub fn retry_on(exception_name~ : String, attempts? : Int, wait? : @job.RetryWait, queue? : String?, report? : Bool) -> @job.JobFailurePolicy
+
+pub fn reverse_order(@active_record.Relation) -> @active_record.Relation
 
 pub fn reversible_step(String, String) -> @migration.MigrationStep
 
@@ -737,6 +757,10 @@ pub fn scheduler_process(String, String, Array[String]) -> @process.ProcessDefin
 pub fn schema_dump(Array[@active_record.ModelSchema]) -> String
 
 pub fn schema_sql(Array[@migration.Migration]) -> Array[String]
+
+#label_migration(name, allow_positional=true)
+#label_migration(relation, allow_positional=true)
+pub fn scope(name~ : String, relation~ : @active_record.Relation) -> @active_record.ScopeDefinition
 
 pub fn scope_routes(String, String, Array[@http.RouteSpec]) -> Array[@http.RouteSpec]
 
@@ -942,6 +966,8 @@ pub fn with_request_header(@middleware.Middleware, String, String) -> @middlewar
 
 pub fn with_response_header(@middleware.Middleware, String, String) -> @middleware.Middleware
 
+pub fn with_scope(@active_record.ModelSchema, @active_record.ScopeDefinition) -> @active_record.ModelSchema
+
 pub fn with_template_import(@view.VaporComponentRef, @view.TemplateImport) -> @view.VaporComponentRef
 
 pub fn with_validation(@active_record.ModelSchema, @active_record.Validation) -> @active_record.ModelSchema
@@ -1144,6 +1170,8 @@ pub using @active_record {type SaveOutcome}
 pub using @generator {type ScaffoldField}
 
 pub using @generator {type ScaffoldPlan}
+
+pub using @active_record {type ScopeDefinition}
 
 pub using @secrets {type SecretVar}
 

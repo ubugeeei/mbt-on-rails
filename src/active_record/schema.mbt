@@ -30,9 +30,17 @@ pub struct ModelSchema {
   columns : Array[Column]
   timestamps : Bool
   soft_delete : Bool
+  scopes : Array[ScopeDefinition]
   associations : Array[Association]
   validations : Array[Validation]
   callbacks : Array[Callback]
+}
+
+///|
+/// Describes one named relation scope attached to a model.
+pub struct ScopeDefinition {
+  name : String
+  relation : Relation
 }
 
 ///|
@@ -169,10 +177,27 @@ pub fn model(
     columns,
     timestamps,
     soft_delete,
+    scopes: [],
     associations: [],
     validations: [],
     callbacks: [],
   }
+}
+
+///|
+/// Builds one named scope from a preconfigured relation.
+#label_migration(name, allow_positional=true)
+#label_migration(relation, allow_positional=true)
+pub fn scope(name~ : String, relation~ : Relation) -> ScopeDefinition {
+  { name, relation }
+}
+
+///|
+/// Returns a schema with one more named scope.
+pub fn with_scope(schema : ModelSchema, scope : ScopeDefinition) -> ModelSchema {
+  let scopes = @support.clone_array(schema.scopes)
+  scopes.push(scope)
+  { ..schema, scopes, }
 }
 
 ///|
@@ -203,4 +228,15 @@ pub fn with_callback(schema : ModelSchema, callback : Callback) -> ModelSchema {
   let callbacks = @support.clone_array(schema.callbacks)
   callbacks.push(callback)
   { ..schema, callbacks, }
+}
+
+///|
+/// Finds one named scope by name.
+pub fn find_scope(schema : ModelSchema, name : String) -> ScopeDefinition? {
+  for current in schema.scopes {
+    if current.name == name {
+      return Some(current)
+    }
+  }
+  None
 }
