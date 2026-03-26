@@ -101,6 +101,13 @@ fn demo_home_page(layout : @view.LayoutModule) -> @view.PageModule {
 ///|
 /// Builds the demo sign-in page module.
 fn demo_sign_in_page(layout : @view.LayoutModule) -> @view.PageModule {
+  let binding = @view.form_binding(
+    name="sign_in",
+    action_name="sessions.create",
+    verb="POST",
+    optimistic_key=None,
+    redirect_to=Some("/"),
+  )
   @view.page_module(
     route_name="sign_in",
     route_path="/sign-in",
@@ -110,13 +117,25 @@ fn demo_sign_in_page(layout : @view.LayoutModule) -> @view.PageModule {
   )
   .with_layout(layout)
   .with_action_name("sessions.create")
-  .with_form(
-    @view.form_binding(
-      name="sign_in",
-      action_name="sessions.create",
-      verb="POST",
-      optimistic_key=None,
-      redirect_to=Some("/"),
+  .with_form_builder(
+    @view.form_builder(
+      name="sign_in_form",
+      binding~,
+      fields=[
+        @view.email_field(
+          name="email",
+          label="Email",
+          autocomplete=Some("email"),
+          placeholder=Some("hello@example.com"),
+        ),
+        @view.password_field(
+          name="password",
+          label="Password",
+          autocomplete=Some("current-password"),
+        ),
+      ],
+      submit_label="Sign in",
+      description=Some("Typed sign-in form metadata for the client bridge"),
     ),
   )
 }

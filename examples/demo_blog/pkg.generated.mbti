@@ -73,6 +73,8 @@ pub fn demo_session_model() -> @active_record.ModelSchema
 
 pub fn demo_sessions_controller() -> @controller.ControllerDefinition
 
+pub fn demo_sign_in_form_partial_component() -> @view.VaporComponentRef
+
 pub fn demo_sign_in_page_component() -> @view.VaporComponentRef
 
 pub fn demo_user_model() -> @active_record.ModelSchema

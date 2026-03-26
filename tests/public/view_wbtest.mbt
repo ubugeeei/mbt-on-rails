@@ -9,16 +9,46 @@ test "rendered page includes islands forms and route tree data" {
       props=[],
     ),
   )
+  let hero_partial = server_component(
+    name="PostHero",
+    source_path=mbtv_path("examples/demo_blog/views/components/post_hero.mbtv"),
+    props=[("title", "MoonBit on Rails")],
+  ).with_contract(
+    server_contract(
+      props=[
+        prop_contract(
+          name="title",
+          type_name="String",
+          required=true,
+          description="Hero title",
+        ),
+      ],
+      async_only=false,
+    ),
+  )
+  let binding = form_binding(
+    name="post_update",
+    action_name="posts.update",
+    verb="POST",
+    optimistic_key=Some("post"),
+    redirect_to=Some("/posts/[id]"),
+  )
   let page = page_module(
       route_name="posts_show",
       route_path="/posts/[id]",
       file_path=mbtv_path("examples/demo_blog/views/pages/posts/show.mbtv"),
       title="Post",
       component=server_component(
-        name="PostsShowPage",
-        source_path=mbtv_path("examples/demo_blog/views/pages/posts/show.mbtv"),
-        props=[],
-      ),
+          name="PostsShowPage",
+          source_path=mbtv_path(
+            "examples/demo_blog/views/pages/posts/show.mbtv",
+          ),
+          props=[],
+        )
+        .with_partial(partial(local_name="PostHero", component=hero_partial))
+        .with_child(
+          render_partial(name="PostHero", locals=[("title", "MoonBit on Rails")]),
+        ),
     )
     .with_layout(layout)
     .with_loader(
@@ -34,18 +64,31 @@ test "rendered page includes islands forms and route tree data" {
     .with_island(
       client_component(
         name="LikeButton",
-        source_path=mbtv_path("examples/demo_blog/views/components/like_button.mbtv"),
+        source_path=mbtv_path(
+          "examples/demo_blog/views/components/like_button.mbtv",
+        ),
         props=[("kind", "heart")],
         hydration=hydrate_visible(),
       ),
     )
-    .with_form(
-      form_binding(
-        name="post_update",
-        action_name="posts.update",
-        verb="POST",
-        optimistic_key=Some("post"),
-        redirect_to=Some("/posts/[id]"),
+    .with_form_builder(
+      form_builder(
+        name="post_update_form",
+        binding~,
+        fields=[
+          text_field(
+            name="title",
+            label="Title",
+            placeholder=Some("MoonBit on Rails"),
+          ),
+          textarea_field(
+            name="body",
+            label="Body",
+            help_text=Some("Rendered through typed form metadata"),
+          ),
+        ],
+        submit_label="Save post",
+        description=Some("Edit form for one post"),
       ),
     )
   let actions = [
@@ -68,10 +111,31 @@ test "rendered page includes islands forms and route tree data" {
   assert_true(rendered.html.contains("data-mbor-page=\"posts_show\""))
   assert_true(rendered.html.contains("client:visible"))
   assert_true(rendered.html.contains("LikeButton"))
+  assert_true(rendered.html.contains("data-mbor-import=\"PostHero\""))
+  assert_true(rendered.html.contains("id=\"mbor-form-builders\""))
   assert_true(
     rendered.data_json.contains("\"dynamic_mode\": \"revalidate:60\""),
   )
   assert_true(render_form_manifest(page.forms).contains("\"method\": \"POST\""))
+  assert_true(
+    render_form_builder_manifest(page.form_builders).contains(
+      "\"submit_label\": \"Save post\"",
+    ),
+  )
+  assert_true(
+    render_form_builder_manifest(page.form_builders).contains(
+      "\"kind\": \"textarea\"",
+    ),
+  )
+  assert_eq(validate_page_tree(page), [])
+  assert_true(
+    rendered.component_manifest_json.contains("\"local_name\": \"PostHero\""),
+  )
+  assert_true(
+    rendered.form_builder_manifest_json.contains(
+      "\"binding_name\": \"post_update\"",
+    ),
+  )
   assert_true(
     render_route_tree([page]).contains("\"segments\": [\"posts\", \"[id]\"]"),
   )
@@ -135,4 +199,7 @@ test "scaffold and demo app expose richer rails style surfaces" {
   )
   assert_true(demo.router_manifest().contains("\"route_name\": \"posts_show\""))
   assert_true(demo.schema_statements().length() >= 3)
+  assert_true(
+    render_response_body(page_response.body).contains("mbor-form-builders"),
+  )
 }

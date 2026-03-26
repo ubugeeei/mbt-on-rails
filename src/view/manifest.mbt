@@ -133,6 +133,73 @@ pub fn render_form_manifest(forms : Array[FormBinding]) -> String {
 }
 
 ///|
+/// Renders the richer form builder manifest consumed by the client bridge.
+pub fn render_form_builder_manifest(builders : Array[FormBuilder]) -> String {
+  let entries : Array[String] = []
+  for builder in builders {
+    let optimistic_key = match builder.binding.optimistic_key {
+      Some(key) => @support.json_string(key)
+      None => "null"
+    }
+    let redirect_to = match builder.binding.redirect_to {
+      Some(path) => @support.json_string(path)
+      None => "null"
+    }
+    let description = match builder.description {
+      Some(text) => @support.json_string(text)
+      None => "null"
+    }
+    let fields : Array[String] = []
+    for field in builder.fields {
+      fields.push(
+        "{" +
+        "\"name\": " +
+        @support.json_string(field.name) +
+        ", \"kind\": " +
+        @support.json_string(render_form_field_kind(field.field_kind)) +
+        ", \"label\": " +
+        @support.json_string(field.label) +
+        ", \"required\": " +
+        (if field.required { "true" } else { "false" }) +
+        ", \"placeholder\": " +
+        render_optional_json(field.placeholder) +
+        ", \"value\": " +
+        render_optional_json(field.value) +
+        ", \"autocomplete\": " +
+        render_optional_json(field.autocomplete) +
+        ", \"help_text\": " +
+        render_optional_json(field.help_text) +
+        "}",
+      )
+    }
+    entries.push(
+      "{" +
+      "\"name\": " +
+      @support.json_string(builder.name) +
+      ", \"binding_name\": " +
+      @support.json_string(builder.binding.name) +
+      ", \"action_name\": " +
+      @support.json_string(builder.binding.action_name) +
+      ", \"method\": " +
+      @support.json_string(builder.binding.verb) +
+      ", \"optimistic_key\": " +
+      optimistic_key +
+      ", \"redirect_to\": " +
+      redirect_to +
+      ", \"submit_label\": " +
+      @support.json_string(builder.submit_label) +
+      ", \"description\": " +
+      description +
+      ", \"fields\": [" +
+      fields.join(", ") +
+      "]" +
+      "}",
+    )
+  }
+  "[" + entries.join(", ") + "]"
+}
+
+///|
 /// Renders one component entry for the component contract manifest.
 fn render_component_entry(component : VaporComponentRef) -> String {
   let boundary = match component.contract {
@@ -177,6 +244,26 @@ fn render_component_entry(component : VaporComponentRef) -> String {
   ", \"children\": " +
   children +
   "}"
+}
+
+///|
+fn render_optional_json(value : String?) -> String {
+  match value {
+    Some(text) => @support.json_string(text)
+    None => "null"
+  }
+}
+
+///|
+fn render_form_field_kind(kind : FormFieldKind) -> String {
+  match kind {
+    TextInput => "text"
+    EmailInput => "email"
+    PasswordInput => "password"
+    TextArea => "textarea"
+    HiddenInput => "hidden"
+    CheckboxInput => "checkbox"
+  }
 }
 
 ///|

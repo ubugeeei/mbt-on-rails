@@ -8,12 +8,30 @@ pub fn template_import(
 }
 
 ///|
+/// Rails-style alias for declaring an explicit partial import.
+pub fn partial(
+  local_name~ : String,
+  component~ : VaporComponentRef,
+) -> TemplateImport {
+  template_import(local_name~, component~)
+}
+
+///|
 /// Mounts one imported component with explicit props.
 pub fn mount_import(
   import_name~ : String,
   props~ : Array[(String, String)],
 ) -> VaporNode {
   Mounted({ import_name, props })
+}
+
+///|
+/// Rails-style alias for mounting one imported partial with locals.
+pub fn render_partial(
+  name~ : String,
+  locals~ : Array[(String, String)],
+) -> VaporNode {
+  mount_import(import_name=name, props=locals)
 }
 
 ///|
@@ -35,6 +53,15 @@ pub fn with_template_import(
   let template_imports = @support.clone_array(component.template_imports)
   template_imports.push(imported)
   { ..component, template_imports, }
+}
+
+///|
+/// Rails-style alias for attaching one imported partial to a component.
+pub fn with_partial(
+  component : VaporComponentRef,
+  imported : TemplateImport,
+) -> VaporComponentRef {
+  with_template_import(component, imported)
 }
 
 ///|

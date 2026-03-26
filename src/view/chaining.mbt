@@ -28,6 +28,17 @@ pub fn VaporComponentRef::with_template_import(
 }
 
 ///|
+/// Chainable alias for `with_partial`.
+pub fn VaporComponentRef::with_partial(
+  self : VaporComponentRef,
+  imported : TemplateImport,
+) -> VaporComponentRef {
+  let template_imports = @support.clone_array(self.template_imports)
+  template_imports.push(imported)
+  { ..self, template_imports, }
+}
+
+///|
 /// Chainable alias for `with_child`.
 pub fn VaporComponentRef::with_child(
   self : VaporComponentRef,
@@ -87,6 +98,21 @@ pub fn PageModule::with_form(
   let forms = @support.clone_array(self.forms)
   forms.push(form)
   { ..self, forms, }
+}
+
+///|
+/// Chainable alias for `with_form_builder`.
+pub fn PageModule::with_form_builder(
+  self : PageModule,
+  builder : FormBuilder,
+) -> PageModule {
+  let forms = @support.clone_array(self.forms)
+  if not(forms.any(fn(current) { current.name == builder.binding.name })) {
+    forms.push(builder.binding)
+  }
+  let form_builders = @support.clone_array(self.form_builders)
+  form_builders.push(builder)
+  { ..self, forms, form_builders }
 }
 
 ///|

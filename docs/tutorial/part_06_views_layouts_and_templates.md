@@ -9,6 +9,7 @@ Understand how pages and layouts are described, and how `.mbtv` templates are ti
 - [`../../src/view/types.mbt`](../../src/view/types.mbt)
 - [`../../src/view/page_builders.mbt`](../../src/view/page_builders.mbt)
 - [`../../src/view/component_builders.mbt`](../../src/view/component_builders.mbt)
+- [`../../src/view/composition.mbt`](../../src/view/composition.mbt)
 - [`../../src/view/template_validation.mbt`](../../src/view/template_validation.mbt)
 - [`../../examples/demo_blog/views`](../../examples/demo_blog/views)
 
@@ -37,6 +38,7 @@ Then decorate it with:
 - `.with_action_name(...)`
 - `.with_dynamic_mode(...)`
 - `.with_metadata(...)`
+- `.with_partial(partial(...))`
 
 Favor labeled arguments for builders like `page_module(...)` so route names,
 paths, and titles stay readable at a glance.
@@ -51,6 +53,27 @@ That means template composition stays:
 - explicit
 - analyzable
 - safer for code generation
+
+Rails-style partial naming is now available as a thin alias over those same primitives:
+
+```moonbit
+let page_component = server_component(
+  name="SignInPage",
+  source_path=view_pages_sign_in(),
+  props=[],
+)
+.with_partial(
+  partial(
+    local_name="SignInForm",
+    component=server_component(
+      name="SignInForm",
+      source_path=view_components_sign_in_form(),
+      props=[],
+    ),
+  ),
+)
+.with_child(render_partial(name="SignInForm", locals=[]))
+```
 
 ## Generated Typed Helpers
 

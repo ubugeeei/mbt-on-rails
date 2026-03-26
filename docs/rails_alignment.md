@@ -77,19 +77,25 @@ The source audit in this batch was anchored to the official Rails repository at:
 - `controller_summary(...)` renders before/around/after callback declarations so generated plans stay inspectable
 - The demo app and public tests now show controller callback metadata alongside action plans
 
+## Ninth batch added here
+
+- The view layer now exposes Rails-style `partial(...)`, `render_partial(...)`, and `with_partial(...)` aliases on top of explicit template imports
+- Page modules can now carry typed `form_builder(...)` metadata with field descriptors such as `email_field`, `password_field`, `text_field`, and `textarea_field`
+- `render_page(...)` now emits a form-builder manifest so page HTML can ship richer end-to-end UI metadata alongside action and component manifests
+
 ## Biggest gaps still open
 
 - `activesupport`: concern/autoloading/deprecation/timezones/notifications subscribers
 - `activemodel`: typed attributes/serialization/validator objects
 - `activerecord`: callback chains/database adapters/query execution
 - `actionpack`: cookies/session store/responders/request forgery strategy
-- `actionview`: partials/helpers/form builders/template lookup
+- `actionview`: helpers/template lookup
 - `activejob`: adapters/serialization
 - `actioncable`: connection lifecycle and richer subscription adapters
 - `railties`: generators/initializers/config loading/engines
 
 ## Recommended next batches
 
-1. Add partial rendering plus a small helper/form-builder layer so the scaffolded frontend can become less template-string-heavy.
-2. Expand the validation library with reusable validator objects and richer message customization.
-3. Add Active Job adapters and serialization contracts.
+1. Expand the validation library with reusable validator objects and richer message customization.
+2. Add Active Job adapters and serialization contracts.
+3. Add more Action View helper coverage on top of the new partial/form-builder metadata.

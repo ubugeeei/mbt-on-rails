@@ -10,6 +10,8 @@ import {
 #label_migration(style_urls, allow_positional=true)
 pub fn asset_manifest(style_urls~ : Array[String], script_urls~ : Array[String]) -> AssetManifest
 
+pub fn checkbox_field(name~ : String, label~ : String, required? : Bool, value? : String?, help_text? : String?) -> FormField
+
 #label_migration(hydration, allow_positional=true)
 #label_migration(name, allow_positional=true)
 #label_migration(props, allow_positional=true)
@@ -30,12 +32,27 @@ pub fn dynamic_force_static() -> DynamicMode
 
 pub fn dynamic_revalidate(Int) -> DynamicMode
 
+pub fn email_field(name~ : String, label~ : String, required? : Bool, placeholder? : String?, value? : String?, autocomplete? : String?, help_text? : String?) -> FormField
+
 #label_migration(action_name, allow_positional=true)
 #label_migration(name, allow_positional=true)
 #label_migration(optimistic_key, allow_positional=true)
 #label_migration(redirect_to, allow_positional=true)
 #label_migration(verb, allow_positional=true)
 pub fn form_binding(name~ : String, action_name~ : String, verb~ : String, optimistic_key~ : String?, redirect_to~ : String?) -> FormBinding
+
+#label_migration(binding, allow_positional=true)
+#label_migration(fields, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(submit_label, allow_positional=true)
+pub fn form_builder(name~ : String, binding~ : FormBinding, fields~ : Array[FormField], submit_label~ : String, description? : String?) -> FormBuilder
+
+#label_migration(field_kind, allow_positional=true)
+#label_migration(label, allow_positional=true)
+#label_migration(name, allow_positional=true)
+pub fn form_field(name~ : String, field_kind~ : FormFieldKind, label~ : String, required? : Bool, placeholder? : String?, value? : String?, autocomplete? : String?, help_text? : String?) -> FormField
+
+pub fn hidden_field(name~ : String, label~ : String, value? : String?) -> FormField
 
 pub fn hydrate_idle() -> HydrationMode
 
@@ -69,6 +86,10 @@ pub fn mount_import(import_name~ : String, props~ : Array[(String, String)]) -> 
 #label_migration(title, allow_positional=true)
 pub fn page_module(route_name~ : String, route_path~ : String, file_path~ : @support.MbtvPath, title~ : String, component~ : VaporComponentRef) -> PageModule
 
+pub fn partial(local_name~ : String, component~ : VaporComponentRef) -> TemplateImport
+
+pub fn password_field(name~ : String, label~ : String, required? : Bool, placeholder? : String?, value? : String?, autocomplete? : String?, help_text? : String?) -> FormField
+
 #label_migration(description, allow_positional=true)
 #label_migration(name, allow_positional=true)
 #label_migration(required, allow_positional=true)
@@ -79,6 +100,8 @@ pub fn render_bundle_plan(PageModule) -> String
 
 pub fn render_component_manifest(PageModule) -> String
 
+pub fn render_form_builder_manifest(Array[FormBuilder]) -> String
+
 pub fn render_form_manifest(Array[FormBinding]) -> String
 
 pub fn render_page(PageModule, Array[(String, String)], Array[(String, String)], Array[ServerAction]) -> RenderedPage
@@ -86,6 +109,8 @@ pub fn render_page(PageModule, Array[(String, String)], Array[(String, String)],
 pub fn render_page_manifest_entry(PageModule) -> String
 
 pub fn render_page_with_notifications(page~ : PageModule, route_params~ : Array[(String, String)], loader_data~ : Array[(String, String)], actions~ : Array[ServerAction], notifications~ : @support.Notifications) -> (RenderedPage, @support.Notifications)
+
+pub fn render_partial(name~ : String, locals~ : Array[(String, String)]) -> VaporNode
 
 pub fn render_route_tree(Array[PageModule]) -> String
 
@@ -117,6 +142,10 @@ pub fn template_component_usages(String) -> Array[String]
 
 pub fn template_import(local_name~ : String, component~ : VaporComponentRef) -> TemplateImport
 
+pub fn text_field(name~ : String, label~ : String, required? : Bool, placeholder? : String?, value? : String?, autocomplete? : String?, help_text? : String?) -> FormField
+
+pub fn textarea_field(name~ : String, label~ : String, required? : Bool, placeholder? : String?, value? : String?, autocomplete? : String?, help_text? : String?) -> FormField
+
 pub fn validate_component_tree(VaporComponentRef) -> Array[String]
 
 pub fn validate_page_tree(PageModule) -> Array[String]
@@ -137,6 +166,8 @@ pub fn with_fallback(VaporComponentRef, String) -> VaporComponentRef
 
 pub fn with_form(PageModule, FormBinding) -> PageModule
 
+pub fn with_form_builder(PageModule, FormBuilder) -> PageModule
+
 pub fn with_island(PageModule, VaporComponentRef) -> PageModule
 
 pub fn with_layout(PageModule, LayoutModule) -> PageModule
@@ -144,6 +175,8 @@ pub fn with_layout(PageModule, LayoutModule) -> PageModule
 pub fn with_loader(PageModule, LoaderModule) -> PageModule
 
 pub fn with_metadata(PageModule, String, String) -> PageModule
+
+pub fn with_partial(VaporComponentRef, TemplateImport) -> VaporComponentRef
 
 pub fn with_template_import(VaporComponentRef, TemplateImport) -> VaporComponentRef
 
@@ -186,6 +219,36 @@ pub struct FormBinding {
   redirect_to : String?
 }
 
+pub struct FormBuilder {
+  name : String
+  binding : FormBinding
+  fields : Array[FormField]
+  submit_label : String
+  description : String?
+}
+
+pub struct FormField {
+  name : String
+  field_kind : FormFieldKind
+  label : String
+  required : Bool
+  placeholder : String?
+  value : String?
+  autocomplete : String?
+  help_text : String?
+}
+
+pub enum FormFieldKind {
+  TextInput
+  EmailInput
+  PasswordInput
+  TextArea
+  HiddenInput
+  CheckboxInput
+}
+pub impl Eq for FormFieldKind
+pub impl Show for FormFieldKind
+
 pub enum HydrationMode {
   Manual
   Load
@@ -227,6 +290,7 @@ pub struct PageModule {
   action_name : String?
   client_islands : Array[VaporComponentRef]
   forms : Array[FormBinding]
+  form_builders : Array[FormBuilder]
   metadata : Array[(String, String)]
   dynamic_mode : DynamicMode
   assets : AssetManifest
@@ -235,6 +299,7 @@ pub fn PageModule::with_action_name(Self, String) -> Self
 pub fn PageModule::with_assets(Self, AssetManifest) -> Self
 pub fn PageModule::with_dynamic_mode(Self, DynamicMode) -> Self
 pub fn PageModule::with_form(Self, FormBinding) -> Self
+pub fn PageModule::with_form_builder(Self, FormBuilder) -> Self
 pub fn PageModule::with_island(Self, VaporComponentRef) -> Self
 pub fn PageModule::with_layout(Self, LayoutModule) -> Self
 pub fn PageModule::with_loader(Self, LoaderModule) -> Self
@@ -251,6 +316,7 @@ pub struct RenderedPage {
   html : String
   data_json : String
   component_manifest_json : String
+  form_builder_manifest_json : String
   router_manifest_entry : String
 }
 
@@ -287,6 +353,7 @@ pub struct VaporComponentRef {
 pub fn VaporComponentRef::with_child(Self, VaporNode) -> Self
 pub fn VaporComponentRef::with_contract(Self, ComponentContract) -> Self
 pub fn VaporComponentRef::with_fallback(Self, String) -> Self
+pub fn VaporComponentRef::with_partial(Self, TemplateImport) -> Self
 pub fn VaporComponentRef::with_template_import(Self, TemplateImport) -> Self
 
 pub enum VaporNode {

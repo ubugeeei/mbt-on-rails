@@ -165,6 +165,8 @@ pub fn change_default_step(String, String, String?, String?) -> @migration.Migra
 
 pub fn change_null_step(String, String, Bool, backfill_value? : String?) -> @migration.MigrationStep
 
+pub fn checkbox_field(name~ : String, label~ : String, required? : Bool, value? : String?, help_text? : String?) -> @view.FormField
+
 pub fn classify(String) -> String
 
 #label_migration(hydration, allow_positional=true)
@@ -273,6 +275,8 @@ pub fn dynamic_force_static() -> @view.DynamicMode
 
 pub fn dynamic_revalidate(Int) -> @view.DynamicMode
 
+pub fn email_field(name~ : String, label~ : String, required? : Bool, placeholder? : String?, value? : String?, autocomplete? : String?, help_text? : String?) -> @view.FormField
+
 pub fn empty_memory_database() -> @active_record.MemoryDatabase
 
 pub fn enqueue_at(@job.JobQueue, @job.JobDefinition, Array[(String, String)], String) -> @job.JobQueue
@@ -329,6 +333,17 @@ pub fn flash(String, String) -> @controller.ActionStep
 #label_migration(verb, allow_positional=true)
 pub fn form_binding(name~ : String, action_name~ : String, verb~ : String, optimistic_key~ : String?, redirect_to~ : String?) -> @view.FormBinding
 
+#label_migration(binding, allow_positional=true)
+#label_migration(fields, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(submit_label, allow_positional=true)
+pub fn form_builder(name~ : String, binding~ : @view.FormBinding, fields~ : Array[@view.FormField], submit_label~ : String, description? : String?) -> @view.FormBuilder
+
+#label_migration(field_kind, allow_positional=true)
+#label_migration(label, allow_positional=true)
+#label_migration(name, allow_positional=true)
+pub fn form_field(name~ : String, field_kind~ : @view.FormFieldKind, label~ : String, required? : Bool, placeholder? : String?, value? : String?, autocomplete? : String?, help_text? : String?) -> @view.FormField
+
 pub fn gauge(String, Array[(String, String)], Int) -> @metrics.MetricSample
 
 pub fn group_by(@active_record.Relation, Array[String]) -> @active_record.Relation
@@ -368,6 +383,8 @@ pub fn having_raw(@active_record.Relation, String) -> @active_record.Relation
 pub fn health_check(name~ : String, ok~ : Bool, detail~ : String) -> @production.HealthCheck
 
 pub fn health_response(Array[@production.HealthCheck]) -> @http.Response
+
+pub fn hidden_field(name~ : String, label~ : String, value? : String?) -> @view.FormField
 
 pub fn html_format() -> @controller.ResponseFormat
 
@@ -592,6 +609,10 @@ pub fn params(Array[(String, String)]) -> @params.Parameters
 
 pub fn parse_route_pattern(String) -> @http.RoutePattern
 
+pub fn partial(local_name~ : String, component~ : @view.VaporComponentRef) -> @view.TemplateImport
+
+pub fn password_field(name~ : String, label~ : String, required? : Bool, placeholder? : String?, value? : String?, autocomplete? : String?, help_text? : String?) -> @view.FormField
+
 pub fn permission_access(String) -> @auth.AuthRequirement
 
 pub fn permit(@params.Parameters, Array[String]) -> @params.PermittedParams
@@ -684,6 +705,8 @@ pub fn render_bundle_plan(@view.PageModule) -> String
 
 pub fn render_component_manifest(@view.PageModule) -> String
 
+pub fn render_form_builder_manifest(Array[@view.FormBuilder]) -> String
+
 pub fn render_form_manifest(Array[@view.FormBinding]) -> String
 
 pub fn render_health_json(Array[@production.HealthCheck]) -> String
@@ -695,6 +718,8 @@ pub fn render_page_manifest_entry(@view.PageModule) -> String
 pub fn render_page_step(String) -> @controller.ActionStep
 
 pub fn render_page_with_notifications(page~ : @view.PageModule, route_params~ : Array[(String, String)], loader_data~ : Array[(String, String)], actions~ : Array[@view.ServerAction], notifications~ : @support.Notifications) -> (@view.RenderedPage, @support.Notifications)
+
+pub fn render_partial(name~ : String, locals~ : Array[(String, String)]) -> @view.VaporNode
 
 pub fn render_prometheus(@metrics.MetricsRegistry) -> String
 
@@ -840,6 +865,10 @@ pub fn template_import(local_name~ : String, component~ : @view.VaporComponentRe
 
 pub fn text_column(String) -> @active_record.Column
 
+pub fn text_field(name~ : String, label~ : String, required? : Bool, placeholder? : String?, value? : String?, autocomplete? : String?, help_text? : String?) -> @view.FormField
+
+pub fn textarea_field(name~ : String, label~ : String, required? : Bool, placeholder? : String?, value? : String?, autocomplete? : String?, help_text? : String?) -> @view.FormField
+
 pub fn timestamp_column(String) -> @active_record.Column
 
 pub fn touch_cache_step(String) -> @controller.ActionStep
@@ -964,6 +993,8 @@ pub fn with_fallback(@view.VaporComponentRef, String) -> @view.VaporComponentRef
 
 pub fn with_form(@view.PageModule, @view.FormBinding) -> @view.PageModule
 
+pub fn with_form_builder(@view.PageModule, @view.FormBuilder) -> @view.PageModule
+
 pub fn with_island(@view.PageModule, @view.VaporComponentRef) -> @view.PageModule
 
 pub fn with_layout(@view.PageModule, @view.LayoutModule) -> @view.PageModule
@@ -979,6 +1010,8 @@ pub fn with_metric(@metrics.MetricsRegistry, @metrics.MetricSample) -> @metrics.
 pub fn with_only(@http.ResourceOptions, Array[String]) -> @http.ResourceOptions
 
 pub fn with_param_name(@http.ResourceOptions, String) -> @http.ResourceOptions
+
+pub fn with_partial(@view.VaporComponentRef, @view.TemplateImport) -> @view.VaporComponentRef
 
 pub fn with_request_header(@middleware.Middleware, String, String) -> @middleware.Middleware
 
@@ -1068,6 +1101,12 @@ pub using @fixture {type FixtureRow}
 pub using @fixture {type FixtureSet}
 
 pub using @view {type FormBinding}
+
+pub using @view {type FormBuilder}
+
+pub using @view {type FormField}
+
+pub using @view {type FormFieldKind}
 
 pub using @generator {type GeneratedArtifact}
 

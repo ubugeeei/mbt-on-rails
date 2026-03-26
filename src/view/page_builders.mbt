@@ -23,6 +23,7 @@ pub fn page_module(
     action_name: None,
     client_islands: [],
     forms: [],
+    form_builders: [],
     metadata: [],
     dynamic_mode: Auto,
     assets: default_assets(),

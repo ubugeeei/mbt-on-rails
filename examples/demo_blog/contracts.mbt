@@ -34,8 +34,25 @@ pub fn demo_home_page_component() -> @view.VaporComponentRef {
 /// Builds the sign-in page server component used by the demo app.
 pub fn demo_sign_in_page_component() -> @view.VaporComponentRef {
   @view.server_component(name="SignInPage", source_path=view_pages_sign_in(), props=[])
+  .with_partial(
+    @view.partial(
+      local_name="SignInForm",
+      component=demo_sign_in_form_partial_component(),
+    ),
+  )
+  .with_child(@view.render_partial(name="SignInForm", locals=[]))
   .with_fallback("<div class=\"mbor-shell\">Loading sign in...</div>")
   .with_contract(@view.server_contract(props=[], async_only=true))
+}
+
+///|
+/// Builds the sign-in partial component referenced by the sign-in page.
+pub fn demo_sign_in_form_partial_component() -> @view.VaporComponentRef {
+  @view.server_component(
+    name="SignInForm",
+    source_path=view_components_sign_in_form(),
+    props=[],
+  ).with_contract(@view.server_contract(props=[], async_only=false))
 }
 
 ///|

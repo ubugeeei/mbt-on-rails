@@ -125,6 +125,40 @@ pub struct FormBinding {
 }
 
 ///|
+/// Lists the field controls a generated form builder can emit.
+pub enum FormFieldKind {
+  TextInput
+  EmailInput
+  PasswordInput
+  TextArea
+  HiddenInput
+  CheckboxInput
+} derive(Eq, Show)
+
+///|
+/// Describes one typed field used by a form builder.
+pub struct FormField {
+  name : String
+  field_kind : FormFieldKind
+  label : String
+  required : Bool
+  placeholder : String?
+  value : String?
+  autocomplete : String?
+  help_text : String?
+}
+
+///|
+/// Describes one Rails-style form builder attached to a page.
+pub struct FormBuilder {
+  name : String
+  binding : FormBinding
+  fields : Array[FormField]
+  submit_label : String
+  description : String?
+}
+
+///|
 /// Lists the styles and scripts emitted for a rendered page.
 pub struct AssetManifest {
   style_urls : Array[String]
@@ -144,6 +178,7 @@ pub struct PageModule {
   action_name : String?
   client_islands : Array[VaporComponentRef]
   forms : Array[FormBinding]
+  form_builders : Array[FormBuilder]
   metadata : Array[(String, String)]
   dynamic_mode : DynamicMode
   assets : AssetManifest
@@ -155,5 +190,6 @@ pub struct RenderedPage {
   html : String
   data_json : String
   component_manifest_json : String
+  form_builder_manifest_json : String
   router_manifest_entry : String
 }

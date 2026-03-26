@@ -7,6 +7,7 @@ Understand how mutations are modeled and how forms connect to them.
 ## Key Files
 
 - [`../../src/view/component_builders.mbt`](../../src/view/component_builders.mbt)
+- [`../../src/view/form_builders.mbt`](../../src/view/form_builders.mbt)
 - [`../../src/view/render.mbt`](../../src/view/render.mbt)
 - [`../../examples/demo_blog/frontend.mbt`](../../examples/demo_blog/frontend.mbt)
 - [`../../examples/resource_app/frontend.mbt`](../../examples/resource_app/frontend.mbt)
@@ -42,6 +43,39 @@ Use it to describe:
 - verb
 - optimistic key
 - redirect target
+
+If you want stronger page-level UI metadata, attach a `form_builder(...)`:
+
+```moonbit
+let binding = form_binding(
+  name="sign_in",
+  action_name="sessions.create",
+  verb="POST",
+  optimistic_key=None,
+  redirect_to=Some("/"),
+)
+
+let page = page_module(
+  route_name="sign_in",
+  route_path="/sign-in",
+  file_path=view_pages_sign_in(),
+  title="Sign In",
+  component=demo_sign_in_page_component(),
+).with_form_builder(
+  form_builder(
+    name="sign_in_form",
+    binding=binding,
+    fields=[
+      email_field(name="email", label="Email"),
+      password_field(name="password", label="Password"),
+    ],
+    submit_label="Sign in",
+  ),
+)
+```
+
+`with_form_builder(...)` also keeps `page.forms` populated, so the lower-level
+action manifest and the richer UI metadata stay aligned.
 
 ## Route Helper Generation
 

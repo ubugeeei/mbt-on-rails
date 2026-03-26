@@ -17,6 +17,9 @@ pub fn render_page(
   }
   let data_json = @support.entries_to_json(page_payload)
   let component_manifest_json = render_component_manifest(page)
+  let form_builder_manifest_json = render_form_builder_manifest(
+    page.form_builders,
+  )
 
   let body = StringBuilder::new()
   body.write_string(
@@ -83,6 +86,11 @@ pub fn render_page(
     @support.escape_html(render_form_manifest(page.forms)) +
     "</script>",
   )
+  script_bits.push(
+    "<script type=\"application/json\" id=\"mbor-form-builders\">" +
+    @support.escape_html(form_builder_manifest_json) +
+    "</script>",
+  )
   for script_url in page.assets.script_urls {
     script_bits.push(
       "<script src=\"" + @support.escape_html(script_url) + "\" defer></script>",
@@ -100,6 +108,7 @@ pub fn render_page(
     html,
     data_json,
     component_manifest_json,
+    form_builder_manifest_json,
     router_manifest_entry: render_page_manifest_entry(page),
   }
 }
