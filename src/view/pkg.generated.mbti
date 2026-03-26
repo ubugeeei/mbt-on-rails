@@ -10,7 +10,11 @@ import {
 #label_migration(style_urls, allow_positional=true)
 pub fn asset_manifest(style_urls~ : Array[String], script_urls~ : Array[String]) -> AssetManifest
 
+pub fn button_to(label~ : String, action~ : String, http_method? : String, attrs? : Array[(String, String)], form_attrs? : Array[(String, String)]) -> String
+
 pub fn checkbox_field(name~ : String, label~ : String, required? : Bool, value? : String?, help_text? : String?) -> FormField
+
+pub fn class_names(Array[(String, Bool)]) -> String
 
 #label_migration(hydration, allow_positional=true)
 #label_migration(name, allow_positional=true)
@@ -20,9 +24,13 @@ pub fn client_component(name~ : String, source_path~ : @support.MbtvPath, props~
 
 pub fn client_contract(Array[PropContract]) -> ComponentContract
 
+pub fn content_tag(name~ : String, content~ : String, attrs? : Array[(String, String)], escape? : Bool) -> String
+
 pub fn default_assets() -> AssetManifest
 
 pub fn defer_on_server() -> HydrationMode
+
+pub fn dom_id(record_name~ : String, record_id? : String?, prefix? : String?) -> String
 
 pub fn dynamic_auto() -> DynamicMode
 
@@ -66,10 +74,14 @@ pub fn hydrate_only() -> HydrationMode
 
 pub fn hydrate_visible() -> HydrationMode
 
+pub fn image_tag(src~ : String, alt? : String, attrs? : Array[(String, String)]) -> String
+
 #label_migration(component, allow_positional=true)
 #label_migration(file_path, allow_positional=true)
 #label_migration(name, allow_positional=true)
 pub fn layout_module(name~ : String, file_path~ : @support.MbtvPath, component~ : VaporComponentRef) -> LayoutModule
+
+pub fn link_to(label~ : String, href~ : String, attrs? : Array[(String, String)]) -> String
 
 #label_migration(cache_key, allow_positional=true)
 #label_migration(depends_on, allow_positional=true)
@@ -89,6 +101,8 @@ pub fn page_module(route_name~ : String, route_path~ : String, file_path~ : @sup
 pub fn partial(local_name~ : String, component~ : VaporComponentRef) -> TemplateImport
 
 pub fn password_field(name~ : String, label~ : String, required? : Bool, placeholder? : String?, value? : String?, autocomplete? : String?, help_text? : String?) -> FormField
+
+pub fn pluralize(Int, String, plural? : String?) -> String
 
 #label_migration(description, allow_positional=true)
 #label_migration(name, allow_positional=true)
@@ -118,6 +132,8 @@ pub fn render_router_manifest(Array[PageModule]) -> String
 
 pub fn render_server_action_manifest(Array[ServerAction]) -> String
 
+pub fn safe_join(Array[String], separator? : String) -> String
+
 #label_migration(csrf_protected, allow_positional=true)
 #label_migration(input_fields, allow_positional=true)
 #label_migration(name, allow_positional=true)
@@ -135,6 +151,8 @@ pub fn server_component(name~ : String, source_path~ : @support.MbtvPath, props~
 pub fn server_contract(props~ : Array[PropContract], async_only~ : Bool) -> ComponentContract
 
 pub fn suspense_boundary(name~ : String, fallback_html~ : String, children~ : Array[VaporNode]) -> VaporNode
+
+pub fn tag(name~ : String, attrs? : Array[(String, String)]) -> String
 
 pub fn template_component_imports(String) -> Array[String]
 

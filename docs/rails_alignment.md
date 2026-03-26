@@ -95,19 +95,25 @@ The source audit in this batch was anchored to the official Rails repository at:
 - Jobs now retain their argument type contract after enqueue, so serialized envelopes can round-trip that metadata
 - `serialize_job(...)`, `render_serialized_job(...)`, `deserialize_payload(...)`, and `restore_enqueued_job(...)` add explicit serialization contracts for queue backends and persistence
 
+## Twelfth batch added here
+
+- The view layer now exposes `tag(...)` and `content_tag(...)` as concise Action View-style HTML primitives
+- `link_to(...)`, `button_to(...)`, and `image_tag(...)` now cover the most common helper-driven template fragments
+- `class_names(...)`, `safe_join(...)`, `dom_id(...)`, and `pluralize(...)` keep `.mbtv` call sites compact without giving up typed, explicit inputs
+
 ## Biggest gaps still open
 
 - `activesupport`: concern/autoloading/deprecation/timezones/notifications subscribers
 - `activemodel`: typed attributes/serialization
 - `activerecord`: callback chains/database adapters/query execution
 - `actionpack`: cookies/session store/responders/request forgery strategy
-- `actionview`: helpers/template lookup
+- `actionview`: helper breadth/template lookup
 - `activejob`: execution backends/monitoring depth
 - `actioncable`: connection lifecycle and richer subscription adapters
 - `railties`: generators/initializers/config loading/engines
 
 ## Recommended next batches
 
-1. Add more Action View helper coverage on top of the new partial/form-builder metadata.
-2. Add typed attribute/serialization support on top of the validation layer.
-3. Add deeper Active Job execution backend and monitoring behavior.
+1. Add typed attribute/serialization support on top of the validation layer.
+2. Add deeper Active Job execution backend and monitoring behavior.
+3. Add broader Action View helper and template lookup coverage.

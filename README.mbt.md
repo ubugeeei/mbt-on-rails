@@ -26,7 +26,7 @@ moon run examples/demo_blog
 - Declarative controllers, before/after/around callback metadata, and action plans
 - Active Record-style schema, scopes, relations, reusable validators, dirty tracking, in-memory transactions, and opinionated migration plans with safety analysis
 - Auth, sessions, policies, and CSRF helpers
-- `.mbtv` pages, layouts, partials, server components, client islands, and suspense-like boundaries
+- `.mbtv` pages, layouts, partials, Action View-style HTML helpers, server components, client islands, and suspense-like boundaries
 - Server actions, form bindings, typed form builders, and generated typed route/action helpers
 - Jobs, adapter contracts, serialized job envelopes, mailers, cache, cable, turbo stream, and production helpers
 - Rails-style runtime notifications for controller, view, cache, job, and mailer flows

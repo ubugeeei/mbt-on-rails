@@ -142,6 +142,78 @@ test "rendered page includes islands forms and route tree data" {
 }
 
 ///|
+test "action view style helpers render concise typed html fragments" {
+  let navigation = content_tag(
+    name="nav",
+    content=safe_join(
+      [
+        link_to(label="Posts", href="/posts", attrs=[
+          (
+            "class",
+            class_names([
+              ("nav-link", true),
+              ("is-active", true),
+              ("is-hidden", false),
+            ]),
+          ),
+        ]),
+        button_to(
+          label="Delete",
+          action="/posts/42",
+          http_method="delete",
+          attrs=[("class", "danger")],
+          form_attrs=[("class", "inline")],
+        ),
+        image_tag(src="/assets/logo.svg", alt="MoonBit on Rails", attrs=[
+          ("loading", "lazy"),
+        ]),
+      ],
+      separator="\n",
+    ),
+    attrs=[
+      (
+        "id",
+        dom_id(record_name="posts", record_id=Some("42"), prefix=Some("admin")),
+      ),
+    ],
+    escape=false,
+  )
+
+  assert_true(navigation.contains("<nav id=\"admin_post_42\">"))
+  assert_true(
+    navigation.contains(
+      "<a href=\"/posts\" class=\"nav-link is-active\">Posts</a>",
+    ),
+  )
+  assert_true(
+    navigation.contains(
+      "<form action=\"/posts/42\" method=\"post\" class=\"inline\">",
+    ),
+  )
+  assert_true(
+    navigation.contains(
+      "<input type=\"hidden\" name=\"_method\" value=\"delete\">",
+    ),
+  )
+  assert_true(
+    navigation.contains(
+      "<button type=\"submit\" class=\"danger\">Delete</button>",
+    ),
+  )
+  assert_true(
+    navigation.contains(
+      "<img src=\"/assets/logo.svg\" alt=\"MoonBit on Rails\" loading=\"lazy\">",
+    ),
+  )
+  assert_eq(
+    tag(name="br", attrs=[("class", "spacer")]),
+    "<br class=\"spacer\">",
+  )
+  assert_eq(pluralize(1, "comment"), "1 comment")
+  assert_eq(pluralize(2, "category"), "2 categories")
+}
+
+///|
 test "scaffold and demo app expose richer rails style surfaces" {
   let scaffold = scaffold_resource("comments", [
     scaffold_field("body", text_column("body")),

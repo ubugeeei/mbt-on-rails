@@ -131,6 +131,8 @@ pub fn broadcast_turbo(@cable.CableChannel, Array[@turbo.TurboStream]) -> @cable
 
 pub fn build_path(@http.RouteSpec, Array[(String, String)]) -> String
 
+pub fn button_to(label~ : String, action~ : String, http_method? : String, attrs? : Array[(String, String)], form_attrs? : Array[(String, String)]) -> String
+
 pub fn cable_broadcast(@cable.CableChannel, String, String) -> @cable.CableBroadcast
 
 pub fn cable_channel(String, String, Array[String]) -> @cable.CableChannel
@@ -171,6 +173,8 @@ pub fn change_null_step(String, String, Bool, backfill_value? : String?) -> @mig
 
 pub fn checkbox_field(name~ : String, label~ : String, required? : Bool, value? : String?, help_text? : String?) -> @view.FormField
 
+pub fn class_names(Array[(String, Bool)]) -> String
+
 pub fn classify(String) -> String
 
 #label_migration(hydration, allow_positional=true)
@@ -195,6 +199,8 @@ pub fn config_summary(@production.DeploymentConfig) -> String
 
 #label_migration(pattern, allow_positional=true)
 pub fn contains(pattern~ : String) -> @validation.FieldRule
+
+pub fn content_tag(name~ : String, content~ : String, attrs? : Array[(String, String)], escape? : Bool) -> String
 
 pub fn controller(String, String?, String, Array[@controller.BeforeAction], Array[@controller.AfterAction], Array[@controller.AroundAction], Array[@controller.ActionDefinition]) -> @controller.ControllerDefinition
 
@@ -264,6 +270,8 @@ pub fn dirty_record(@active_record.Record, @active_record.Record) -> @active_rec
 pub fn discard_on(exception_name~ : String, report? : Bool) -> @job.JobFailurePolicy
 
 pub fn distinct_records(@active_record.Relation) -> @active_record.Relation
+
+pub fn dom_id(record_name~ : String, record_id? : String?, prefix? : String?) -> String
 
 pub fn dotenv_preview(@secrets.SecretsConfig) -> String
 
@@ -426,6 +434,8 @@ pub fn hydrate_visible() -> @view.HydrationMode
 
 pub fn identity(String, String, String, Array[String], String?) -> @auth.Identity
 
+pub fn image_tag(src~ : String, alt? : String, attrs? : Array[(String, String)]) -> String
+
 #label_migration(values, allow_positional=true)
 pub fn included_in(values~ : Array[String]) -> @validation.FieldRule
 
@@ -491,6 +501,8 @@ pub fn json_string(String) -> String
 pub fn layout_module(name~ : String, file_path~ : @support.MbtvPath, component~ : @view.VaporComponentRef) -> @view.LayoutModule
 
 pub fn limit_to(@active_record.Relation, Int) -> @active_record.Relation
+
+pub fn link_to(label~ : String, href~ : String, attrs? : Array[(String, String)]) -> String
 
 pub fn load_collection_step(String) -> @controller.ActionStep
 
@@ -644,6 +656,8 @@ pub fn permitted_value(@params.PermittedParams, String) -> String?
 pub fn persist_model_step(String) -> @controller.ActionStep
 
 pub fn pluck_sql(@active_record.Relation, Array[String]) -> String
+
+pub fn pluralize(Int, String, plural? : String?) -> String
 
 #label_migration(action, allow_positional=true)
 #label_migration(allow_owner, allow_positional=true)
@@ -800,6 +814,8 @@ pub fn rollback_transaction(@active_record.MemoryTransaction) -> @active_record.
 #label_migration(verb, allow_positional=true)
 pub fn route(name~ : String, verb~ : @http.HttpMethod, path~ : String, controller~ : String, action~ : String, page_name~ : String?) -> @http.RouteSpec
 
+pub fn safe_join(Array[String], separator? : String) -> String
+
 #label_migration(other_field, allow_positional=true)
 pub fn same_as(other_field~ : String) -> @validation.FieldRule
 
@@ -889,6 +905,8 @@ pub fn string_column(String) -> @active_record.Column
 pub fn string_field(name~ : String) -> @validation.FieldSchema
 
 pub fn suspense_boundary(name~ : String, fallback_html~ : String, children~ : Array[@view.VaporNode]) -> @view.VaporNode
+
+pub fn tag(name~ : String, attrs? : Array[(String, String)]) -> String
 
 pub fn template_component_imports(String) -> Array[String]
 

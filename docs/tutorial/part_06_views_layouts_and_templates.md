@@ -9,6 +9,7 @@ Understand how pages and layouts are described, and how `.mbtv` templates are ti
 - [`../../src/view/types.mbt`](../../src/view/types.mbt)
 - [`../../src/view/page_builders.mbt`](../../src/view/page_builders.mbt)
 - [`../../src/view/component_builders.mbt`](../../src/view/component_builders.mbt)
+- [`../../src/view/helpers.mbt`](../../src/view/helpers.mbt)
 - [`../../src/view/composition.mbt`](../../src/view/composition.mbt)
 - [`../../src/view/template_validation.mbt`](../../src/view/template_validation.mbt)
 - [`../../examples/demo_blog/views`](../../examples/demo_blog/views)
@@ -74,6 +75,38 @@ let page_component = server_component(
 )
 .with_child(render_partial(name="SignInForm", locals=[]))
 ```
+
+## Helper Layer
+
+The view package now also exposes a small Action View-style helper layer for
+HTML fragments that still stays explicit in MoonBit:
+
+```moonbit
+let navigation = content_tag(
+  name="nav",
+  content=safe_join(
+    [
+      link_to(label="Posts", href="/posts"),
+      button_to(label="Delete", action="/posts/42", http_method="delete"),
+    ],
+    separator=" ",
+  ),
+  attrs=[("id", dom_id(record_name="posts", record_id=Some("42")))],
+  escape=false,
+)
+```
+
+The core helpers are:
+
+- `tag(...)`
+- `content_tag(...)`
+- `link_to(...)`
+- `button_to(...)`
+- `image_tag(...)`
+- `class_names(...)`
+- `safe_join(...)`
+- `dom_id(...)`
+- `pluralize(...)`
 
 ## Generated Typed Helpers
 
