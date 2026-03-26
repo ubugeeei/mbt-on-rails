@@ -287,6 +287,8 @@ pub fn deployment_config(environment~ : @production.Environment, host~ : String,
 
 pub fn deserialize_payload(String) -> Array[(String, String)]?
 
+pub fn destroy_record(@active_record.ModelSchema, @active_record.MemoryDatabase, String, deleted_at? : String?) -> @active_record.DestroyOutcome
+
 pub fn digest_password(String, String) -> String
 
 pub fn dirty_new_record(@active_record.Record) -> @active_record.DirtyRecord
@@ -363,6 +365,8 @@ pub fn exists_sql(@active_record.Relation) -> String
 pub fn find_cookie(Array[(String, String)], String) -> String?
 
 pub fn find_entry(Array[(String, String)], String) -> String?
+
+pub fn find_record_by_primary_key(@active_record.ModelSchema, @active_record.MemoryDatabase, String) -> @active_record.Record?
 
 pub fn find_records(@active_record.MemoryDatabase, String, String, String) -> Array[@active_record.Record]
 
@@ -1257,6 +1261,8 @@ pub using @controller {type ControllerDefinition}
 pub using @auth {type CookieSameSite}
 
 pub using @production {type DeploymentConfig}
+
+pub using @active_record {type DestroyOutcome}
 
 pub using @active_record {type DirtyFieldChange}
 

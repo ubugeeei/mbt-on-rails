@@ -41,6 +41,8 @@ pub fn create_table_sql(ModelSchema) -> String
 
 pub fn delete_sql(ModelSchema, String) -> String
 
+pub fn destroy_record(ModelSchema, MemoryDatabase, String, deleted_at? : String?) -> DestroyOutcome
+
 pub fn dirty_new_record(Record) -> DirtyRecord
 
 pub fn dirty_record(Record, Record) -> DirtyRecord
@@ -50,6 +52,8 @@ pub fn distinct_records(Relation) -> Relation
 pub fn empty_memory_database() -> MemoryDatabase
 
 pub fn exists_sql(Relation) -> String
+
+pub fn find_record_by_primary_key(ModelSchema, MemoryDatabase, String) -> Record?
 
 pub fn find_records(MemoryDatabase, String, String, String) -> Array[Record]
 
@@ -272,6 +276,11 @@ pub enum ColumnType {
 pub impl Eq for ColumnType
 pub impl Show for ColumnType
 
+pub enum DestroyOutcome {
+  DestroyedRecord(MemoryDatabase, Record)
+  DestroyNotFound(MemoryDatabase)
+}
+
 pub struct DirtyFieldChange {
   attribute : String
   before : String?
@@ -309,6 +318,8 @@ pub struct MemoryDatabase {
   tables : Array[MemoryTable]
 }
 pub fn MemoryDatabase::begin_transaction(Self) -> MemoryTransaction
+pub fn MemoryDatabase::destroy(Self, ModelSchema, String, deleted_at? : String?) -> DestroyOutcome
+pub fn MemoryDatabase::find_record_by_primary_key(Self, ModelSchema, String) -> Record?
 
 pub struct MemoryTable {
   name : String
