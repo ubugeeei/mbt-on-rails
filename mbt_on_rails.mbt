@@ -13,6 +13,8 @@
 ///|
 pub using @support {
   type MbtvPath,
+  type NotificationEvent,
+  type Notifications,
   append_entries,
   classify,
   clone_array,
@@ -24,6 +26,8 @@ pub using @support {
   json_string,
   mbtv_path,
   normalize_path,
+  notification_event,
+  notifications,
   singularize,
   split_path,
 }
@@ -325,14 +329,18 @@ pub using @job {
   type JobDefinition,
   type JobQueue,
   drain_ready,
+  drain_ready_with_notifications,
   enqueue_at,
+  enqueue_at_with_notifications,
   enqueue_now,
+  enqueue_now_with_notifications,
   enqueued_job,
   job,
   job_queue,
   job_ready,
   job_summary,
   retry_job,
+  retry_job_with_notifications,
 }
 
 ///|
@@ -341,8 +349,10 @@ pub using @mailer {
   type MailTemplate,
   type MailerDefinition,
   compose_mail,
+  compose_mail_with_notifications,
   delivery_job,
   enqueue_delivery,
+  enqueue_delivery_with_notifications,
   mail_template,
   mailer,
   mailer_summary,
@@ -356,13 +366,18 @@ pub using @cache {
   type CacheFetchResult,
   type CacheStore,
   cache_delete,
+  cache_delete_tag_with_notifications,
+  cache_delete_with_notifications,
   cache_delete_tag,
   cache_fetch,
+  cache_fetch_with_notifications,
   cache_key,
   cache_read,
+  cache_read_with_notifications,
   cache_store,
   cache_summary,
   cache_write,
+  cache_write_with_notifications,
 }
 
 ///|
@@ -487,6 +502,7 @@ pub using @view {
   render_component_manifest,
   render_form_manifest,
   render_page,
+  render_page_with_notifications,
   render_page_manifest_entry,
   render_route_tree,
   render_router_manifest,
@@ -528,7 +544,13 @@ pub using @generator {
 
 ///|
 /// Re-exports the high-level app runtime.
-pub using @app {type MbtOnRailsApp, app, app_named, handle_request}
+pub using @app {
+  type MbtOnRailsApp,
+  app,
+  app_named,
+  handle_request,
+  handle_request_with_notifications,
+}
 
 ///|
 pub using @demo_blog {demo_blog_app}
