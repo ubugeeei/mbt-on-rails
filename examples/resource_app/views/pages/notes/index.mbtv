@@ -26,13 +26,23 @@ fn toggle_tips() -> Unit {
   <main class="notes-index">
     <header>
       <h1>Notes</h1>
-      <p>Small resource app example built with the public API.</p>
+      <p>Small resource app example built with the public API and kept aligned with the tutorial.</p>
       <p>{{ summary() }}</p>
       <div class="index-actions">
         <button type="button" @click='show_archived()'>Show Archived</button>
         <button type="button" @click='toggle_tips()'>Toggle Tips</button>
       </div>
     </header>
+    <section class="notes-overview">
+      <article>
+        <h2>Why this page exists</h2>
+        <p>It is the smallest route that still shows layout wiring, a client island, and a form-shaped interaction.</p>
+      </article>
+      <article>
+        <h2>What to compare</h2>
+        <p>Read this page next to `examples/resource_app` and the tutorial parts on routes, views, and forms.</p>
+      </article>
+    </section>
     <NoteCounter client:visible />
     <form>
       <input type="text" placeholder="Title" />
@@ -50,5 +60,10 @@ fn toggle_tips() -> Unit {
 .index-actions {
   display: flex;
   gap: 8px;
+}
+
+.notes-overview {
+  display: grid;
+  gap: 12px;
 }
 </style>

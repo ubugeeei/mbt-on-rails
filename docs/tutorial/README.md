@@ -3,6 +3,8 @@
 This is a Rails Tutorial-style walkthrough for `mbt on rails`.
 It is not a port of the original Ruby on Rails Tutorial text. Instead, it teaches this repository in the same spirit: start small, build a real app shape, and grow into the full stack.
 
+The examples and `.mbtv` pages in this repository are meant to be read alongside the tutorial, not after it. If something in the tutorial feels abstract, jump into the matching example directory and compare the page modules, controller metadata, and rendered HTML manifests side by side.
+
 ## Audience
 
 - You want to learn this repository from top to bottom.
@@ -40,6 +42,15 @@ moon run examples/demo_blog
 moon run examples/rails_ops
 moon run examples/production_api
 ```
+
+## Best Reading Loop
+
+- Read one part.
+- Run the matching example.
+- Open the related files listed in the part.
+- Compare the public test that locks the behavior in.
+
+That loop is the fastest way to understand how the API surface, the examples, and the tests line up.
 
 ## Main Source Landmarks
 

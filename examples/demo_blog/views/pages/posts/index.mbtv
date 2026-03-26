@@ -30,10 +30,21 @@ fn toggle_layout() -> Unit {
   <section class="posts-index">
     <h1>Posts</h1>
     <p>{{ summary() }}</p>
+    <p>This page combines a deferred server table with a visible client composer so the example shows both sides of the boundary.</p>
     <div class="post-controls">
       <button type="button" @click='show_drafts()'>Show Drafts</button>
       <button type="button" @click='toggle_layout()'>Toggle Layout</button>
     </div>
+    <section class="callout-grid">
+      <article>
+        <h2>Server-first</h2>
+        <p>`PostsTable` stays deferred so the route keeps a strong SSR shape.</p>
+      </article>
+      <article>
+        <h2>Interactive</h2>
+        <p>`PostComposer` hydrates when visible and models the island path the tutorial talks about.</p>
+      </article>
+    </section>
     <PostComposer client:visible />
     <PostsTable server:defer />
   </section>
@@ -48,5 +59,10 @@ fn toggle_layout() -> Unit {
 .post-controls {
   display: flex;
   gap: 8px;
+}
+
+.callout-grid {
+  display: grid;
+  gap: 12px;
 }
 </style>

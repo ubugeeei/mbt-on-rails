@@ -23,11 +23,15 @@ fn open_attr() -> String {
 <template>
   <div class="application-shell" :data-shell='shell_id' :data-open='open_attr()'>
     <header class="site-header">
-      <a href="/">mbt on rails</a>
+      <div class="brand-block">
+        <a href="/">mbt on rails</a>
+        <p>Typed Rails-like patterns with Vapor Moon delivery.</p>
+      </div>
       <button type="button" @click='toggle_menu()'>{{ menu_label() }}</button>
-      <nav>
+      <nav class="site-nav">
         <a href="/posts">Posts</a>
         <a href="/sign-in">Sign In</a>
+        <a href="/posts/new">New Post</a>
       </nav>
     </header>
     <slot />
@@ -44,5 +48,15 @@ fn open_attr() -> String {
   display: flex;
   justify-content: space-between;
   gap: 12px;
+}
+
+.brand-block {
+  display: grid;
+  gap: 4px;
+}
+
+.site-nav {
+  display: flex;
+  gap: 10px;
 }
 </style>

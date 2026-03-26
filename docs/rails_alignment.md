@@ -119,11 +119,18 @@ The source audit in this batch was anchored to the official Rails repository at:
 - The runtime now hydrates `Request.session_id` from configured signed session cookies before controller work and exposes that in controller notifications
 - Response helpers such as `created_json(...)`, `accepted_json(...)`, `append_set_cookie(...)`, `see_other_response(...)`, `unauthorized_response(...)`, `forbidden_response(...)`, and `unprocessable_entity_response(...)` cover a more realistic Action Pack responder surface
 
+## Sixteenth batch added here
+
+- `save_record(...)` now behaves more like a real persistence layer: when a primary key is present it merges changes into the current row instead of blindly inserting a duplicate
+- Uniqueness validations now ignore the row currently being updated, so partial updates do not fail on their own unique attributes
+- Schema-level `unique()` column metadata is now enforced by the in-memory validation path too, so migration intent and example persistence behavior stay aligned
+- `find_record_by_primary_key(...)` and `destroy_record(...)` add the basic lookup and destroy lifecycle expected from an Active Record-style adapter, including soft-delete aware tombstones
+
 ## Biggest gaps still open
 
 - `activesupport`: concern/autoloading/deprecation/timezones/notifications subscribers
 - `activemodel`: typed attributes/serialization
-- `activerecord`: callback chains/database adapters/query execution
+- `activerecord`: callback chains/database adapters/query execution and typed attributes
 - `actionpack`: flash/request variants/content negotiation depth beyond the current typed cookie/session and responder layer
 - `actionview`: helper breadth/template lookup
 - `activejob`: execution backends/monitoring depth
@@ -132,6 +139,6 @@ The source audit in this batch was anchored to the official Rails repository at:
 
 ## Recommended next batches
 
-1. Add typed attribute/serialization support on top of the validation layer.
+1. Add typed attribute/serialization support on top of the stronger in-memory persistence layer.
 2. Add deeper Active Job execution backend and monitoring behavior.
 3. Add deeper Action Pack request variants, flash, and richer content negotiation on top of the new session/request integration layer.

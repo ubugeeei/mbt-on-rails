@@ -94,7 +94,9 @@ This repo ships an in-memory store for testing and examples:
 - `empty_memory_database()`
 - `insert_record(...)`
 - `find_records(...)`
+- `find_record_by_primary_key(...)`
 - `save_record(...)`
+- `destroy_record(...)`
 - `validate_record(...)`
 - `begin_transaction(...)`
 - `create_savepoint(...)`
@@ -110,6 +112,13 @@ Dirty tracking is also explicit:
 - `.clear_changes_information()`
 
 This makes the tutorial runnable without needing a real database adapter.
+The persistence path is also less toy-like now:
+
+- `save_record(...)` updates the existing row when the primary key is present
+- partial updates merge into the persisted row instead of dropping untouched fields
+- uniqueness validations ignore the record currently being updated
+- `string_column(...).unique()` and other unique column metadata are enforced by the in-memory adapter even before a real database exists
+- `destroy_record(...)` removes rows or writes a `deleted_at` tombstone for soft-delete models
 
 Example:
 
@@ -119,6 +128,18 @@ let tx = empty_memory_database()
   .begin_transaction()
   .insert(updated_record)
   .savepoint("after_insert")
+```
+
+Update and destroy flow:
+
+```moonbit
+let updated = save_record(
+  schema,
+  db,
+  record("accounts", [("id", "1"), ("state", "published")]),
+)
+
+let removed = destroy_record(schema, db, "1")
 ```
 
 ## Rails Gap

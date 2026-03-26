@@ -32,10 +32,24 @@ fn rotate_spotlight() -> Unit {
   <main class="home">
     <header>
       <h1>{{ props.title }}</h1>
-      <p>MoonBit on Rails with Vapor Moon style delivery.</p>
+      <p>MoonBit on Rails with typed routes, server actions, and current Vapor Moon-style islands.</p>
       <p>{{ "Spotlight: " + spotlight() }}</p>
       <button type="button" @click='rotate_spotlight()'>Cycle Spotlight</button>
     </header>
+    <section class="feature-grid">
+      <article>
+        <h2>Backend</h2>
+        <p>Opinionated migrations, validations, and update-aware persistence semantics.</p>
+      </article>
+      <article>
+        <h2>Frontend</h2>
+        <p>Server components, client islands, and route-aligned `.mbtv` pages.</p>
+      </article>
+      <article>
+        <h2>Tutorial</h2>
+        <p>Read this page with the tutorial to see how the public API maps to real files.</p>
+      </article>
+    </section>
     <RecentPosts server:defer />
     <PostComposer client:idle />
   </main>
@@ -45,5 +59,10 @@ fn rotate_spotlight() -> Unit {
 .home {
   display: grid;
   gap: 16px;
+}
+
+.feature-grid {
+  display: grid;
+  gap: 12px;
 }
 </style>

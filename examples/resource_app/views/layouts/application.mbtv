@@ -19,10 +19,14 @@ fn toggle_menu() -> Unit {
 <template>
   <div class="notes-shell" :data-shell='shell_id' :data-open='if menu_open.get() { "true" } else { "false" }'>
     <header class="notes-header">
-      <a href="/notes">Notes</a>
+      <div class="notes-brand">
+        <a href="/notes">Notes</a>
+        <p>Small public-API example for the tutorial loop.</p>
+      </div>
       <button type="button" @click='toggle_menu()'>{{ menu_label() }}</button>
-      <nav>
+      <nav class="notes-nav">
         <a href="/notes/new">New</a>
+        <a href="/notes">Index</a>
       </nav>
     </header>
     <slot />
@@ -39,5 +43,15 @@ fn toggle_menu() -> Unit {
   display: flex;
   justify-content: space-between;
   gap: 12px;
+}
+
+.notes-brand {
+  display: grid;
+  gap: 4px;
+}
+
+.notes-nav {
+  display: flex;
+  gap: 10px;
 }
 </style>
