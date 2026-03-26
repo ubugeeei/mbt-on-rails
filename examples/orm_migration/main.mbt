@@ -1,16 +1,12 @@
 ///|
 /// Builds a `Post` schema used for ORM and migration examples.
 fn post_model() -> @mbor.ModelSchema {
-  @mbor.model(
-    name="Post",
-    table="posts",
-    columns=[
-      @mbor.string_column("title"),
-      @mbor.indexed(@mbor.string_column("slug")),
-      @mbor.text_column("body"),
-      @mbor.references_column("author_id", "users"),
-    ],
-  )
+  @mbor.model(name="Post", table="posts", columns=[
+    @mbor.string_column("title"),
+    @mbor.indexed(@mbor.string_column("slug")),
+    @mbor.text_column("body"),
+    @mbor.references_column("author_id", "users"),
+  ])
   .with_validation(@mbor.validates_presence(field="title"))
   .with_validation(@mbor.validates_uniqueness(field="slug"))
   .with_association(

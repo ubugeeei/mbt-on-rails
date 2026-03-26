@@ -119,7 +119,9 @@ test "memory validation reports rich errors across edge branches" {
     Some("5"),
   )
   assert_true(
-    typed_missing.full_messages_for("email").contains("email has invalid format"),
+    typed_missing
+    .full_messages_for("email")
+    .contains("email has invalid format"),
   )
 
   let duplicate = record("accounts", [

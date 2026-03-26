@@ -31,7 +31,7 @@ pub fn handle_request_with_notifications(
           payload=controller_payload(
             controller="Middleware",
             action="halt",
-            request=request,
+            request~,
             response=final_response,
           ),
         ),
@@ -64,8 +64,8 @@ pub fn handle_request_with_notifications(
             payload=controller_payload(
               controller="ServerActionsController",
               action=action.name,
-              request=request,
-              response=response,
+              request~,
+              response~,
             ),
           ),
         )
@@ -84,9 +84,9 @@ pub fn handle_request_with_notifications(
                 ("action", matched.route.action),
               ]
               let (rendered, with_render) = @view.render_page_with_notifications(
-                page=page,
+                page~,
                 route_params=matched.params,
-                loader_data=loader_data,
+                loader_data~,
                 actions=app.server_actions,
                 notifications=started,
               )
@@ -102,8 +102,8 @@ pub fn handle_request_with_notifications(
                   payload=controller_payload(
                     controller=matched.route.controller,
                     action=matched.route.action,
-                    request=request,
-                    response=response,
+                    request~,
+                    response~,
                   ),
                 ),
               )
@@ -126,8 +126,8 @@ pub fn handle_request_with_notifications(
                   payload=controller_payload(
                     controller=matched.route.controller,
                     action=matched.route.action,
-                    request=request,
-                    response=response,
+                    request~,
+                    response~,
                   ),
                 ),
               )
@@ -153,8 +153,8 @@ pub fn handle_request_with_notifications(
                   payload=controller_payload(
                     controller=matched.route.controller,
                     action=matched.route.action,
-                    request=request,
-                    response=response,
+                    request~,
+                    response~,
                   ),
                 ),
               )
@@ -177,8 +177,8 @@ pub fn handle_request_with_notifications(
                   payload=controller_payload(
                     controller=matched.route.controller,
                     action=matched.route.action,
-                    request=request,
-                    response=response,
+                    request~,
+                    response~,
                   ),
                 ),
               )
@@ -198,8 +198,8 @@ pub fn handle_request_with_notifications(
           payload=controller_payload(
             controller="Routing",
             action="not_found",
-            request=request,
-            response=response,
+            request~,
+            response~,
           ),
         ),
       )
@@ -207,6 +207,7 @@ pub fn handle_request_with_notifications(
   }
 }
 
+///|
 fn controller_payload(
   controller~ : String,
   action~ : String,
@@ -223,6 +224,7 @@ fn controller_payload(
   ]
 }
 
+///|
 fn http_method_name(verb : @http.HttpMethod) -> String {
   match verb {
     Get => "GET"
@@ -235,6 +237,7 @@ fn http_method_name(verb : @http.HttpMethod) -> String {
   }
 }
 
+///|
 fn response_format_name(body : @http.ResponseBody) -> String {
   match body {
     Html(_) => "html"

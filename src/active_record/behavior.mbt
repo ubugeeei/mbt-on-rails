@@ -244,7 +244,7 @@ pub fn ValidationErrors::add(
 ) -> ValidationErrors {
   let errors = @support.clone_array(self.errors)
   errors.push(error)
-  { ..self, errors }
+  { ..self, errors, }
 }
 
 ///|
@@ -257,7 +257,7 @@ pub fn ValidationErrors::merge(
   for error in other.errors {
     errors.push(error)
   }
-  { ..self, errors }
+  { ..self, errors, }
 }
 
 ///|

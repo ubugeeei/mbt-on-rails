@@ -136,7 +136,9 @@ pub fn posts_show_route_params(id~ : String) -> PostsShowRouteParams {
 }
 
 ///|
-pub fn PostsShowRouteParams::entries(self : PostsShowRouteParams) -> Array[(String, String)] {
+pub fn PostsShowRouteParams::entries(
+  self : PostsShowRouteParams,
+) -> Array[(String, String)] {
   let entries : Array[(String, String)] = []
   entries.push(("id", self.id))
   entries
@@ -178,7 +180,9 @@ pub fn posts_edit_route_params(id~ : String) -> PostsEditRouteParams {
 }
 
 ///|
-pub fn PostsEditRouteParams::entries(self : PostsEditRouteParams) -> Array[(String, String)] {
+pub fn PostsEditRouteParams::entries(
+  self : PostsEditRouteParams,
+) -> Array[(String, String)] {
   let entries : Array[(String, String)] = []
   entries.push(("id", self.id))
   entries

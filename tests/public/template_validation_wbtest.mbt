@@ -1,7 +1,6 @@
 ///|
 test "template validator requires explicit component imports" {
-  let source =
-    "<script setup>\n" +
+  let source = "<script setup>\n" +
     "import {\n" +
     "  component LikeButton,\n" +
     "  component PostHero,\n" +
@@ -21,8 +20,7 @@ test "template validator requires explicit component imports" {
 
 ///|
 test "template validator reports missing and unused imports" {
-  let source =
-    "<script setup>\n" +
+  let source = "<script setup>\n" +
     "import {\n" +
     "  component LikeButton,\n" +
     "  component PostHero,\n" +
@@ -36,5 +34,7 @@ test "template validator reports missing and unused imports" {
 
   let errors = validate_template_component_imports("demo.mbtv", source)
   assert_true(errors.contains("demo.mbtv: unused component import PostHero"))
-  assert_false(errors.contains("demo.mbtv: missing component import for <LikeButton>"))
+  assert_false(
+    errors.contains("demo.mbtv: missing component import for <LikeButton>"),
+  )
 }

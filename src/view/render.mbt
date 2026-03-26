@@ -154,6 +154,7 @@ fn render_component_placeholder(component : VaporComponentRef) -> String {
   render_component_placeholder_with_import(component, None)
 }
 
+///|
 fn render_component_placeholder_with_import(
   component : VaporComponentRef,
   import_name : String?,
@@ -188,7 +189,9 @@ fn render_component_placeholder_with_import(
   if not(component.template_imports.is_empty()) {
     attrs.write_string(
       "data-mbor-template-imports='" +
-      @support.escape_html(render_template_import_names(component.template_imports)) +
+      @support.escape_html(
+        render_template_import_names(component.template_imports),
+      ) +
       "' ",
     )
   }
@@ -228,6 +231,7 @@ fn render_component_placeholder_with_import(
   "</section>"
 }
 
+///|
 fn render_component_children(component : VaporComponentRef) -> String {
   let parts : Array[String] = []
   for child in component.children {
@@ -236,6 +240,7 @@ fn render_component_children(component : VaporComponentRef) -> String {
   parts.join("")
 }
 
+///|
 fn render_tree_node(parent : VaporComponentRef, node : VaporNode) -> String {
   match node {
     Mounted(mounted) =>
@@ -245,7 +250,10 @@ fn render_tree_node(parent : VaporComponentRef, node : VaporNode) -> String {
             ..imported.component,
             props: render_merge_props(imported.component.props, mounted.props),
           }
-          render_component_placeholder_with_import(child, Some(imported.local_name))
+          render_component_placeholder_with_import(
+            child,
+            Some(imported.local_name),
+          )
         }
         None =>
           "<div class=\"mbor-error\" data-mbor-missing-import=\"" +
@@ -302,6 +310,7 @@ fn render_boundary_attr(kind : BoundaryKind) -> String {
   }
 }
 
+///|
 fn render_template_import_names(imports : Array[TemplateImport]) -> String {
   let names : Array[String] = []
   for imported in imports {
@@ -310,6 +319,7 @@ fn render_template_import_names(imports : Array[TemplateImport]) -> String {
   "[" + names.join(", ") + "]"
 }
 
+///|
 fn render_resolve_template_import(
   component : VaporComponentRef,
   local_name : String,
@@ -322,6 +332,7 @@ fn render_resolve_template_import(
   None
 }
 
+///|
 fn render_merge_props(
   base : Array[(String, String)],
   overrides : Array[(String, String)],

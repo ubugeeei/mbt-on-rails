@@ -209,6 +209,7 @@ fn render_boundary_kind(kind : BoundaryKind) -> String {
   }
 }
 
+///|
 fn collect_component_source(
   component : VaporComponentRef,
   sources : Array[String],
@@ -222,6 +223,7 @@ fn collect_component_source(
   }
 }
 
+///|
 fn collect_component_entries(
   component : VaporComponentRef,
   entries : Array[String],
@@ -238,6 +240,7 @@ fn collect_component_entries(
   }
 }
 
+///|
 fn render_template_imports(imports : Array[TemplateImport]) -> String {
   let entries : Array[String] = []
   for imported in imports {
@@ -257,6 +260,7 @@ fn render_template_imports(imports : Array[TemplateImport]) -> String {
   "[" + entries.join(", ") + "]"
 }
 
+///|
 fn render_vapor_nodes(nodes : Array[VaporNode]) -> String {
   let entries : Array[String] = []
   for node in nodes {
@@ -265,6 +269,7 @@ fn render_vapor_nodes(nodes : Array[VaporNode]) -> String {
   "[" + entries.join(", ") + "]"
 }
 
+///|
 fn render_manifest_vapor_node(node : VaporNode) -> String {
   match node {
     Mounted(mounted) =>
@@ -288,6 +293,7 @@ fn render_manifest_vapor_node(node : VaporNode) -> String {
   }
 }
 
+///|
 fn render_component_boundary(component : VaporComponentRef) -> String {
   match component.contract {
     Some(contract) => render_boundary_kind(contract.boundary)

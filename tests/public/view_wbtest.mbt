@@ -10,37 +10,37 @@ test "rendered page includes islands forms and route tree data" {
     ),
   )
   let page = page_module(
-    "posts_show",
-    "/posts/[id]",
-    mbtv_path("examples/demo_blog/views/pages/posts/show.mbtv"),
-    "Post",
-    server_component(
-      "PostsShowPage",
+      "posts_show",
+      "/posts/[id]",
       mbtv_path("examples/demo_blog/views/pages/posts/show.mbtv"),
-      [],
-    ),
-  )
-  .with_layout(layout)
-  .with_loader(loader_module("load_post", "posts:show", Some(60), ["posts"]))
-  .with_action_name("posts.update")
-  .with_dynamic_mode(dynamic_revalidate(60))
-  .with_island(
-    client_component(
-      "LikeButton",
-      mbtv_path("examples/demo_blog/views/components/like_button.mbtv"),
-      [("kind", "heart")],
-      hydrate_visible(),
-    ),
-  )
-  .with_form(
-    form_binding(
-      "post_update",
-      "posts.update",
-      "POST",
-      Some("post"),
-      Some("/posts/[id]"),
-    ),
-  )
+      "Post",
+      server_component(
+        "PostsShowPage",
+        mbtv_path("examples/demo_blog/views/pages/posts/show.mbtv"),
+        [],
+      ),
+    )
+    .with_layout(layout)
+    .with_loader(loader_module("load_post", "posts:show", Some(60), ["posts"]))
+    .with_action_name("posts.update")
+    .with_dynamic_mode(dynamic_revalidate(60))
+    .with_island(
+      client_component(
+        "LikeButton",
+        mbtv_path("examples/demo_blog/views/components/like_button.mbtv"),
+        [("kind", "heart")],
+        hydrate_visible(),
+      ),
+    )
+    .with_form(
+      form_binding(
+        "post_update",
+        "posts.update",
+        "POST",
+        Some("post"),
+        Some("/posts/[id]"),
+      ),
+    )
   let actions = [
     server_action(
       "posts.update",

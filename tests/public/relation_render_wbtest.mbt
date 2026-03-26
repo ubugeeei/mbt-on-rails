@@ -14,11 +14,9 @@ fn render_test_layout() -> LayoutModule {
 
 ///|
 test "relation sql covers joins selects predicates counts and offsets" {
-  let schema = model(
-    name="Post",
-    table="posts",
-    columns=[string_column("title")],
-  )
+  let schema = model(name="Post", table="posts", columns=[
+    string_column("title"),
+  ])
   let relation = offset_by(
     limit_to(
       order_by(

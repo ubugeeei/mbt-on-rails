@@ -115,7 +115,7 @@ pub fn ObjectSchema::with_field(
 ) -> ObjectSchema {
   let fields = @support.clone_array(self.fields)
   fields.push(field)
-  { ..self, fields }
+  { ..self, fields, }
 }
 
 ///|
@@ -126,7 +126,7 @@ pub fn FieldSchema::with_rule(
 ) -> FieldSchema {
   let rules = @support.clone_array(self.rules)
   rules.push(rule)
-  { ..self, rules }
+  { ..self, rules, }
 }
 
 ///|
@@ -141,7 +141,7 @@ pub fn FieldSchema::min_length(
   self : FieldSchema,
   minimum : Int,
 ) -> FieldSchema {
-  self.with_rule(min_length(minimum=minimum))
+  self.with_rule(min_length(minimum~))
 }
 
 ///|
@@ -150,7 +150,7 @@ pub fn FieldSchema::max_length(
   self : FieldSchema,
   maximum : Int,
 ) -> FieldSchema {
-  self.with_rule(max_length(maximum=maximum))
+  self.with_rule(max_length(maximum~))
 }
 
 ///|
@@ -159,7 +159,7 @@ pub fn FieldSchema::included_in(
   self : FieldSchema,
   values : Array[String],
 ) -> FieldSchema {
-  self.with_rule(included_in(values=values))
+  self.with_rule(included_in(values~))
 }
 
 ///|
@@ -168,7 +168,7 @@ pub fn FieldSchema::same_as(
   self : FieldSchema,
   other_field : String,
 ) -> FieldSchema {
-  self.with_rule(same_as(other_field=other_field))
+  self.with_rule(same_as(other_field~))
 }
 
 ///|
@@ -177,7 +177,7 @@ pub fn FieldSchema::contains(
   self : FieldSchema,
   pattern : String,
 ) -> FieldSchema {
-  self.with_rule(contains(pattern=pattern))
+  self.with_rule(contains(pattern~))
 }
 
 ///|
@@ -210,7 +210,7 @@ pub fn ValidationReport::add(
 ) -> ValidationReport {
   let issues = @support.clone_array(self.issues)
   issues.push(issue)
-  { ..self, issues }
+  { ..self, issues, }
 }
 
 ///|
@@ -223,7 +223,7 @@ pub fn ValidationReport::merge(
   for issue in other.issues {
     issues.push(issue)
   }
-  { ..self, issues }
+  { ..self, issues, }
 }
 
 ///|
@@ -327,6 +327,7 @@ pub fn validate_object(
   current
 }
 
+///|
 fn apply_rule(
   report : ValidationReport,
   path : String,
@@ -343,7 +344,8 @@ fn apply_rule(
           } else {
             report
           }
-        None => report.add(issue_for(path, rule, Required, "must be present", []))
+        None =>
+          report.add(issue_for(path, rule, Required, "must be present", []))
       }
     MinLength(minimum) =>
       match field_value {
@@ -442,6 +444,7 @@ fn apply_rule(
   }
 }
 
+///|
 fn issue_for(
   path : String,
   rule : FieldRule,
@@ -453,5 +456,5 @@ fn issue_for(
     Some(message) => message
     None => default_message
   }
-  validation_issue(path=path, kind=kind, message=message, details=details)
+  validation_issue(path~, kind~, message~, details~)
 }

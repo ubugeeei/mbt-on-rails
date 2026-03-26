@@ -34,7 +34,7 @@ pub fn Notifications::append(
 ) -> Notifications {
   let events = clone_array(self.events)
   events.push(event)
-  { events }
+  { events, }
 }
 
 ///|
@@ -44,7 +44,7 @@ pub fn Notifications::instrument(
   name~ : String,
   payload~ : Array[(String, String)],
 ) -> Notifications {
-  self.append(notification_event(name=name, payload=payload))
+  self.append(notification_event(name~, payload~))
 }
 
 ///|
@@ -57,7 +57,7 @@ pub fn Notifications::merge(
   for event in other.events {
     events.push(event)
   }
-  { events }
+  { events, }
 }
 
 ///|

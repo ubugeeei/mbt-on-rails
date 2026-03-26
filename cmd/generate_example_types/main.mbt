@@ -14,6 +14,7 @@ fn main {
   }
 }
 
+///|
 fn run(command : GenerateExampleTypesCommand) -> Unit {
   let package_dir = normalize_relative_path(command.package_dir)
   let frontend_path = normalize_relative_path(command.frontend_path)
@@ -22,30 +23,29 @@ fn run(command : GenerateExampleTypesCommand) -> Unit {
   let template_paths = discover_templates(views_dir)
   let frontend_source = read_text_file(frontend_path)
   let generated_source = @generator.generate_example_types_source(
-    views_dir=views_dir,
-    template_paths=template_paths,
-    frontend_source=frontend_source,
+    views_dir~,
+    template_paths~,
+    frontend_source~,
   )
   write_text_file(output_path, generated_source)
 }
 
+///|
 fn parse_command(args : Array[String]) -> GenerateExampleTypesCommand? {
   if args.length() != 4 {
     return None
   }
-  Some({
-    package_dir: args[1],
-    frontend_path: args[2],
-    output_path: args[3],
-  })
+  Some({ package_dir: args[1], frontend_path: args[2], output_path: args[3] })
 }
 
+///|
 fn print_usage() -> Unit {
   println(
     "usage: moon run --target native cmd/generate_example_types -- <package_dir> <frontend_path> <output_path>",
   )
 }
 
+///|
 fn normalize_relative_path(path : String) -> String {
   let mut normalized = path.trim().to_string()
   while normalized.has_prefix("./") {

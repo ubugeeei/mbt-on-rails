@@ -59,23 +59,19 @@ test "resources and namespace routes recognize member and collection actions" {
 
 ///|
 test "active record relation and validation cover rails-like basics" {
-  let user_model = model(
-    name="User",
-    table="users",
-    columns=[
+  let user_model = model(name="User", table="users", columns=[
       string_column("email").indexed().unique(),
       string_column("password"),
       string_column("password_confirmation"),
-    ],
-  )
-  .with_validation(validates_presence(field="email"))
-  .with_validation(validates_uniqueness(field="email"))
-  .with_validation(
-    validates_confirmation(
-      field="password",
-      confirmation_field="password_confirmation",
-    ),
-  )
+    ])
+    .with_validation(validates_presence(field="email"))
+    .with_validation(validates_uniqueness(field="email"))
+    .with_validation(
+      validates_confirmation(
+        field="password",
+        confirmation_field="password_confirmation",
+      ),
+    )
 
   let relation = relation_for(user_model)
     .where_eq("email", "hello@example.com")
@@ -107,14 +103,10 @@ test "active record relation and validation cover rails-like basics" {
 
 ///|
 test "migration generation produces reversible down sql" {
-  let user_model = model(
-    name="User",
-    table="users",
-    columns=[
-      string_column("email").indexed().unique(),
-      string_column("password_digest"),
-    ],
-  )
+  let user_model = model(name="User", table="users", columns=[
+    string_column("email").indexed().unique(),
+    string_column("password_digest"),
+  ])
 
   let create_users = migration_from_model(
     "20260323010101", "create_users", user_model,
@@ -176,7 +168,16 @@ test "declarative controller and app builders preserve inferred metadata" {
 
   let app = app_named("demo")
     .with_controller(controller)
-    .with_route(route("sign_in", http_get(), "/sign-in", "SessionsController", "create", None))
+    .with_route(
+      route(
+        "sign_in",
+        http_get(),
+        "/sign-in",
+        "SessionsController",
+        "create",
+        None,
+      ),
+    )
   assert_eq(app.controllers.length(), 1)
   assert_eq(app.routes.length(), 1)
 }

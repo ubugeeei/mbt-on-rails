@@ -18,17 +18,15 @@ pub fn render_page_with_notifications(
     ],
   )
   for layout in page.layouts {
-    updated = updated.instrument(
-      name="render_layout.action_view",
-      payload=[
-        ("identifier", layout.file_path.as_string()),
-        ("layout", layout.name),
-      ],
-    )
+    updated = updated.instrument(name="render_layout.action_view", payload=[
+      ("identifier", layout.file_path.as_string()),
+      ("layout", layout.name),
+    ])
   }
   (rendered, updated)
 }
 
+///|
 fn dynamic_mode_name(mode : DynamicMode) -> String {
   match mode {
     Auto => "auto"

@@ -54,17 +54,20 @@ pub fn validate_template_component_imports(
   errors
 }
 
+///|
 fn extract_between(source : String, start : String, end_ : String) -> String {
-  let parts : Array[String] = source.split(start).map(fn(part) {
-    part.to_string()
-  }).collect()
+  let parts : Array[String] = source
+    .split(start)
+    .map(fn(part) { part.to_string() })
+    .collect()
   if parts.length() < 2 {
     return ""
   }
   let tail = parts[1]
-  let inner : Array[String] = tail.split(end_).map(fn(part) {
-    part.to_string()
-  }).collect()
+  let inner : Array[String] = tail
+    .split(end_)
+    .map(fn(part) { part.to_string() })
+    .collect()
   if inner.is_empty() {
     ""
   } else {
@@ -72,16 +75,19 @@ fn extract_between(source : String, start : String, end_ : String) -> String {
   }
 }
 
+///|
 fn parse_component_name_after(line : String, marker : String) -> String {
-  let parts : Array[String] = line.split(marker).map(fn(part) {
-    part.to_string()
-  }).collect()
+  let parts : Array[String] = line
+    .split(marker)
+    .map(fn(part) { part.to_string() })
+    .collect()
   if parts.length() < 2 {
     return ""
   }
   collect_component_name(parts[1].to_array(), 0)
 }
 
+///|
 fn collect_component_name(chars : Array[Char], start : Int) -> String {
   let sb = StringBuilder::new()
   for i = start; i < chars.length(); i = i + 1 {
@@ -95,10 +101,12 @@ fn collect_component_name(chars : Array[Char], start : Int) -> String {
   sb.to_string()
 }
 
+///|
 fn is_upper_alpha(ch : Char) -> Bool {
   ch >= 'A' && ch <= 'Z'
 }
 
+///|
 fn is_component_char(ch : Char) -> Bool {
   (ch >= 'A' && ch <= 'Z') ||
   (ch >= 'a' && ch <= 'z') ||

@@ -12,15 +12,12 @@ pub fn compose_mail_with_notifications(
     Some(_) => "true"
     None => "false"
   }
-  let updated = notifications.instrument(
-    name="process.action_mailer",
-    payload=[
-      ("mailer", mailer.name),
-      ("action", action_name),
-      ("found", found),
-      ("recipient_count", to.length().to_string()),
-    ],
-  )
+  let updated = notifications.instrument(name="process.action_mailer", payload=[
+    ("mailer", mailer.name),
+    ("action", action_name),
+    ("found", found),
+    ("recipient_count", to.length().to_string()),
+  ])
   (delivery, updated)
 }
 
@@ -36,18 +33,18 @@ pub fn enqueue_delivery_with_notifications(
   match run_at {
     Some(timestamp) =>
       @job.enqueue_at_with_notifications(
-        queue=queue,
-        definition=definition,
+        queue~,
+        definition~,
         payload=delivery_payload(delivery),
         run_at=timestamp,
-        notifications=notifications,
+        notifications~,
       )
     None =>
       @job.enqueue_now_with_notifications(
-        queue=queue,
-        definition=definition,
+        queue~,
+        definition~,
         payload=delivery_payload(delivery),
-        notifications=notifications,
+        notifications~,
       )
   }
 }

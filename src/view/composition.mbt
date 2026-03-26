@@ -70,6 +70,7 @@ pub fn validate_page_tree(page : PageModule) -> Array[String] {
   errors
 }
 
+///|
 fn validate_component_tree_into(
   component : VaporComponentRef,
   errors : Array[String],
@@ -100,6 +101,7 @@ fn validate_component_tree_into(
   }
 }
 
+///|
 fn validate_child(
   parent : VaporComponentRef,
   child : VaporNode,
@@ -109,7 +111,10 @@ fn validate_child(
     Mounted(mounted) =>
       match resolve_template_import(parent, mounted.import_name) {
         Some(imported) => {
-          let effective_props = merge_props(imported.component.props, mounted.props)
+          let effective_props = merge_props(
+            imported.component.props,
+            mounted.props,
+          )
           validate_props(
             parent.name,
             imported.local_name,
@@ -142,6 +147,7 @@ fn validate_child(
   }
 }
 
+///|
 fn validate_props(
   parent_name : String,
   import_name : String,
@@ -180,6 +186,7 @@ fn validate_props(
   }
 }
 
+///|
 fn resolve_template_import(
   component : VaporComponentRef,
   local_name : String,
@@ -192,6 +199,7 @@ fn resolve_template_import(
   None
 }
 
+///|
 fn merge_props(
   base : Array[(String, String)],
   overrides : Array[(String, String)],
@@ -212,6 +220,7 @@ fn merge_props(
   merged
 }
 
+///|
 fn is_client_boundary(component : VaporComponentRef) -> Bool {
   match component.contract {
     Some(contract) => contract.boundary == ClientBoundary
@@ -219,6 +228,7 @@ fn is_client_boundary(component : VaporComponentRef) -> Bool {
   }
 }
 
+///|
 fn is_server_boundary(component : VaporComponentRef) -> Bool {
   not(is_client_boundary(component))
 }

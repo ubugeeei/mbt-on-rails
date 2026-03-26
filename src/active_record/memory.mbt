@@ -107,6 +107,7 @@ pub fn save_record(
   Saved(insert_record(db, row), row)
 }
 
+///|
 fn validate_rule(
   schema : ModelSchema,
   validation : Validation,
@@ -119,6 +120,7 @@ fn validate_rule(
   }
 }
 
+///|
 fn validate_local_rule(
   schema : ModelSchema,
   validation : Validation,
@@ -136,6 +138,7 @@ fn validate_local_rule(
   }
 }
 
+///|
 fn validate_uniqueness_rule(
   schema : ModelSchema,
   validation : Validation,
@@ -162,6 +165,7 @@ fn validate_uniqueness_rule(
   }
 }
 
+///|
 fn validation_field_schema(validation : Validation) -> @validation.FieldSchema? {
   match validation_field_rule(validation) {
     Some(rule) => {
@@ -169,37 +173,40 @@ fn validation_field_schema(validation : Validation) -> @validation.FieldSchema? 
         Some(message) => rule.with_message(message)
         None => rule
       }
-      Some(@validation.string_field(name=validation.field).with_rule(configured))
+      Some(
+        @validation.string_field(name=validation.field).with_rule(configured),
+      )
     }
     None => None
   }
 }
 
+///|
 fn validation_field_rule(validation : Validation) -> @validation.FieldRule? {
   match validation.rule {
     Presence => Some(@validation.required())
-    LengthMin(minimum) => Some(@validation.min_length(minimum=minimum))
-    LengthMax(maximum) => Some(@validation.max_length(maximum=maximum))
-    Inclusion(values) => Some(@validation.included_in(values=values))
+    LengthMin(minimum) => Some(@validation.min_length(minimum~))
+    LengthMax(maximum) => Some(@validation.max_length(maximum~))
+    Inclusion(values) => Some(@validation.included_in(values~))
     Confirmation(other_field) =>
       Some(
-        @validation.same_as(other_field=other_field)
-        .with_message("confirmation does not match"),
+        @validation.same_as(other_field~).with_message(
+          "confirmation does not match",
+        ),
       )
     Format(pattern) =>
-      Some(
-        @validation.contains(pattern=pattern).with_message("has invalid format"),
-      )
+      Some(@validation.contains(pattern~).with_message("has invalid format"))
     WrappedRule(rule) => Some(rule)
     Uniqueness => None
   }
 }
 
+///|
 fn validation_report_to_errors(
   model_name : String,
   report : @validation.ValidationReport,
 ) -> ValidationErrors {
-  let errors = validation_errors(model_name=model_name)
+  let errors = validation_errors(model_name~)
   let mut current = errors
   for issue in report.issues {
     current = current.add(
@@ -214,9 +221,8 @@ fn validation_report_to_errors(
   current
 }
 
-fn rule_kind_to_error_kind(
-  kind : @validation.RuleKind,
-) -> ValidationErrorKind {
+///|
+fn rule_kind_to_error_kind(kind : @validation.RuleKind) -> ValidationErrorKind {
   match kind {
     @validation.Required => Blank
     @validation.MinLength(minimum) => TooShort(minimum)
@@ -227,6 +233,7 @@ fn rule_kind_to_error_kind(
   }
 }
 
+///|
 fn resolve_message(validation : Validation, default_message : String) -> String {
   match validation.message {
     Some(message) => message

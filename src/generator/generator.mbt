@@ -45,7 +45,7 @@ pub fn scaffold_resource(
       @orm.model(
         name=@support.classify(@support.singularize(resource_name)),
         table=resource_name,
-        columns=columns,
+        columns~,
       ),
       @orm.validates_presence(field="title"),
     ),

@@ -11,11 +11,9 @@ pub fn demo_application_layout_component() -> @view.VaporComponentRef {
 ///|
 /// Builds the home page server component used by the demo app.
 pub fn demo_home_page_component() -> @view.VaporComponentRef {
-  @view.server_component(
-    name="HomePage",
-    source_path=view_pages_home(),
-    props=[("title", "mbt on rails")],
-  )
+  @view.server_component(name="HomePage", source_path=view_pages_home(), props=[
+    ("title", "mbt on rails"),
+  ])
   .with_fallback("<div class=\"mbor-shell\">Loading home...</div>")
   .with_contract(
     @view.server_contract(
@@ -28,11 +26,7 @@ pub fn demo_home_page_component() -> @view.VaporComponentRef {
 ///|
 /// Builds the sign-in page server component used by the demo app.
 pub fn demo_sign_in_page_component() -> @view.VaporComponentRef {
-  @view.server_component(
-    name="SignInPage",
-    source_path=view_pages_sign_in(),
-    props=[],
-  )
+  @view.server_component(name="SignInPage", source_path=view_pages_sign_in(), props=[])
   .with_fallback("<div class=\"mbor-shell\">Loading sign in...</div>")
   .with_contract(@view.server_contract([], true))
 }
@@ -87,9 +81,11 @@ pub fn demo_post_composer_island(mode : String) -> @view.VaporComponentRef {
     hydration=@view.hydrate_visible(),
   )
   .with_fallback("<div class=\"composer-shell\">Preparing composer...</div>")
-  .with_contract(@view.client_contract([
-    @view.prop_contract("mode", "String", true, "Composer mode selector"),
-  ]))
+  .with_contract(
+    @view.client_contract([
+      @view.prop_contract("mode", "String", true, "Composer mode selector"),
+    ]),
+  )
 }
 
 ///|
@@ -102,9 +98,11 @@ pub fn demo_post_composer_idle_island() -> @view.VaporComponentRef {
     hydration=@view.hydrate_idle(),
   )
   .with_fallback("<div class=\"composer-shell\">Preparing composer...</div>")
-  .with_contract(@view.client_contract([
-    @view.prop_contract("mode", "String", true, "Composer mode selector"),
-  ]))
+  .with_contract(
+    @view.client_contract([
+      @view.prop_contract("mode", "String", true, "Composer mode selector"),
+    ]),
+  )
 }
 
 ///|
@@ -116,8 +114,12 @@ pub fn demo_like_button_island() -> @view.VaporComponentRef {
     props=[("kind", "heart")],
     hydration=@view.hydrate_load(),
   )
-  .with_fallback("<button type=\"button\" class=\"like-button\">12 likes</button>")
-  .with_contract(@view.client_contract([
-    @view.prop_contract("kind", "String", true, "Visual reaction kind"),
-  ]))
+  .with_fallback(
+    "<button type=\"button\" class=\"like-button\">12 likes</button>",
+  )
+  .with_contract(
+    @view.client_contract([
+      @view.prop_contract("kind", "String", true, "Visual reaction kind"),
+    ]),
+  )
 }

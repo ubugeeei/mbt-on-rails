@@ -56,7 +56,9 @@ pub fn notes_show_route_params(id~ : String) -> NotesShowRouteParams {
 }
 
 ///|
-pub fn NotesShowRouteParams::entries(self : NotesShowRouteParams) -> Array[(String, String)] {
+pub fn NotesShowRouteParams::entries(
+  self : NotesShowRouteParams,
+) -> Array[(String, String)] {
   let entries : Array[(String, String)] = []
   entries.push(("id", self.id))
   entries
@@ -98,7 +100,9 @@ pub fn notes_edit_route_params(id~ : String) -> NotesEditRouteParams {
 }
 
 ///|
-pub fn NotesEditRouteParams::entries(self : NotesEditRouteParams) -> Array[(String, String)] {
+pub fn NotesEditRouteParams::entries(
+  self : NotesEditRouteParams,
+) -> Array[(String, String)] {
   let entries : Array[(String, String)] = []
   entries.push(("id", self.id))
   entries
