@@ -44,7 +44,7 @@ pub fn delivery_job(
 ) -> @job.EnqueuedJob {
   let definition = mail_delivery_definition(delivery, queue_name)
   @job.enqueued_job(
-    definition=definition,
+    definition~,
     payload=delivery_payload(delivery),
     run_at=match run_at {
       Some(timestamp) => timestamp
