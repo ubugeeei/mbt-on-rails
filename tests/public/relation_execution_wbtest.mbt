@@ -70,7 +70,7 @@ test "execute_relation filters sorts projects distincts and windows in memory" {
     .select_columns(["posts.id", "title"])
     .limit_to(2)
 
-  let outcome = db.execute_relation(schema, relation)
+  let outcome = relation.execute(schema, db)
   assert_true(outcome.issues().is_empty())
   assert_true(outcome.exists())
   assert_eq(outcome.count(), 2)
@@ -84,16 +84,13 @@ test "execute_relation filters sorts projects distincts and windows in memory" {
   let records = outcome.records()
   assert_eq(find_entry(records[1].fields, "id"), Some("5"))
 
-  let distinct_titles = execute_relation(
-    schema,
-    db,
-    relation_for(schema)
+  let distinct_titles = relation_for(schema)
     .where_eq("published", "true")
     .where_like("title", "%MoonBit%")
     .select_columns(["title"])
     .distinct_records()
-    .order_by("title"),
-  )
+    .order_by("title")
+    .execute(schema, db)
   assert_eq(distinct_titles.count(), 2)
   assert_eq(
     find_entry(distinct_titles.records()[0].fields, "title"),
@@ -105,16 +102,13 @@ test "execute_relation filters sorts projects distincts and windows in memory" {
 test "execute_relation surfaces unsupported features as explicit issues" {
   let schema = relation_execution_schema()
   let db = relation_execution_db()
-  let unsupported = execute_relation(
-    schema,
-    db,
-    relation_for(schema)
+  let unsupported = relation_for(schema)
     .join_relation("INNER JOIN users ON users.id = posts.author_id")
     .preload("author")
     .group_by(["author_id"])
     .having_raw("COUNT(*) > 1")
-    .where_raw("published = TRUE"),
-  )
+    .where_raw("published = TRUE")
+    .execute(schema, db)
 
   assert_eq(unsupported.records().length(), 0)
   assert_eq(unsupported.count(), 0)
@@ -127,10 +121,8 @@ test "execute_relation surfaces unsupported features as explicit issues" {
   assert_true(issues[3].message().contains("preload"))
   assert_true(issues[4].message().contains("raw_predicate"))
 
-  let none = execute_relation(
-    schema,
-    db,
-    none_relation(relation_for(schema).where_raw("broken = TRUE")),
+  let none = none_relation(relation_for(schema).where_raw("broken = TRUE")).execute(
+    schema, db,
   )
   assert_true(none.issues().is_empty())
   assert_eq(none.count(), 0)

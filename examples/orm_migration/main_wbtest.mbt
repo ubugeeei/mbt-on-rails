@@ -21,22 +21,21 @@ test "orm migration example builders keep relation migration and validation stab
     @mbor.relation_to_sql(relation),
     "SELECT * FROM posts WHERE author_id = 7 AND title LIKE '%MoonBit%' ORDER BY created_at DESC LIMIT 5",
   )
-  let executed = @mbor.empty_memory_database()
-    .insert_record(
-      @mbor.record("posts", [
-        ("id", "1"),
-        ("title", "MoonBit Launch"),
-        ("slug", "moonbit-launch"),
-        ("body", "Shipping MoonBit on Rails"),
-        ("author_id", "7"),
-      ]),
-    )
-    .execute_relation(
+  let executed = @mbor.relation_for(schema)
+    .where_eq("author_id", "7")
+    .where_like("title", "%MoonBit%")
+    .select_columns(["id", "title"])
+    .execute(
       schema,
-      @mbor.relation_for(schema)
-      .where_eq("author_id", "7")
-      .where_like("title", "%MoonBit%")
-      .select_columns(["id", "title"]),
+      @mbor.empty_memory_database().insert_record(
+        @mbor.record("posts", [
+          ("id", "1"),
+          ("title", "MoonBit Launch"),
+          ("slug", "moonbit-launch"),
+          ("body", "Shipping MoonBit on Rails"),
+          ("author_id", "7"),
+        ]),
+      ),
     )
   assert_eq(executed.count(), 1)
   assert_eq(
@@ -93,17 +92,17 @@ test "orm migration example builders keep relation migration and validation stab
     ),
   )
 
-  let casted = @mbor.cast_record(schema, typed_post_row())
+  let casted = typed_post_row().cast(schema)
   match casted.typed_record() {
     Some(current) => {
       assert_eq(current.fields.length(), 6)
+      assert_true(current.field("author_id") is Some(_))
       assert_true(current.to_json().contains("\"author_id\": 7"))
     }
     None => assert_true(false)
   }
-  let serialized = @mbor.serialize_record_json(
+  let serialized = @mbor.record("posts", [("author_id", "oops")]).serialize_json(
     schema,
-    @mbor.record("posts", [("author_id", "oops")]),
   )
   assert_eq(serialized.json(), None)
   let errors = serialized.errors()

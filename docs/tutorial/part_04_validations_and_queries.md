@@ -163,6 +163,7 @@ The ORM now has a schema-aware casting layer for transport boundaries:
 
 This is useful when a row arrives as stringly data from forms, fixtures, or adapters,
 but the rest of the app wants explicit types and predictable JSON.
+Method aliases such as `row.cast(schema)`, `row.serialize_json(schema)`, and `column.attribute_type_name()` keep the call sites more cohesive too.
 
 ```moonbit
 let schema = model(
@@ -189,7 +190,7 @@ let row = record("posts", [
   ("deleted_at", "null"),
 ])
 
-match cast_record(schema, row) {
+match row.cast(schema) {
   CastedRecord(current) => println(current.to_json())
   CastRecordFailed(errors) =>
     for error in errors {
@@ -214,7 +215,7 @@ let invalid = record("posts", [
   ("published", "maybe"),
 ])
 
-match serialize_record_json(schema, invalid) {
+match invalid.serialize_json(schema) {
   SerializedRecordJson(json) => println(json)
   SerializeRecordFailed(errors) =>
     for error in errors {

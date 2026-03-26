@@ -309,6 +309,7 @@ pub struct Column {
   indexed : Bool
   default_value : String?
 }
+pub fn Column::attribute_type_name(Self) -> String
 pub fn Column::indexed(Self) -> Self
 pub fn Column::nullable(Self) -> Self
 pub fn Column::unique(Self) -> Self
@@ -403,6 +404,7 @@ pub struct ModelSchema {
   validations : Array[Validation]
   callbacks : Array[Callback]
 }
+pub fn ModelSchema::find_column(Self, String) -> Column?
 pub fn ModelSchema::with_association(Self, Association) -> Self
 pub fn ModelSchema::with_callback(Self, Callback) -> Self
 pub fn ModelSchema::with_scope(Self, ScopeDefinition) -> Self
@@ -428,6 +430,8 @@ pub struct Record {
   table : String
   fields : Array[(String, String)]
 }
+pub fn Record::cast(Self, ModelSchema) -> CastRecordOutcome
+pub fn Record::serialize_json(Self, ModelSchema) -> SerializeRecordOutcome
 pub fn Record::track_changes(Self, Self) -> DirtyRecord
 
 pub struct Relation {
@@ -445,6 +449,7 @@ pub struct Relation {
   preloads : Array[String]
 }
 pub fn Relation::distinct_records(Self) -> Self
+pub fn Relation::execute(Self, ModelSchema, MemoryDatabase) -> RelationExecutionOutcome
 pub fn Relation::group_by(Self, Array[String]) -> Self
 pub fn Relation::having_raw(Self, String) -> Self
 pub fn Relation::join_relation(Self, String) -> Self
@@ -523,8 +528,10 @@ pub struct TypedRecord {
   table : String
   fields : Array[TypedField]
 }
+pub fn TypedRecord::field(Self, String) -> TypedField?
 pub fn TypedRecord::to_json(Self) -> String
 pub fn TypedRecord::to_record(Self) -> Record
+pub fn TypedRecord::value_for(Self, String) -> AttributeValue?
 pub impl Eq for TypedRecord
 pub impl Show for TypedRecord
 

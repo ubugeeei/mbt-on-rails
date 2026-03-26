@@ -28,28 +28,29 @@ test "cast_record maps schema-backed fields into typed values" {
     ("deleted_at", "null"),
   ])
 
-  match cast_record(schema, row) {
+  match row.cast(schema) {
     CastedRecord(current) => {
       assert_eq(current.fields.length(), 8)
-      assert_eq(attribute_type_name(integer_column("views")), "Int")
+      assert_eq(integer_column("views").attribute_type_name(), "Int")
       assert_eq(
-        attribute_type_name(nullable(boolean_column("published"))),
+        nullable(boolean_column("published")).attribute_type_name(),
         "Bool?",
       )
-      match current.fields[0].value {
-        IntegerAttribute(value) => assert_eq(value, 1)
+      assert_true(schema.find_column("deleted_at") is Some(_))
+      match current.value_for("id") {
+        Some(IntegerAttribute(value)) => assert_eq(value, 1)
         _ => assert_true(false)
       }
-      match current.fields[3].value {
-        BooleanAttribute(value) => assert_true(value)
+      match current.value_for("published") {
+        Some(BooleanAttribute(value)) => assert_true(value)
         _ => assert_true(false)
       }
-      match current.fields[4].value {
-        JsonAttribute(value) => assert_true(value.contains("\"moonbit\""))
+      match current.value_for("meta") {
+        Some(JsonAttribute(value)) => assert_true(value.contains("\"moonbit\""))
         _ => assert_true(false)
       }
-      match current.fields[7].value {
-        NullAttribute => assert_true(true)
+      match current.value_for("deleted_at") {
+        Some(NullAttribute) => assert_true(true)
         _ => assert_true(false)
       }
       let roundtrip = current.to_record()
@@ -73,7 +74,7 @@ test "serialize_record_json emits typed JSON and surfaces cast failures" {
     ("author_id", "7"),
     ("updated_at", "2026-03-27T00:00:00Z"),
   ])
-  match serialize_record_json(schema, valid) {
+  match valid.serialize_json(schema) {
     SerializedRecordJson(json) => {
       assert_true(json.contains("\"id\": 1"))
       assert_true(json.contains("\"published\": false"))
@@ -89,7 +90,7 @@ test "serialize_record_json emits typed JSON and surfaces cast failures" {
     ("author_id", "abc"),
     ("unknown_field", "surprise"),
   ])
-  match serialize_record_json(schema, invalid) {
+  match invalid.serialize_json(schema) {
     SerializedRecordJson(_) => assert_true(false)
     SerializeRecordFailed(errors) => {
       assert_eq(errors.length(), 4)

@@ -63,7 +63,7 @@ fn print_relation_execution_example(model : @mbor.ModelSchema) -> Unit {
     .select_columns(["id", "title"])
 
   println("Relation Execution")
-  let outcome = db.execute_relation(model, relation)
+  let outcome = relation.execute(model, db)
   println("count = " + outcome.count().to_string())
   match outcome.first() {
     Some(row) => {
@@ -166,12 +166,12 @@ fn typed_post_row() -> @mbor.Record {
 /// Prints typed attribute casting and error reporting for one schema-backed row.
 fn print_typed_attribute_example(model : @mbor.ModelSchema) -> Unit {
   println("Typed Attributes")
-  let casted = @mbor.cast_record(model, typed_post_row())
+  let casted = typed_post_row().cast(model)
   match casted.typed_record() {
     Some(current) => {
       println(
         "author_id type = " +
-        @mbor.attribute_type_name(@mbor.references_column("author_id", "users")),
+        @mbor.references_column("author_id", "users").attribute_type_name(),
       )
       println(current.to_json())
     }
@@ -182,9 +182,8 @@ fn print_typed_attribute_example(model : @mbor.ModelSchema) -> Unit {
   }
   println("")
   println("Typed Attribute Error")
-  let serialized = @mbor.serialize_record_json(
+  let serialized = @mbor.record("posts", [("author_id", "oops")]).serialize_json(
     model,
-    @mbor.record("posts", [("author_id", "oops")]),
   )
   match serialized.json() {
     Some(json) => println(json)
