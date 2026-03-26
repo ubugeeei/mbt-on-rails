@@ -42,10 +42,13 @@ pub fn process_definition(
 
 ///|
 /// Builds one release task.
+#label_migration(name, allow_positional=true)
+#label_migration(command, allow_positional=true)
+#label_migration(required, allow_positional=true)
 pub fn release_task(
-  name : String,
-  command : String,
-  required : Bool,
+  name~ : String,
+  command~ : String,
+  required~ : Bool,
 ) -> ReleaseTask {
   { name, command, required }
 }

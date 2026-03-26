@@ -73,10 +73,13 @@ pub fn csrf_valid(session : Session?, provided : String?) -> Bool {
 
 ///|
 /// Builds the session cookie that should be set for a browser client.
+#label_migration(config, allow_positional=true)
+#label_migration(session, allow_positional=true)
+#label_migration(remember_me, allow_positional=true)
 pub fn session_cookie(
-  config : AuthConfig,
-  session : Session,
-  remember_me : Bool,
+  config~ : AuthConfig,
+  session~ : Session,
+  remember_me~ : Bool,
 ) -> AuthCookie {
   {
     name: if remember_me {

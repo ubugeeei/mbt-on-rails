@@ -111,12 +111,17 @@ pub fn identity(
 
 ///|
 /// Builds a policy rule for resource/action authorization.
+#label_migration(resource, allow_positional=true)
+#label_migration(action, allow_positional=true)
+#label_migration(roles, allow_positional=true)
+#label_migration(permissions, allow_positional=true)
+#label_migration(allow_owner, allow_positional=true)
 pub fn policy_rule(
-  resource : String,
-  action : String,
-  roles : Array[String],
-  permissions : Array[String],
-  allow_owner : Bool,
+  resource~ : String,
+  action~ : String,
+  roles~ : Array[String],
+  permissions~ : Array[String],
+  allow_owner~ : Bool,
 ) -> PolicyRule {
   { resource, action, roles, permissions, allow_owner }
 }

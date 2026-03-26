@@ -2,9 +2,9 @@
 test "production stack example summaries stay stable" {
   let config = @mbor.default_production_config()
   let checks = [
-    @mbor.health_check("database", true, "primary reachable"),
-    @mbor.health_check("redis", true, "queue online"),
-    @mbor.health_check("mail", false, "smtp timeout"),
+    @mbor.health_check(name="database", ok=true, detail="primary reachable"),
+    @mbor.health_check(name="redis", ok=true, detail="queue online"),
+    @mbor.health_check(name="mail", ok=false, detail="smtp timeout"),
   ]
   let limit = @mbor.rate_limit_rule("api-write", "/api", 60, 60)
   let event = @mbor.log_event("info", "request completed", Some("req_123"), [

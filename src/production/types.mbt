@@ -48,15 +48,23 @@ pub struct LogEvent {
 
 ///|
 /// Builds a deployment config.
+#label_migration(environment, allow_positional=true)
+#label_migration(host, allow_positional=true)
+#label_migration(port, allow_positional=true)
+#label_migration(force_ssl, allow_positional=true)
+#label_migration(trust_proxy, allow_positional=true)
+#label_migration(asset_host, allow_positional=true)
+#label_migration(health_path, allow_positional=true)
+#label_migration(ready_path, allow_positional=true)
 pub fn deployment_config(
-  environment : Environment,
-  host : String,
-  port : Int,
-  force_ssl : Bool,
-  trust_proxy : Bool,
-  asset_host : String?,
-  health_path : String,
-  ready_path : String,
+  environment~ : Environment,
+  host~ : String,
+  port~ : Int,
+  force_ssl~ : Bool,
+  trust_proxy~ : Bool,
+  asset_host~ : String?,
+  health_path~ : String,
+  ready_path~ : String,
 ) -> DeploymentConfig {
   {
     environment,
@@ -74,14 +82,14 @@ pub fn deployment_config(
 /// Returns a development-leaning default config.
 pub fn default_development_config() -> DeploymentConfig {
   deployment_config(
-    Development,
-    "127.0.0.1",
-    3000,
-    false,
-    false,
-    None,
-    "/health",
-    "/ready",
+    environment=Development,
+    host="127.0.0.1",
+    port=3000,
+    force_ssl=false,
+    trust_proxy=false,
+    asset_host=None,
+    health_path="/health",
+    ready_path="/ready",
   )
 }
 
@@ -89,14 +97,14 @@ pub fn default_development_config() -> DeploymentConfig {
 /// Returns a test-leaning default config.
 pub fn default_test_config() -> DeploymentConfig {
   deployment_config(
-    Test,
-    "127.0.0.1",
-    3001,
-    false,
-    false,
-    None,
-    "/health",
-    "/ready",
+    environment=Test,
+    host="127.0.0.1",
+    port=3001,
+    force_ssl=false,
+    trust_proxy=false,
+    asset_host=None,
+    health_path="/health",
+    ready_path="/ready",
   )
 }
 
@@ -104,14 +112,14 @@ pub fn default_test_config() -> DeploymentConfig {
 /// Returns a staging-leaning default config.
 pub fn default_staging_config() -> DeploymentConfig {
   deployment_config(
-    Staging,
-    "0.0.0.0",
-    3000,
-    true,
-    true,
-    None,
-    "/health",
-    "/ready",
+    environment=Staging,
+    host="0.0.0.0",
+    port=3000,
+    force_ssl=true,
+    trust_proxy=true,
+    asset_host=None,
+    health_path="/health",
+    ready_path="/ready",
   )
 }
 
@@ -119,20 +127,27 @@ pub fn default_staging_config() -> DeploymentConfig {
 /// Returns a production-leaning default config.
 pub fn default_production_config() -> DeploymentConfig {
   deployment_config(
-    Production,
-    "0.0.0.0",
-    3000,
-    true,
-    true,
-    None,
-    "/health",
-    "/ready",
+    environment=Production,
+    host="0.0.0.0",
+    port=3000,
+    force_ssl=true,
+    trust_proxy=true,
+    asset_host=None,
+    health_path="/health",
+    ready_path="/ready",
   )
 }
 
 ///|
 /// Builds one probe result.
-pub fn health_check(name : String, ok : Bool, detail : String) -> HealthCheck {
+#label_migration(name, allow_positional=true)
+#label_migration(ok, allow_positional=true)
+#label_migration(detail, allow_positional=true)
+pub fn health_check(
+  name~ : String,
+  ok~ : Bool,
+  detail~ : String,
+) -> HealthCheck {
   { name, ok, detail }
 }
 

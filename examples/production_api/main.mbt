@@ -47,10 +47,12 @@ fn dispatch(
   match @mbor.recognize(routes, request) {
     Some(matched) =>
       if matched.route.name == "health" {
-        return @mbor.health_response([@mbor.health_check("app", true, "ok")])
+        return @mbor.health_response([
+          @mbor.health_check(name="app", ok=true, detail="ok"),
+        ])
       } else if matched.route.name == "ready" {
         return @mbor.readiness_response([
-          @mbor.health_check("db", true, "connected"),
+          @mbor.health_check(name="db", ok=true, detail="connected"),
         ])
       } else if matched.route.name == "metrics" {
         return @mbor.metrics_response(@mbor.render_prometheus(registry))
@@ -88,13 +90,23 @@ fn run_example() -> Unit {
   )
   let secrets = @mbor.secrets_config([
     @mbor.secret_var(
-      "DATABASE_URL",
-      Some("postgres://app:secret@db/prod"),
-      true,
-      true,
+      name="DATABASE_URL",
+      value=Some("postgres://app:secret@db/prod"),
+      required=true,
+      sensitive=true,
     ),
-    @mbor.secret_var("REDIS_URL", Some("redis://cache:6379/0"), true, false),
-    @mbor.secret_var("SMTP_PASSWORD", None, true, true),
+    @mbor.secret_var(
+      name="REDIS_URL",
+      value=Some("redis://cache:6379/0"),
+      required=true,
+      sensitive=false,
+    ),
+    @mbor.secret_var(
+      name="SMTP_PASSWORD",
+      value=None,
+      required=true,
+      sensitive=true,
+    ),
   ])
 
   println("Production API Example")

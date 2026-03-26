@@ -15,11 +15,15 @@ pub struct SecretsConfig {
 
 ///|
 /// Builds one secret declaration.
+#label_migration(name, allow_positional=true)
+#label_migration(value, allow_positional=true)
+#label_migration(required, allow_positional=true)
+#label_migration(sensitive, allow_positional=true)
 pub fn secret_var(
-  name : String,
-  value : String?,
-  required : Bool,
-  sensitive : Bool,
+  name~ : String,
+  value~ : String?,
+  required~ : Bool,
+  sensitive~ : Bool,
 ) -> SecretVar {
   { name, value, required, sensitive }
 }

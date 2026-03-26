@@ -26,18 +26,18 @@ test "metrics secrets and production http helpers are production friendly" {
 
   let secrets = secrets_config([
     secret_var(
-      "DATABASE_URL",
-      Some("postgres://app:secret@db/prod"),
-      true,
-      true,
+      name="DATABASE_URL",
+      value=Some("postgres://app:secret@db/prod"),
+      required=true,
+      sensitive=true,
     ),
-    secret_var("SMTP_PASSWORD", None, true, true),
+    secret_var(name="SMTP_PASSWORD", value=None, required=true, sensitive=true),
   ])
   assert_false(secrets_valid(secrets))
   assert_true(masked_secret_summary(secrets).contains("po****od"))
   assert_eq(missing_secrets(secrets)[0], "SMTP_PASSWORD")
 
-  let healthy = health_response([health_check("app", true, "ok")])
+  let healthy = health_response([health_check(name="app", ok=true, detail="ok")])
   let metrics = metrics_response(render_prometheus(registry))
   let api_ok = json_api_ok("posts", "42", [("title", "MoonBit")])
   let api_error = json_api_error(404, "not_found", "missing")
@@ -70,8 +70,16 @@ test "deployment helpers describe production process topology" {
     ]),
   ]
   let tasks = [
-    release_task("db:migrate", "moon run examples/orm_migration", true),
-    release_task("db:seed", "moon run examples/rails_ops", false),
+    release_task(
+      name="db:migrate",
+      command="moon run examples/orm_migration",
+      required=true,
+    ),
+    release_task(
+      name="db:seed",
+      command="moon run examples/rails_ops",
+      required=false,
+    ),
   ]
 
   assert_true(process_summary(processes).contains("worker role=worker"))

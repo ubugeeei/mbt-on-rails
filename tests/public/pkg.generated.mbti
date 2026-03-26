@@ -218,7 +218,15 @@ pub fn delivery_job(@mailer.MailDelivery, String, String?) -> @job.EnqueuedJob
 
 pub fn demo_blog_app() -> @app.MbtOnRailsApp
 
-pub fn deployment_config(@production.Environment, String, Int, Bool, Bool, String?, String, String) -> @production.DeploymentConfig
+#label_migration(asset_host, allow_positional=true)
+#label_migration(environment, allow_positional=true)
+#label_migration(force_ssl, allow_positional=true)
+#label_migration(health_path, allow_positional=true)
+#label_migration(host, allow_positional=true)
+#label_migration(port, allow_positional=true)
+#label_migration(ready_path, allow_positional=true)
+#label_migration(trust_proxy, allow_positional=true)
+pub fn deployment_config(environment~ : @production.Environment, host~ : String, port~ : Int, force_ssl~ : Bool, trust_proxy~ : Bool, asset_host~ : String?, health_path~ : String, ready_path~ : String) -> @production.DeploymentConfig
 
 pub fn digest_password(String, String) -> String
 
@@ -322,7 +330,10 @@ pub fn has_one(name~ : String, target~ : String, foreign_key~ : String) -> @acti
 
 pub fn hash_string(String) -> String
 
-pub fn health_check(String, Bool, String) -> @production.HealthCheck
+#label_migration(detail, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(ok, allow_positional=true)
+pub fn health_check(name~ : String, ok~ : Bool, detail~ : String) -> @production.HealthCheck
 
 pub fn health_response(Array[@production.HealthCheck]) -> @http.Response
 
@@ -559,7 +570,12 @@ pub fn permitted_value(@params.PermittedParams, String) -> String?
 
 pub fn persist_model_step(String) -> @controller.ActionStep
 
-pub fn policy_rule(String, String, Array[String], Array[String], Bool) -> @auth.PolicyRule
+#label_migration(action, allow_positional=true)
+#label_migration(allow_owner, allow_positional=true)
+#label_migration(permissions, allow_positional=true)
+#label_migration(resource, allow_positional=true)
+#label_migration(roles, allow_positional=true)
+pub fn policy_rule(resource~ : String, action~ : String, roles~ : Array[String], permissions~ : Array[String], allow_owner~ : Bool) -> @auth.PolicyRule
 
 pub fn polynomially_longer() -> @job.RetryWait
 
@@ -601,7 +617,10 @@ pub fn release_process(String, String, Array[String]) -> @process.ProcessDefinit
 
 pub fn release_summary(Array[@process.ReleaseTask]) -> String
 
-pub fn release_task(String, String, Bool) -> @process.ReleaseTask
+#label_migration(command, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(required, allow_positional=true)
+pub fn release_task(name~ : String, command~ : String, required~ : Bool) -> @process.ReleaseTask
 
 pub fn remove_column_step(String, String) -> @migration.MigrationStep
 
@@ -705,7 +724,11 @@ pub fn scope_routes(String, String, Array[@http.RouteSpec]) -> Array[@http.Route
 
 pub fn secret_value(@secrets.SecretsConfig, String) -> String?
 
-pub fn secret_var(String, String?, Bool, Bool) -> @secrets.SecretVar
+#label_migration(name, allow_positional=true)
+#label_migration(required, allow_positional=true)
+#label_migration(sensitive, allow_positional=true)
+#label_migration(value, allow_positional=true)
+pub fn secret_var(name~ : String, value~ : String?, required~ : Bool, sensitive~ : Bool) -> @secrets.SecretVar
 
 pub fn secrets_config(Array[@secrets.SecretVar]) -> @secrets.SecretsConfig
 
@@ -731,7 +754,10 @@ pub fn server_component(name~ : String, source_path~ : @support.MbtvPath, props~
 
 pub fn server_contract(Array[@view.PropContract], Bool) -> @view.ComponentContract
 
-pub fn session_cookie(@auth.AuthConfig, @auth.Session, Bool) -> @auth.AuthCookie
+#label_migration(config, allow_positional=true)
+#label_migration(remember_me, allow_positional=true)
+#label_migration(session, allow_positional=true)
+pub fn session_cookie(config~ : @auth.AuthConfig, session~ : @auth.Session, remember_me~ : Bool) -> @auth.AuthCookie
 
 pub fn set_metric(@metrics.MetricsRegistry, String, Array[(String, String)], Int) -> @metrics.MetricsRegistry
 

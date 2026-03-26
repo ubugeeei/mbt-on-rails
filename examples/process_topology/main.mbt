@@ -19,8 +19,16 @@ fn run_example() -> Unit {
     ]),
   ]
   let release = [
-    @mbor.release_task("db:migrate", "moon run examples/orm_migration", true),
-    @mbor.release_task("db:seed", "moon run examples/rails_ops", false),
+    @mbor.release_task(
+      name="db:migrate",
+      command="moon run examples/orm_migration",
+      required=true,
+    ),
+    @mbor.release_task(
+      name="db:seed",
+      command="moon run examples/rails_ops",
+      required=false,
+    ),
   ]
 
   println("Process Topology Example")

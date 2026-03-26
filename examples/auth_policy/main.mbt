@@ -35,13 +35,19 @@ fn print_requirement_checks(identity : @mbor.Identity) -> Unit {
 /// Prints policy-rule checks, including owner access.
 fn print_policy_checks(identity : @mbor.Identity) -> Unit {
   let publish_rule = @mbor.policy_rule(
-    "posts",
-    "publish",
-    ["editor"],
-    ["posts.publish"],
-    false,
+    resource="posts",
+    action="publish",
+    roles=["editor"],
+    permissions=["posts.publish"],
+    allow_owner=false,
   )
-  let owner_rule = @mbor.policy_rule("posts", "update", [], [], true)
+  let owner_rule = @mbor.policy_rule(
+    resource="posts",
+    action="update",
+    roles=[],
+    permissions=[],
+    allow_owner=true,
+  )
 
   println("Policy Checks")
   println(
@@ -63,7 +69,7 @@ fn print_policy_checks(identity : @mbor.Identity) -> Unit {
 fn print_session_checks(identity : @mbor.Identity) -> Unit {
   let config = @mbor.default_auth_config()
   let session = @mbor.issue_session(identity.user_id, "examples/auth_policy")
-  let cookie = @mbor.session_cookie(config, session, true)
+  let cookie = @mbor.session_cookie(config~, session~, remember_me=true)
 
   println("Session + Cookie")
   println("session id = " + session.id)

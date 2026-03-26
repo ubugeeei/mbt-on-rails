@@ -55,8 +55,8 @@ test "middleware fixtures seeds and turbo streams behave like rails runtime help
 test "production helpers render config health and logs" {
   let config = default_production_config()
   let checks = [
-    health_check("database", true, "ok"),
-    health_check("redis", false, "timeout"),
+    health_check(name="database", ok=true, detail="ok"),
+    health_check(name="redis", ok=false, detail="timeout"),
   ]
   let rule = rate_limit_rule("api", "/api", 60, 60)
   let event = log_event("info", "request completed", Some("req_1"), [

@@ -23,8 +23,8 @@ test "session helpers generate stable digests tokens and cookies" {
   assert_true(verification.token.has_prefix("verify_"))
   assert_eq(verification.expires_at, "2026-03-25T10:00:00Z+24h")
 
-  let remember = session_cookie(config, session, true)
-  let transient = session_cookie(config, session, false)
+  let remember = session_cookie(config~, session~, remember_me=true)
+  let transient = session_cookie(config~, session~, remember_me=false)
   assert_eq(remember.name, config.remember_cookie)
   assert_true(cookie_header(remember).contains("Max-Age="))
   assert_eq(transient.name, config.session_cookie)
@@ -33,8 +33,10 @@ test "session helpers generate stable digests tokens and cookies" {
 
 ///|
 test "json api and probe helpers preserve statuses and metadata" {
-  let healthy = health_response([health_check("app", true, "ok")])
-  let degraded = readiness_response([health_check("db", false, "down")])
+  let healthy = health_response([health_check(name="app", ok=true, detail="ok")])
+  let degraded = readiness_response([
+    health_check(name="db", ok=false, detail="down"),
+  ])
   let metrics = metrics_response("# TYPE requests_total counter")
   let ok = json_api_ok("posts", "42", [("title", "MoonBit")])
   let error = json_api_error(404, "not_found", "missing")
@@ -84,15 +86,20 @@ test "metrics and secrets helpers expose environment safe summaries" {
   assert_true(metrics_summary(registry).contains("job_executions_total"))
 
   let secrets = secrets_config([
-    secret_var("SHORT", Some("abc"), true, true),
+    secret_var(name="SHORT", value=Some("abc"), required=true, sensitive=true),
     secret_var(
-      "DATABASE_URL",
-      Some("postgres://app:secret@db/prod"),
-      true,
-      true,
+      name="DATABASE_URL",
+      value=Some("postgres://app:secret@db/prod"),
+      required=true,
+      sensitive=true,
     ),
-    secret_var("PUBLIC_HOST", Some("example.com"), true, false),
-    secret_var("SMTP_PASSWORD", None, true, true),
+    secret_var(
+      name="PUBLIC_HOST",
+      value=Some("example.com"),
+      required=true,
+      sensitive=false,
+    ),
+    secret_var(name="SMTP_PASSWORD", value=None, required=true, sensitive=true),
   ])
   assert_false(secrets_valid(secrets))
   assert_true(masked_secret_summary(secrets).contains("SHORT=****"))

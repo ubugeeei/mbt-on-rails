@@ -14,7 +14,10 @@ pub fn release_process(String, String, Array[String]) -> ProcessDefinition
 
 pub fn release_summary(Array[ReleaseTask]) -> String
 
-pub fn release_task(String, String, Bool) -> ReleaseTask
+#label_migration(command, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(required, allow_positional=true)
+pub fn release_task(name~ : String, command~ : String, required~ : Bool) -> ReleaseTask
 
 pub fn scheduler_process(String, String, Array[String]) -> ProcessDefinition
 

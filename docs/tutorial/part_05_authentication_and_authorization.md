@@ -36,9 +36,29 @@ Session helpers include:
 
 The current implementation is intentionally lightweight but typed.
 
+Example:
+
+```moonbit
+let cookie = session_cookie(
+  config=config,
+  session=session,
+  remember_me=true,
+)
+```
+
 ## Policy Rules
 
 Use `policy_rule(...)` and `authorize(...)` to model access checks.
+
+```moonbit
+let owner_rule = policy_rule(
+  resource="posts",
+  action="update",
+  roles=[],
+  permissions=[],
+  allow_owner=true,
+)
+```
 
 In this repository, the important design choice is:
 

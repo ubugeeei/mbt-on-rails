@@ -10,13 +10,19 @@ test "auth policy example helpers keep identities and requirements stable" {
   assert_false(@mbor.authorize(Some(current), @mbor.role_access("admin")))
 
   let publish_rule = @mbor.policy_rule(
-    "posts",
-    "publish",
-    ["editor"],
-    ["posts.publish"],
-    false,
+    resource="posts",
+    action="publish",
+    roles=["editor"],
+    permissions=["posts.publish"],
+    allow_owner=false,
   )
-  let owner_rule = @mbor.policy_rule("posts", "update", [], [], true)
+  let owner_rule = @mbor.policy_rule(
+    resource="posts",
+    action="update",
+    roles=[],
+    permissions=[],
+    allow_owner=true,
+  )
   assert_true(@mbor.allowed(Some(current), publish_rule, None))
   assert_true(@mbor.allowed(Some(current), owner_rule, Some("7")))
   assert_false(@mbor.allowed(Some(current), owner_rule, Some("9")))

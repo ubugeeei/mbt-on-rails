@@ -16,9 +16,20 @@ pub fn default_staging_config() -> DeploymentConfig
 
 pub fn default_test_config() -> DeploymentConfig
 
-pub fn deployment_config(Environment, String, Int, Bool, Bool, String?, String, String) -> DeploymentConfig
+#label_migration(asset_host, allow_positional=true)
+#label_migration(environment, allow_positional=true)
+#label_migration(force_ssl, allow_positional=true)
+#label_migration(health_path, allow_positional=true)
+#label_migration(host, allow_positional=true)
+#label_migration(port, allow_positional=true)
+#label_migration(ready_path, allow_positional=true)
+#label_migration(trust_proxy, allow_positional=true)
+pub fn deployment_config(environment~ : Environment, host~ : String, port~ : Int, force_ssl~ : Bool, trust_proxy~ : Bool, asset_host~ : String?, health_path~ : String, ready_path~ : String) -> DeploymentConfig
 
-pub fn health_check(String, Bool, String) -> HealthCheck
+#label_migration(detail, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(ok, allow_positional=true)
+pub fn health_check(name~ : String, ok~ : Bool, detail~ : String) -> HealthCheck
 
 pub fn health_response(Array[HealthCheck]) -> @http.Response
 

@@ -32,13 +32,21 @@ pub fn issue_session(String, String) -> Session
 
 pub fn permission_access(String) -> AuthRequirement
 
-pub fn policy_rule(String, String, Array[String], Array[String], Bool) -> PolicyRule
+#label_migration(action, allow_positional=true)
+#label_migration(allow_owner, allow_positional=true)
+#label_migration(permissions, allow_positional=true)
+#label_migration(resource, allow_positional=true)
+#label_migration(roles, allow_positional=true)
+pub fn policy_rule(resource~ : String, action~ : String, roles~ : Array[String], permissions~ : Array[String], allow_owner~ : Bool) -> PolicyRule
 
 pub fn render_auth_requirement(AuthRequirement) -> String
 
 pub fn role_access(String) -> AuthRequirement
 
-pub fn session_cookie(AuthConfig, Session, Bool) -> AuthCookie
+#label_migration(config, allow_positional=true)
+#label_migration(remember_me, allow_positional=true)
+#label_migration(session, allow_positional=true)
+pub fn session_cookie(config~ : AuthConfig, session~ : Session, remember_me~ : Bool) -> AuthCookie
 
 pub fn verify_password(String, String, String) -> Bool
 
