@@ -108,6 +108,52 @@ fn print_migration_example(model : @mbor.ModelSchema) -> Unit {
 }
 
 ///|
+/// Builds one schema-shaped row used to demonstrate typed casting helpers.
+fn typed_post_row() -> @mbor.Record {
+  @mbor.record("posts", [
+    ("id", "42"),
+    ("title", "MoonBit on Rails"),
+    ("body", "Typed attributes keep transport explicit."),
+    ("author_id", "7"),
+    ("created_at", "2026-03-27T00:00:00Z"),
+    ("updated_at", "2026-03-27T00:05:00Z"),
+  ])
+}
+
+///|
+/// Prints typed attribute casting and error reporting for one schema-backed row.
+fn print_typed_attribute_example(model : @mbor.ModelSchema) -> Unit {
+  println("Typed Attributes")
+  let casted = @mbor.cast_record(model, typed_post_row())
+  match casted.typed_record() {
+    Some(current) => {
+      println(
+        "author_id type = " +
+        @mbor.attribute_type_name(@mbor.references_column("author_id", "users")),
+      )
+      println(current.to_json())
+    }
+    None =>
+      for error in casted.errors() {
+        println("- " + error.message())
+      }
+  }
+  println("")
+  println("Typed Attribute Error")
+  let serialized = @mbor.serialize_record_json(
+    model,
+    @mbor.record("posts", [("author_id", "oops")]),
+  )
+  match serialized.json() {
+    Some(json) => println(json)
+    None =>
+      for error in serialized.errors() {
+        println("- " + error.message())
+      }
+  }
+}
+
+///|
 /// Prints in-memory validation behavior for one invalid record.
 fn print_memory_example(model : @mbor.ModelSchema) -> Unit {
   let db = @mbor.insert_record(
@@ -142,6 +188,8 @@ fn run_example() -> Unit {
   print_relation_example(model)
   println("")
   print_migration_example(model)
+  println("")
+  print_typed_attribute_example(model)
   println("")
   print_memory_example(model)
 }

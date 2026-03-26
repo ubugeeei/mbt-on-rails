@@ -12,6 +12,10 @@ pub fn after_destroy(String) -> Callback
 
 pub fn after_save(String) -> Callback
 
+pub fn attribute_cast_error(String, String, String?, String) -> AttributeCastError
+
+pub fn attribute_type_name(Column) -> String
+
 pub fn before_create(String) -> Callback
 
 pub fn before_destroy(String) -> Callback
@@ -28,6 +32,8 @@ pub fn begin_transaction(MemoryDatabase) -> MemoryTransaction
 pub fn belongs_to(name~ : String, target~ : String, foreign_key~ : String) -> Association
 
 pub fn boolean_column(String) -> Column
+
+pub fn cast_record(ModelSchema, Record) -> CastRecordOutcome
 
 pub fn column_definition_sql(Column) -> String
 
@@ -52,6 +58,8 @@ pub fn distinct_records(Relation) -> Relation
 pub fn empty_memory_database() -> MemoryDatabase
 
 pub fn exists_sql(Relation) -> String
+
+pub fn find_column(ModelSchema, String) -> Column?
 
 pub fn find_record_by_primary_key(ModelSchema, MemoryDatabase, String) -> Record?
 
@@ -139,6 +147,8 @@ pub fn scope(name~ : String, relation~ : Relation) -> ScopeDefinition
 
 pub fn select_columns(Relation, Array[String]) -> Relation
 
+pub fn serialize_record_json(ModelSchema, Record) -> SerializeRecordOutcome
+
 pub fn string_column(String) -> Column
 
 pub fn text_column(String) -> Column
@@ -148,6 +158,10 @@ pub fn timestamp_column(String) -> Column
 pub fn transaction_insert(MemoryTransaction, Record) -> MemoryTransaction
 
 pub fn transaction_save(ModelSchema, MemoryTransaction, Record) -> TransactionSaveOutcome
+
+pub fn typed_field(String, AttributeValue) -> TypedField
+
+pub fn typed_record(String, Array[TypedField]) -> TypedRecord
 
 pub fn unique(Column) -> Column
 
@@ -246,10 +260,42 @@ pub enum AssociationKind {
 pub impl Eq for AssociationKind
 pub impl Show for AssociationKind
 
+pub struct AttributeCastError {
+  attribute : String
+  expected_type : String
+  value : String?
+  detail : String
+}
+pub fn AttributeCastError::message(Self) -> String
+pub impl Eq for AttributeCastError
+pub impl Show for AttributeCastError
+
+pub enum AttributeValue {
+  StringAttribute(String)
+  IntegerAttribute(Int)
+  BooleanAttribute(Bool)
+  TimestampAttribute(String)
+  JsonAttribute(String)
+  NullAttribute
+}
+pub fn AttributeValue::json_value(Self) -> String
+pub fn AttributeValue::record_value(Self) -> String?
+pub impl Eq for AttributeValue
+pub impl Show for AttributeValue
+
 pub struct Callback {
   hook : LifecycleHook
   function_name : String
 }
+
+pub enum CastRecordOutcome {
+  CastedRecord(TypedRecord)
+  CastRecordFailed(Array[AttributeCastError])
+}
+pub fn CastRecordOutcome::errors(Self) -> Array[AttributeCastError]
+pub fn CastRecordOutcome::typed_record(Self) -> TypedRecord?
+pub impl Eq for CastRecordOutcome
+pub impl Show for CastRecordOutcome
 
 pub struct Column {
   name : String
@@ -423,6 +469,15 @@ pub struct ScopeDefinition {
   relation : Relation
 }
 
+pub enum SerializeRecordOutcome {
+  SerializedRecordJson(String)
+  SerializeRecordFailed(Array[AttributeCastError])
+}
+pub fn SerializeRecordOutcome::errors(Self) -> Array[AttributeCastError]
+pub fn SerializeRecordOutcome::json(Self) -> String?
+pub impl Eq for SerializeRecordOutcome
+pub impl Show for SerializeRecordOutcome
+
 pub enum TransactionSaveOutcome {
   TransactionSaved(MemoryTransaction, Record)
   TransactionValidationFailed(MemoryTransaction, ValidationErrors)
@@ -432,6 +487,22 @@ pub struct TransactionSavepoint {
   name : String
   database : MemoryDatabase
 }
+
+pub struct TypedField {
+  name : String
+  value : AttributeValue
+}
+pub impl Eq for TypedField
+pub impl Show for TypedField
+
+pub struct TypedRecord {
+  table : String
+  fields : Array[TypedField]
+}
+pub fn TypedRecord::to_json(Self) -> String
+pub fn TypedRecord::to_record(Self) -> Record
+pub impl Eq for TypedRecord
+pub impl Show for TypedRecord
 
 pub struct Validation {
   field : String

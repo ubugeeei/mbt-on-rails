@@ -68,6 +68,25 @@ test "orm migration example builders keep relation migration and validation stab
     ),
   )
 
+  let casted = @mbor.cast_record(schema, typed_post_row())
+  match casted.typed_record() {
+    Some(current) => {
+      assert_eq(current.fields.length(), 6)
+      assert_true(current.to_json().contains("\"author_id\": 7"))
+    }
+    None => assert_true(false)
+  }
+  let serialized = @mbor.serialize_record_json(
+    schema,
+    @mbor.record("posts", [("author_id", "oops")]),
+  )
+  assert_eq(serialized.json(), None)
+  let errors = serialized.errors()
+  assert_eq(errors.length(), 1)
+  assert_true(
+    errors[0].message().contains("author_id expected Int but got oops"),
+  )
+
   let db = @mbor.insert_record(
     @mbor.empty_memory_database(),
     @mbor.record("posts", [("slug", "first-post")]),
@@ -83,6 +102,7 @@ test "orm migration example print helpers and main smoke stay runnable" {
   let schema = post_model()
   print_relation_example(schema)
   print_migration_example(schema)
+  print_typed_attribute_example(schema)
   print_memory_example(schema)
   run_example()
   assert_true(true)

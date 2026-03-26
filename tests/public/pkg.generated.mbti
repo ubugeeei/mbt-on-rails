@@ -104,6 +104,10 @@ pub fn asset_manifest(style_urls~ : Array[String], script_urls~ : Array[String])
 
 pub fn async_adapter() -> @job.JobAdapter
 
+pub fn attribute_cast_error(String, String, String?, String) -> @active_record.AttributeCastError
+
+pub fn attribute_type_name(@active_record.Column) -> String
+
 pub fn auth_guest_only() -> @auth.AuthRequirement
 
 pub fn auth_public() -> @auth.AuthRequirement
@@ -183,6 +187,8 @@ pub fn cache_summary(@cache.CacheStore) -> String
 pub fn cache_write(@cache.CacheStore, String, String, String?, String?, Array[String]) -> @cache.CacheStore
 
 pub fn cache_write_with_notifications(store~ : @cache.CacheStore, key~ : String, value~ : String, version~ : String?, expires_at~ : String?, tags~ : Array[String], notifications~ : @support.Notifications) -> (@cache.CacheStore, @support.Notifications)
+
+pub fn cast_record(@active_record.ModelSchema, @active_record.Record) -> @active_record.CastRecordOutcome
 
 pub fn change_default_step(String, String, String?, String?) -> @migration.MigrationStep
 
@@ -365,6 +371,8 @@ pub fn escape_html(String) -> String
 pub fn execute_sql_step(String) -> @migration.MigrationStep
 
 pub fn exists_sql(@active_record.Relation) -> String
+
+pub fn find_column(@active_record.ModelSchema, String) -> @active_record.Column?
 
 pub fn find_cookie(Array[(String, String)], String) -> String?
 
@@ -943,6 +951,8 @@ pub fn serialize_job(@job.EnqueuedJob, @job.JobAdapter) -> @job.SerializedJob
 
 pub fn serialize_payload(Array[(String, String)]) -> String
 
+pub fn serialize_record_json(@active_record.ModelSchema, @active_record.Record) -> @active_record.SerializeRecordOutcome
+
 #label_migration(adapter, allow_positional=true)
 #label_migration(attempts, allow_positional=true)
 #label_migration(definition, allow_positional=true)
@@ -1045,6 +1055,10 @@ pub fn transaction_save(@active_record.ModelSchema, @active_record.MemoryTransac
 pub fn turbo_stream(@turbo.TurboStreamAction, String, String) -> @turbo.TurboStream
 
 pub fn turbo_stream_format() -> @controller.ResponseFormat
+
+pub fn typed_field(String, @active_record.AttributeValue) -> @active_record.TypedField
+
+pub fn typed_record(String, Array[@active_record.TypedField]) -> @active_record.TypedRecord
 
 pub fn typed_text_response(Int, String, String) -> @http.Response
 
@@ -1234,6 +1248,10 @@ pub using @active_record {type Association}
 
 pub using @active_record {type AssociationKind}
 
+pub using @active_record {type AttributeCastError}
+
+pub using @active_record {type AttributeValue}
+
 pub using @auth {type AuthConfig}
 
 pub using @auth {type AuthCookie}
@@ -1255,6 +1273,8 @@ pub using @cache {type CacheFetchResult}
 pub using @cache {type CacheStore}
 
 pub using @active_record {type Callback}
+
+pub using @active_record {type CastRecordOutcome}
 
 pub using @active_record {type Column}
 
@@ -1444,6 +1464,8 @@ pub using @secrets {type SecretsConfig}
 
 pub using @fixture {type SeedPlan}
 
+pub using @active_record {type SerializeRecordOutcome}
+
 pub using @job {type SerializedJob}
 
 pub using @view {type ServerAction}
@@ -1471,6 +1493,10 @@ pub using @active_record {type TransactionSavepoint}
 pub using @turbo {type TurboStream}
 
 pub using @turbo {type TurboStreamAction}
+
+pub using @active_record {type TypedField}
+
+pub using @active_record {type TypedRecord}
 
 pub using @active_record {type Validation}
 
