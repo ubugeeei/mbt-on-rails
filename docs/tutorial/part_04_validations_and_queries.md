@@ -61,17 +61,36 @@ This repo ships an in-memory store for testing and examples:
 - `find_records(...)`
 - `save_record(...)`
 - `validate_record(...)`
+- `begin_transaction(...)`
+- `create_savepoint(...)`
+- `transaction_save(...)`
+
+Dirty tracking is also explicit:
+
+- `dirty_record(...)`
+- `dirty_new_record(...)`
+- `record.track_changes(...)`
+- `.changed_fields()`
+- `.attribute_was(...)`
+- `.clear_changes_information()`
 
 This makes the tutorial runnable without needing a real database adapter.
 
+Example:
+
+```moonbit
+let dirty = original_record.track_changes(updated_record)
+let tx = empty_memory_database()
+  .begin_transaction()
+  .insert(updated_record)
+  .savepoint("after_insert")
+```
+
 ## Rails Gap
 
-This is one of the largest open gaps versus Rails:
-
-- no transaction layer yet
-- no dirty tracking yet
 - no full query interface yet
 - no callback chain execution yet
+- no database adapter abstraction yet
 
 See [`../rails_alignment.md`](../rails_alignment.md).
 

@@ -100,6 +100,8 @@ pub fn before_save(String) -> @active_record.Callback
 
 pub fn before_validation(String) -> @active_record.Callback
 
+pub fn begin_transaction(@active_record.MemoryDatabase) -> @active_record.MemoryTransaction
+
 #label_migration(foreign_key, allow_positional=true)
 #label_migration(name, allow_positional=true)
 #label_migration(target, allow_positional=true)
@@ -165,6 +167,8 @@ pub fn[T] clone_array(Array[T]) -> Array[T]
 
 pub fn column_definition_sql(@active_record.Column) -> String
 
+pub fn commit_transaction(@active_record.MemoryTransaction) -> @active_record.MemoryDatabase
+
 pub fn compose_mail(@mailer.MailerDefinition, String, Array[String], Array[(String, String)]) -> @mailer.MailDelivery?
 
 pub fn compose_mail_with_notifications(mailer~ : @mailer.MailerDefinition, action_name~ : String, to~ : Array[String], assigns~ : Array[(String, String)], notifications~ : @support.Notifications) -> (@mailer.MailDelivery?, @support.Notifications)
@@ -187,6 +191,8 @@ pub fn cookie_header(@auth.AuthCookie) -> String
 pub fn count_sql(@active_record.Relation) -> String
 
 pub fn counter(String, Array[(String, String)], Int) -> @metrics.MetricSample
+
+pub fn create_savepoint(@active_record.MemoryTransaction, String) -> @active_record.MemoryTransaction
 
 pub fn create_table_sql(@active_record.ModelSchema) -> String
 
@@ -229,6 +235,10 @@ pub fn demo_blog_app() -> @app.MbtOnRailsApp
 pub fn deployment_config(environment~ : @production.Environment, host~ : String, port~ : Int, force_ssl~ : Bool, trust_proxy~ : Bool, asset_host~ : String?, health_path~ : String, ready_path~ : String) -> @production.DeploymentConfig
 
 pub fn digest_password(String, String) -> String
+
+pub fn dirty_new_record(@active_record.Record) -> @active_record.DirtyRecord
+
+pub fn dirty_record(@active_record.Record, @active_record.Record) -> @active_record.DirtyRecord
 
 #label_migration(exception_name, allow_positional=true)
 pub fn discard_on(exception_name~ : String, report? : Bool) -> @job.JobFailurePolicy
@@ -699,6 +709,10 @@ pub fn reversible_step(String, String) -> @migration.MigrationStep
 
 pub fn role_access(String) -> @auth.AuthRequirement
 
+pub fn rollback_to_savepoint(@active_record.MemoryTransaction, String) -> @active_record.MemoryTransaction
+
+pub fn rollback_transaction(@active_record.MemoryTransaction) -> @active_record.MemoryDatabase
+
 #label_migration(action, allow_positional=true)
 #label_migration(controller, allow_positional=true)
 #label_migration(name, allow_positional=true)
@@ -789,6 +803,10 @@ pub fn text_column(String) -> @active_record.Column
 pub fn timestamp_column(String) -> @active_record.Column
 
 pub fn touch_cache_step(String) -> @controller.ActionStep
+
+pub fn transaction_insert(@active_record.MemoryTransaction, @active_record.Record) -> @active_record.MemoryTransaction
+
+pub fn transaction_save(@active_record.ModelSchema, @active_record.MemoryTransaction, @active_record.Record) -> @active_record.TransactionSaveOutcome
 
 pub fn turbo_stream(@turbo.TurboStreamAction, String, String) -> @turbo.TurboStream
 
@@ -977,6 +995,10 @@ pub using @controller {type ControllerDefinition}
 
 pub using @production {type DeploymentConfig}
 
+pub using @active_record {type DirtyFieldChange}
+
+pub using @active_record {type DirtyRecord}
+
 pub using @job {type DrainedJobs}
 
 pub using @view {type DynamicMode}
@@ -1038,6 +1060,8 @@ pub using @support {type MbtvPath}
 pub using @active_record {type MemoryDatabase}
 
 pub using @active_record {type MemoryTable}
+
+pub using @active_record {type MemoryTransaction}
 
 pub using @metrics {type MetricKind}
 
@@ -1134,6 +1158,10 @@ pub using @auth {type Session}
 pub using @view {type SuspenseBoundary}
 
 pub using @view {type TemplateImport}
+
+pub using @active_record {type TransactionSaveOutcome}
+
+pub using @active_record {type TransactionSavepoint}
 
 pub using @turbo {type TurboStream}
 

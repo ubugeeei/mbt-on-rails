@@ -58,11 +58,18 @@ The source audit in this batch was anchored to the official Rails repository at:
 - `analyze_migration(...)`, `migration_risk_level(...)`, and `migration_safety_summary(...)` add a Strong Migrations-style safety pass so deploy-hostile steps are surfaced early
 - The ORM example and tutorial now show the phased nullable/backfill/default/index pattern instead of only raw create-table output
 
+## Sixth batch added here
+
+- `DirtyRecord` and `DirtyFieldChange` now model Active Record-style change tracking against explicit record snapshots
+- `dirty_record(...)`, `dirty_new_record(...)`, and `Record::track_changes(...)` surface field-level diffs such as added, removed, and updated attributes
+- The in-memory adapter now includes a transaction surface with `begin_transaction(...)`, savepoints, rollback, commit, and validation-aware `transaction_save(...)`
+- Public tests now lock in savepoint rollback behavior and dirty-state reset semantics
+
 ## Biggest gaps still open
 
 - `activesupport`: concern/autoloading/deprecation/timezones/notifications subscribers
 - `activemodel`: typed attributes/serialization/validator objects
-- `activerecord`: transactions/dirty tracking/query interface/scopes/callback chains
+- `activerecord`: query interface/scopes/callback chains/database adapters
 - `actionpack`: cookies/session store/responders/after_action/around_action/request forgery strategy
 - `actionview`: partials/helpers/form builders/template lookup
 - `activejob`: adapters/serialization

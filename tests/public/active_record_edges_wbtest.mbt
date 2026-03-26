@@ -195,3 +195,117 @@ test "save_record persists valid rows and preserves other tables" {
     ValidationFailed(_) => assert_true(false)
   }
 }
+
+///|
+test "dirty tracking reports changed removed and added attributes" {
+  let original = record("accounts", [
+    ("title", "Launch"),
+    ("state", "draft"),
+    ("summary", "brief"),
+  ])
+  let current = record("accounts", [
+    ("title", "Shipped"),
+    ("summary", "brief"),
+    ("slug", "launch"),
+  ])
+
+  let dirty = original.track_changes(current)
+  assert_true(dirty.changed())
+  assert_eq(dirty.changed_fields(), ["title", "state", "slug"])
+  assert_true(dirty.attribute_changed("state"))
+  assert_eq(dirty.attribute_was("state"), Some("draft"))
+  assert_eq(dirty.attribute_was("summary"), Some("brief"))
+  assert_true(dirty.changes_summary().contains("title: Launch -> Shipped"))
+  assert_true(dirty.changes_summary().contains("state: draft -> <unset>"))
+  assert_true(dirty.changes_summary().contains("slug: <unset> -> launch"))
+
+  match dirty.change_for("title") {
+    Some(change) => {
+      assert_eq(change.before, Some("Launch"))
+      assert_eq(change.after, Some("Shipped"))
+    }
+    None => assert_true(false)
+  }
+
+  let applied = dirty.apply()
+  assert_eq(applied.table, "accounts")
+  assert_eq(applied.fields.length(), 3)
+
+  let persisted = dirty.clear_changes_information()
+  assert_false(persisted.changed())
+  assert_eq(persisted.changed_fields().length(), 0)
+  assert_eq(persisted.attribute_was("slug"), Some("launch"))
+
+  let created = dirty_new_record(record("accounts", [("slug", "fresh")]))
+  assert_true(created.changed())
+  assert_true(created.changes_summary().contains("slug: <unset> -> fresh"))
+}
+
+///|
+test "memory transactions support savepoints rollback and validation-aware saves" {
+  let schema = account_schema()
+  let db = insert_record(
+    empty_memory_database(),
+    record("accounts", [("slug", "taken")]),
+  )
+  let staged = db
+    .begin_transaction()
+    .insert(record("accounts", [("slug", "draft")]))
+    .savepoint("after_draft")
+    .insert(record("accounts", [("slug", "temp")]))
+
+  assert_eq(staged.find_records("accounts", "slug", "draft").length(), 1)
+  assert_eq(staged.find_records("accounts", "slug", "temp").length(), 1)
+
+  let rolled = staged.rollback_to("after_draft")
+  assert_eq(rolled.find_records("accounts", "slug", "draft").length(), 1)
+  assert_eq(rolled.find_records("accounts", "slug", "temp").length(), 0)
+
+  let invalid = record("accounts", [
+    ("title", "Launch"),
+    ("category", "announcements"),
+    ("slug", "taken"),
+    ("body", "Long enough body"),
+    ("summary", "brief"),
+    ("state", "published"),
+    ("password", "secret"),
+    ("password_confirmation", "secret"),
+    ("email", "hello@example.com"),
+  ])
+
+  match rolled.save(schema, invalid) {
+    TransactionValidationFailed(same_tx, errors) => {
+      assert_true(errors.full_messages().contains("slug must be unique"))
+      assert_eq(same_tx.find_records("accounts", "slug", "taken").length(), 1)
+      assert_eq(same_tx.find_records("accounts", "slug", "draft").length(), 1)
+    }
+    TransactionSaved(_, _) => assert_true(false)
+  }
+
+  let valid = record("accounts", [
+    ("title", "Launch"),
+    ("category", "announcements"),
+    ("slug", "fresh"),
+    ("body", "Long enough body"),
+    ("summary", "brief"),
+    ("state", "published"),
+    ("password", "secret"),
+    ("password_confirmation", "secret"),
+    ("email", "hello@example.com"),
+  ])
+
+  match rolled.save(schema, valid) {
+    TransactionSaved(saved_tx, saved) => {
+      assert_eq(saved.table, "accounts")
+      let committed = saved_tx.commit()
+      assert_eq(
+        find_records(committed, "accounts", "slug", "fresh").length(),
+        1,
+      )
+      let reverted = saved_tx.rollback()
+      assert_eq(find_records(reverted, "accounts", "slug", "fresh").length(), 0)
+      assert_eq(find_records(reverted, "accounts", "slug", "draft").length(), 0)
+    }
+    TransactionValidationFailed(_, _) => assert_true(false)
+  }
+}

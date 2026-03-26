@@ -20,6 +20,8 @@ pub fn before_save(String) -> Callback
 
 pub fn before_validation(String) -> Callback
 
+pub fn begin_transaction(MemoryDatabase) -> MemoryTransaction
+
 #label_migration(foreign_key, allow_positional=true)
 #label_migration(name, allow_positional=true)
 #label_migration(target, allow_positional=true)
@@ -29,11 +31,19 @@ pub fn boolean_column(String) -> Column
 
 pub fn column_definition_sql(Column) -> String
 
+pub fn commit_transaction(MemoryTransaction) -> MemoryDatabase
+
 pub fn count_sql(Relation) -> String
+
+pub fn create_savepoint(MemoryTransaction, String) -> MemoryTransaction
 
 pub fn create_table_sql(ModelSchema) -> String
 
 pub fn delete_sql(ModelSchema, String) -> String
+
+pub fn dirty_new_record(Record) -> DirtyRecord
+
+pub fn dirty_record(Record, Record) -> DirtyRecord
 
 pub fn empty_memory_database() -> MemoryDatabase
 
@@ -91,6 +101,10 @@ pub fn relation_for(ModelSchema) -> Relation
 
 pub fn relation_to_sql(Relation) -> String
 
+pub fn rollback_to_savepoint(MemoryTransaction, String) -> MemoryTransaction
+
+pub fn rollback_transaction(MemoryTransaction) -> MemoryDatabase
+
 pub fn save_record(ModelSchema, MemoryDatabase, Record) -> SaveOutcome
 
 pub fn schema_dump(Array[ModelSchema]) -> String
@@ -102,6 +116,10 @@ pub fn string_column(String) -> Column
 pub fn text_column(String) -> Column
 
 pub fn timestamp_column(String) -> Column
+
+pub fn transaction_insert(MemoryTransaction, Record) -> MemoryTransaction
+
+pub fn transaction_save(ModelSchema, MemoryTransaction, Record) -> TransactionSaveOutcome
 
 pub fn unique(Column) -> Column
 
@@ -224,6 +242,27 @@ pub enum ColumnType {
 pub impl Eq for ColumnType
 pub impl Show for ColumnType
 
+pub struct DirtyFieldChange {
+  attribute : String
+  before : String?
+  after : String?
+}
+
+pub struct DirtyRecord {
+  table : String
+  original_fields : Array[(String, String)]
+  current_fields : Array[(String, String)]
+  changes : Array[DirtyFieldChange]
+}
+pub fn DirtyRecord::apply(Self) -> Record
+pub fn DirtyRecord::attribute_changed(Self, String) -> Bool
+pub fn DirtyRecord::attribute_was(Self, String) -> String?
+pub fn DirtyRecord::change_for(Self, String) -> DirtyFieldChange?
+pub fn DirtyRecord::changed(Self) -> Bool
+pub fn DirtyRecord::changed_fields(Self) -> Array[String]
+pub fn DirtyRecord::changes_summary(Self) -> String
+pub fn DirtyRecord::clear_changes_information(Self) -> Self
+
 pub enum LifecycleHook {
   BeforeValidation
   BeforeCreate
@@ -239,11 +278,25 @@ pub impl Show for LifecycleHook
 pub struct MemoryDatabase {
   tables : Array[MemoryTable]
 }
+pub fn MemoryDatabase::begin_transaction(Self) -> MemoryTransaction
 
 pub struct MemoryTable {
   name : String
   rows : Array[Record]
 }
+
+pub struct MemoryTransaction {
+  original_database : MemoryDatabase
+  database : MemoryDatabase
+  savepoints : Array[TransactionSavepoint]
+}
+pub fn MemoryTransaction::commit(Self) -> MemoryDatabase
+pub fn MemoryTransaction::find_records(Self, String, String, String) -> Array[Record]
+pub fn MemoryTransaction::insert(Self, Record) -> Self
+pub fn MemoryTransaction::rollback(Self) -> MemoryDatabase
+pub fn MemoryTransaction::rollback_to(Self, String) -> Self
+pub fn MemoryTransaction::save(Self, ModelSchema, Record) -> TransactionSaveOutcome
+pub fn MemoryTransaction::savepoint(Self, String) -> Self
 
 pub struct ModelSchema {
   name : String
@@ -280,6 +333,7 @@ pub struct Record {
   table : String
   fields : Array[(String, String)]
 }
+pub fn Record::track_changes(Self, Self) -> DirtyRecord
 
 pub struct Relation {
   table : String
@@ -308,6 +362,16 @@ pub fn Relation::where_raw(Self, String) -> Self
 pub enum SaveOutcome {
   Saved(MemoryDatabase, Record)
   ValidationFailed(ValidationErrors)
+}
+
+pub enum TransactionSaveOutcome {
+  TransactionSaved(MemoryTransaction, Record)
+  TransactionValidationFailed(MemoryTransaction, ValidationErrors)
+}
+
+pub struct TransactionSavepoint {
+  name : String
+  database : MemoryDatabase
 }
 
 pub struct Validation {
