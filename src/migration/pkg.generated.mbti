@@ -6,7 +6,11 @@ import {
 }
 
 // Values
+pub fn add_check_constraint_step(String, String, String, validate? : Bool) -> MigrationStep
+
 pub fn add_column_step(String, @active_record.Column) -> MigrationStep
+
+pub fn add_foreign_key_step(String, String, String, validate? : Bool, on_delete? : String?) -> MigrationStep
 
 pub fn add_index_concurrently_step(String, String, Bool) -> MigrationStep
 
@@ -51,7 +55,11 @@ pub fn migration_sql(Migration) -> Array[String]
 
 pub fn migration_up_sql(Migration) -> Array[String]
 
+pub fn remove_check_constraint_step(String, String, expression? : String?, validate? : Bool) -> MigrationStep
+
 pub fn remove_column_step(String, String) -> MigrationStep
+
+pub fn remove_foreign_key_step(String, String, String, validate? : Bool, on_delete? : String?) -> MigrationStep
 
 pub fn remove_index_concurrently_step(String, String, unique? : Bool) -> MigrationStep
 
@@ -65,6 +73,10 @@ pub fn reversible_step(String, String) -> MigrationStep
 
 pub fn schema_sql(Array[Migration]) -> Array[String]
 
+pub fn validate_check_constraint_step(String, String) -> MigrationStep
+
+pub fn validate_foreign_key_step(String, String, String) -> MigrationStep
+
 // Errors
 
 // Types and methods
@@ -73,7 +85,9 @@ pub struct Migration {
   name : String
   steps : Array[MigrationStep]
 }
+pub fn Migration::add_check_constraint(Self, String, String, String, validate? : Bool) -> Self
 pub fn Migration::add_column(Self, String, @active_record.Column) -> Self
+pub fn Migration::add_foreign_key(Self, String, String, String, validate? : Bool, on_delete? : String?) -> Self
 pub fn Migration::add_index(Self, String, String, Bool) -> Self
 pub fn Migration::add_index_concurrently(Self, String, String, Bool) -> Self
 pub fn Migration::add_reference(Self, String, String, String, nullable? : Bool, unique? : Bool, default_value? : String?) -> Self
@@ -83,12 +97,16 @@ pub fn Migration::change_null(Self, String, String, Bool, backfill_value? : Stri
 pub fn Migration::create_table(Self, @active_record.ModelSchema) -> Self
 pub fn Migration::drop_table(Self, String) -> Self
 pub fn Migration::execute_sql(Self, String) -> Self
+pub fn Migration::remove_check_constraint(Self, String, String, expression? : String?, validate? : Bool) -> Self
 pub fn Migration::remove_column(Self, String, String) -> Self
+pub fn Migration::remove_foreign_key(Self, String, String, String, validate? : Bool, on_delete? : String?) -> Self
 pub fn Migration::remove_index(Self, String, String, unique? : Bool) -> Self
 pub fn Migration::remove_index_concurrently(Self, String, String, unique? : Bool) -> Self
 pub fn Migration::rename_column(Self, String, String, String) -> Self
 pub fn Migration::rename_table(Self, String, String) -> Self
 pub fn Migration::reversible(Self, String, String) -> Self
+pub fn Migration::validate_check_constraint(Self, String, String) -> Self
+pub fn Migration::validate_foreign_key(Self, String, String, String) -> Self
 pub fn Migration::with_step(Self, MigrationStep) -> Self
 
 pub struct MigrationSafetyIssue {
@@ -122,6 +140,12 @@ pub enum MigrationStep {
   ChangeColumnNull(String, String, Bool, String?)
   RenameTable(String, String)
   DropTable(String)
+  AddCheckConstraint(String, String, String, Bool)
+  ValidateCheckConstraint(String, String)
+  RemoveCheckConstraint(String, String, String?, Bool)
+  AddForeignKey(String, String, String, Bool, String?)
+  ValidateForeignKey(String, String, String)
+  RemoveForeignKey(String, String, String, Bool, String?)
   ExecuteSql(String)
   Reversible(String, String)
 }

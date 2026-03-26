@@ -33,7 +33,11 @@ pub fn action(String, Array[@controller.ActionStep], String?, Bool, Array[String
 
 pub fn action_plan(String) -> @controller.ActionDefinition
 
+pub fn add_check_constraint_step(String, String, String, validate? : Bool) -> @migration.MigrationStep
+
 pub fn add_column_step(String, @active_record.Column) -> @migration.MigrationStep
+
+pub fn add_foreign_key_step(String, String, String, validate? : Bool, on_delete? : String?) -> @migration.MigrationStep
 
 pub fn add_index_concurrently_step(String, String, Bool) -> @migration.MigrationStep
 
@@ -771,7 +775,11 @@ pub fn release_summary(Array[@process.ReleaseTask]) -> String
 #label_migration(required, allow_positional=true)
 pub fn release_task(name~ : String, command~ : String, required~ : Bool) -> @process.ReleaseTask
 
+pub fn remove_check_constraint_step(String, String, expression? : String?, validate? : Bool) -> @migration.MigrationStep
+
 pub fn remove_column_step(String, String) -> @migration.MigrationStep
+
+pub fn remove_foreign_key_step(String, String, String, validate? : Bool, on_delete? : String?) -> @migration.MigrationStep
 
 pub fn remove_index_concurrently_step(String, String, unique? : Bool) -> @migration.MigrationStep
 
@@ -1056,7 +1064,11 @@ pub fn use_id(String, Int) -> String
 
 pub fn[T] use_template_ref(String) -> @view.TemplateRef[T]
 
+pub fn validate_check_constraint_step(String, String) -> @migration.MigrationStep
+
 pub fn validate_component_tree(@view.VaporComponentRef) -> Array[String]
+
+pub fn validate_foreign_key_step(String, String, String) -> @migration.MigrationStep
 
 pub fn validate_object(@validation.ObjectSchema, Array[(String, String)]) -> @validation.ValidationReport
 
