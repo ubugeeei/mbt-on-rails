@@ -14,13 +14,31 @@ pub fn auth_summary(AuthConfig) -> String
 
 pub fn authorize(Identity?, AuthRequirement) -> Bool
 
+#label_migration(key, allow_positional=true)
+pub fn cache_session_store(key~ : String, expire_after_seconds? : Int?, secure? : Bool, http_only? : Bool, same_site? : CookieSameSite, path? : String, domain? : String?, renew? : Bool) -> SessionStore
+
 pub fn cookie_header(AuthCookie) -> String
+
+pub fn cookie_same_site_lax() -> CookieSameSite
+
+pub fn cookie_same_site_none() -> CookieSameSite
+
+pub fn cookie_same_site_strict() -> CookieSameSite
+
+#label_migration(key, allow_positional=true)
+pub fn cookie_session_store(key~ : String, expire_after_seconds? : Int?, secure? : Bool, http_only? : Bool, same_site? : CookieSameSite, signed? : Bool, path? : String, domain? : String?, renew? : Bool, signing_secret? : String?) -> SessionStore
 
 pub fn csrf_valid(Session?, String?) -> Bool
 
 pub fn default_auth_config() -> AuthConfig
 
 pub fn digest_password(String, String) -> String
+
+pub fn disabled_session_store() -> SessionStore
+
+pub fn find_cookie(Array[(String, String)], String) -> String?
+
+pub fn forgery_strategy_summary(RequestForgeryStrategy) -> String
 
 pub fn identity(String, String, String, Array[String], String?) -> Identity
 
@@ -29,6 +47,8 @@ pub fn issue_email_verification(String, String, String) -> EmailVerificationToke
 pub fn issue_password_reset(String, String, String) -> PasswordResetToken
 
 pub fn issue_session(String, String) -> Session
+
+pub fn parse_cookie_header(String) -> Array[(String, String)]
 
 pub fn permission_access(String) -> AuthRequirement
 
@@ -39,7 +59,18 @@ pub fn permission_access(String) -> AuthRequirement
 #label_migration(roles, allow_positional=true)
 pub fn policy_rule(resource~ : String, action~ : String, roles~ : Array[String], permissions~ : Array[String], allow_owner~ : Bool) -> PolicyRule
 
+pub fn protect_from_forgery(Session?, String?, RequestForgeryStrategy) -> RequestForgeryOutcome
+
+#label_migration(key, allow_positional=true)
+pub fn redis_session_store(key~ : String, expire_after_seconds? : Int?, secure? : Bool, http_only? : Bool, same_site? : CookieSameSite, path? : String, domain? : String?, renew? : Bool) -> SessionStore
+
 pub fn render_auth_requirement(AuthRequirement) -> String
+
+pub fn request_forgery_exception() -> RequestForgeryStrategy
+
+pub fn request_forgery_null_session() -> RequestForgeryStrategy
+
+pub fn request_forgery_reset_session() -> RequestForgeryStrategy
 
 pub fn role_access(String) -> AuthRequirement
 
@@ -48,7 +79,26 @@ pub fn role_access(String) -> AuthRequirement
 #label_migration(session, allow_positional=true)
 pub fn session_cookie(config~ : AuthConfig, session~ : Session, remember_me~ : Bool) -> AuthCookie
 
+#label_migration(session, allow_positional=true)
+#label_migration(store, allow_positional=true)
+pub fn session_cookie_with_store(store~ : SessionStore, session~ : Session) -> AuthCookie
+
+#label_migration(config, allow_positional=true)
+#label_migration(remember_me, allow_positional=true)
+pub fn session_store_for_config(config~ : AuthConfig, remember_me~ : Bool) -> SessionStore
+
+pub fn session_store_summary(SessionStore) -> String
+
+pub fn sign_cookie_value(String, String, String) -> String
+
+#label_migration(name, allow_positional=true)
+#label_migration(secret, allow_positional=true)
+#label_migration(value, allow_positional=true)
+pub fn signed_cookie(name~ : String, value~ : String, secret~ : String, path? : String, domain? : String?, http_only? : Bool, secure? : Bool, same_site? : CookieSameSite, max_age_seconds? : Int?, expires_at? : String?) -> AuthCookie
+
 pub fn verify_password(String, String, String) -> Bool
+
+pub fn verify_signed_cookie_value(String, String, String) -> String?
 
 // Errors
 
@@ -63,16 +113,20 @@ pub struct AuthConfig {
   password_reset_path : String
   verify_email_path : String
   remember_cookie : String
+  secret_key_base : String
 }
 
 pub struct AuthCookie {
   name : String
   value : String
   path : String
+  domain : String?
   http_only : Bool
   secure : Bool
-  same_site : String
+  same_site : CookieSameSite
+  signed : Bool
   max_age_seconds : Int?
+  expires_at : String?
 }
 
 pub enum AuthRequirement {
@@ -84,6 +138,14 @@ pub enum AuthRequirement {
 }
 pub impl Eq for AuthRequirement
 pub impl Show for AuthRequirement
+
+pub enum CookieSameSite {
+  SameSiteStrict
+  SameSiteLax
+  SameSiteNone
+}
+pub impl Eq for CookieSameSite
+pub impl Show for CookieSameSite
 
 pub struct EmailVerificationToken {
   token : String
@@ -115,12 +177,54 @@ pub struct PolicyRule {
   allow_owner : Bool
 }
 
+pub enum RequestForgeryOutcome {
+  Verified(Session?)
+  NullSession
+  ResetSession
+  Rejected(String)
+}
+pub impl Eq for RequestForgeryOutcome
+pub impl Show for RequestForgeryOutcome
+
+pub enum RequestForgeryStrategy {
+  ExceptionStrategy
+  NullSessionStrategy
+  ResetSessionStrategy
+}
+pub impl Eq for RequestForgeryStrategy
+pub impl Show for RequestForgeryStrategy
+
 pub struct Session {
   id : String
   user_id : String
   csrf_token : String
   fresh : Bool
 }
+pub impl Eq for Session
+pub impl Show for Session
+
+pub struct SessionStore {
+  kind : SessionStoreKind
+  key : String
+  expire_after_seconds : Int?
+  secure : Bool
+  http_only : Bool
+  same_site : CookieSameSite
+  signed : Bool
+  path : String
+  domain : String?
+  renew : Bool
+  signing_secret : String?
+}
+
+pub enum SessionStoreKind {
+  CookieStore
+  CacheStore
+  RedisStore
+  DisabledStore
+}
+pub impl Eq for SessionStoreKind
+pub impl Show for SessionStoreKind
 
 // Type aliases
 

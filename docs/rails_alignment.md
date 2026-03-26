@@ -107,12 +107,18 @@ The source audit in this batch was anchored to the official Rails repository at:
 - Component manifests now expose Vapor Moon-style `scope_id`, `client_module_path`, prop defaults, binding names, emits, slots, and template refs
 - Runtime helpers such as `make_scope_id(...)`, `client_module_path(...)`, `scope_css(...)`, `show_style(...)`, `merge_class_names(...)`, `merge_styles(...)`, `use_id(...)`, and `use_template_ref(...)` now mirror Vapor Moon's current helper surface more directly
 
+## Fourteenth batch added here
+
+- The auth layer now models typed `CookieSameSite`, `SessionStoreKind`, `SessionStore`, `RequestForgeryStrategy`, and `RequestForgeryOutcome`
+- `cookie_session_store(...)`, `cache_session_store(...)`, `redis_session_store(...)`, `session_store_for_config(...)`, and `session_cookie_with_store(...)` make cookie/session persistence explicit instead of hiding it behind one demo helper
+- `signed_cookie(...)`, `sign_cookie_value(...)`, `verify_signed_cookie_value(...)`, `parse_cookie_header(...)`, and `protect_from_forgery(...)` add the signed-cookie and forgery-strategy surface needed for a more production-shaped Action Pack layer
+
 ## Biggest gaps still open
 
 - `activesupport`: concern/autoloading/deprecation/timezones/notifications subscribers
 - `activemodel`: typed attributes/serialization
 - `activerecord`: callback chains/database adapters/query execution
-- `actionpack`: cookies/session store/responders/request forgery strategy
+- `actionpack`: responders/request forgery depth beyond the current typed cookie/session strategy layer
 - `actionview`: helper breadth/template lookup
 - `activejob`: execution backends/monitoring depth
 - `actioncable`: connection lifecycle and richer subscription adapters
@@ -122,4 +128,4 @@ The source audit in this batch was anchored to the official Rails repository at:
 
 1. Add typed attribute/serialization support on top of the validation layer.
 2. Add deeper Active Job execution backend and monitoring behavior.
-3. Add broader Vapor Moon compile/tooling integration instead of only runtime-compatible metadata.
+3. Add Action Pack responder and session/request integration depth on top of the new cookie/session primitives.

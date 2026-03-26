@@ -159,6 +159,9 @@ pub fn cache_read(@cache.CacheStore, String, String?) -> String?
 
 pub fn cache_read_with_notifications(store~ : @cache.CacheStore, key~ : String, now~ : String?, notifications~ : @support.Notifications) -> (String?, @support.Notifications)
 
+#label_migration(key, allow_positional=true)
+pub fn cache_session_store(key~ : String, expire_after_seconds? : Int?, secure? : Bool, http_only? : Bool, same_site? : @auth.CookieSameSite, path? : String, domain? : String?, renew? : Bool) -> @auth.SessionStore
+
 pub fn cache_store(String) -> @cache.CacheStore
 
 pub fn cache_summary(@cache.CacheStore) -> String
@@ -215,6 +218,15 @@ pub fn controller_summary(@controller.ControllerDefinition) -> String
 
 pub fn cookie_header(@auth.AuthCookie) -> String
 
+pub fn cookie_same_site_lax() -> @auth.CookieSameSite
+
+pub fn cookie_same_site_none() -> @auth.CookieSameSite
+
+pub fn cookie_same_site_strict() -> @auth.CookieSameSite
+
+#label_migration(key, allow_positional=true)
+pub fn cookie_session_store(key~ : String, expire_after_seconds? : Int?, secure? : Bool, http_only? : Bool, same_site? : @auth.CookieSameSite, signed? : Bool, path? : String, domain? : String?, renew? : Bool, signing_secret? : String?) -> @auth.SessionStore
+
 pub fn count_sql(@active_record.Relation) -> String
 
 pub fn counter(String, Array[(String, String)], Int) -> @metrics.MetricSample
@@ -268,6 +280,8 @@ pub fn digest_password(String, String) -> String
 pub fn dirty_new_record(@active_record.Record) -> @active_record.DirtyRecord
 
 pub fn dirty_record(@active_record.Record, @active_record.Record) -> @active_record.DirtyRecord
+
+pub fn disabled_session_store() -> @auth.SessionStore
 
 #label_migration(exception_name, allow_positional=true)
 pub fn discard_on(exception_name~ : String, report? : Bool) -> @job.JobFailurePolicy
@@ -334,6 +348,8 @@ pub fn execute_sql_step(String) -> @migration.MigrationStep
 
 pub fn exists_sql(@active_record.Relation) -> String
 
+pub fn find_cookie(Array[(String, String)], String) -> String?
+
 pub fn find_entry(Array[(String, String)], String) -> String?
 
 pub fn find_records(@active_record.MemoryDatabase, String, String, String) -> Array[@active_record.Record]
@@ -350,6 +366,8 @@ pub fn fixture_set(String, String, Array[@fixture.FixtureRow]) -> @fixture.Fixtu
 pub fn fixture_summary(@fixture.FixtureSet) -> String
 
 pub fn flash(String, String) -> @controller.ActionStep
+
+pub fn forgery_strategy_summary(@auth.RequestForgeryStrategy) -> String
 
 #label_migration(action_name, allow_positional=true)
 #label_migration(name, allow_positional=true)
@@ -646,6 +664,8 @@ pub fn param_value(@params.Parameters, String) -> String?
 
 pub fn params(Array[(String, String)]) -> @params.Parameters
 
+pub fn parse_cookie_header(String) -> Array[(String, String)]
+
 pub fn parse_route_pattern(String) -> @http.RoutePattern
 
 pub fn partial(local_name~ : String, component~ : @view.VaporComponentRef) -> @view.TemplateImport
@@ -697,6 +717,8 @@ pub fn prop_contract(name~ : String, type_name~ : String, required~ : Bool, desc
 
 pub fn props_to_json(Array[(String, String)]) -> String
 
+pub fn protect_from_forgery(@auth.Session?, String?, @auth.RequestForgeryStrategy) -> @auth.RequestForgeryOutcome
+
 pub fn rate_limit_rule(String, String, Int, Int) -> @production.RateLimitRule
 
 pub fn rate_limit_summary(@production.RateLimitRule) -> String
@@ -714,6 +736,9 @@ pub fn redirect_format() -> @controller.ResponseFormat
 pub fn redirect_response(String) -> @http.Response
 
 pub fn redirect_to_step(String) -> @controller.ActionStep
+
+#label_migration(key, allow_positional=true)
+pub fn redis_session_store(key~ : String, expire_after_seconds? : Int?, secure? : Bool, http_only? : Bool, same_site? : @auth.CookieSameSite, path? : String, domain? : String?, renew? : Bool) -> @auth.SessionStore
 
 pub fn references_column(String, String) -> @active_record.Column
 
@@ -789,6 +814,12 @@ pub fn replace_stream(String, String) -> @turbo.TurboStream
 #label_migration(session_id, allow_positional=true)
 #label_migration(verb, allow_positional=true)
 pub fn request(verb~ : @http.HttpMethod, path~ : String, query~ : Array[(String, String)], form~ : Array[(String, String)], session_id~ : String?, body~ : String) -> @http.Request
+
+pub fn request_forgery_exception() -> @auth.RequestForgeryStrategy
+
+pub fn request_forgery_null_session() -> @auth.RequestForgeryStrategy
+
+pub fn request_forgery_reset_session() -> @auth.RequestForgeryStrategy
 
 pub fn require_auth(@auth.AuthRequirement) -> @controller.ActionStep
 
@@ -908,9 +939,26 @@ pub fn server_contract(props~ : Array[@view.PropContract], async_only~ : Bool, p
 #label_migration(session, allow_positional=true)
 pub fn session_cookie(config~ : @auth.AuthConfig, session~ : @auth.Session, remember_me~ : Bool) -> @auth.AuthCookie
 
+#label_migration(session, allow_positional=true)
+#label_migration(store, allow_positional=true)
+pub fn session_cookie_with_store(store~ : @auth.SessionStore, session~ : @auth.Session) -> @auth.AuthCookie
+
+#label_migration(config, allow_positional=true)
+#label_migration(remember_me, allow_positional=true)
+pub fn session_store_for_config(config~ : @auth.AuthConfig, remember_me~ : Bool) -> @auth.SessionStore
+
+pub fn session_store_summary(@auth.SessionStore) -> String
+
 pub fn set_metric(@metrics.MetricsRegistry, String, Array[(String, String)], Int) -> @metrics.MetricsRegistry
 
 pub fn show_style(Bool, String) -> String
+
+pub fn sign_cookie_value(String, String, String) -> String
+
+#label_migration(name, allow_positional=true)
+#label_migration(secret, allow_positional=true)
+#label_migration(value, allow_positional=true)
+pub fn signed_cookie(name~ : String, value~ : String, secret~ : String, path? : String, domain? : String?, http_only? : Bool, secure? : Bool, same_site? : @auth.CookieSameSite, max_age_seconds? : Int?, expires_at? : String?) -> @auth.AuthCookie
 
 pub fn singularize(String) -> String
 
@@ -1042,6 +1090,8 @@ pub fn validator(name~ : String, rule~ : @validation.FieldRule) -> @validation.V
 
 pub fn verify_password(String, String, String) -> Bool
 
+pub fn verify_signed_cookie_value(String, String, String) -> String?
+
 pub fn web_process(String, String, Int, Array[String]) -> @process.ProcessDefinition
 
 pub fn where_eq(@active_record.Relation, String, String) -> @active_record.Relation
@@ -1164,6 +1214,8 @@ pub using @active_record {type ColumnType}
 pub using @view {type ComponentContract}
 
 pub using @controller {type ControllerDefinition}
+
+pub using @auth {type CookieSameSite}
 
 pub using @production {type DeploymentConfig}
 
@@ -1307,6 +1359,10 @@ pub using @view {type RenderedPage}
 
 pub using @http {type Request}
 
+pub using @auth {type RequestForgeryOutcome}
+
+pub using @auth {type RequestForgeryStrategy}
+
 pub using @http {type ResourceOptions}
 
 pub using @http {type Response}
@@ -1344,6 +1400,10 @@ pub using @job {type SerializedJob}
 pub using @view {type ServerAction}
 
 pub using @auth {type Session}
+
+pub using @auth {type SessionStore}
+
+pub using @auth {type SessionStoreKind}
 
 pub using @view {type SlotContract}
 

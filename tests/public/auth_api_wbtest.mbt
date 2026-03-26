@@ -26,9 +26,112 @@ test "session helpers generate stable digests tokens and cookies" {
   let remember = session_cookie(config~, session~, remember_me=true)
   let transient = session_cookie(config~, session~, remember_me=false)
   assert_eq(remember.name, config.remember_cookie)
+  assert_true(remember.signed)
   assert_true(cookie_header(remember).contains("Max-Age="))
   assert_eq(transient.name, config.session_cookie)
   assert_false(cookie_header(transient).contains("Max-Age="))
+  assert_true(cookie_header(transient).contains("SameSite=Lax"))
+  match
+    verify_signed_cookie_value(
+      config.session_cookie,
+      transient.value,
+      config.secret_key_base,
+    ) {
+    Some(value) => assert_eq(value, session.id)
+    None => assert_true(false)
+  }
+}
+
+///|
+test "cookie stores and forgery strategies stay explicit and type safe" {
+  let config = default_auth_config()
+  let session = issue_session("7", "browser")
+  let store = session_store_for_config(config~, remember_me=false)
+  let remember_store = session_store_for_config(config~, remember_me=true)
+  let cache_store = cache_session_store(
+    key="_cache_session",
+    expire_after_seconds=Some(120),
+  )
+  let redis_store = redis_session_store(
+    key="_redis_session",
+    same_site=cookie_same_site_none(),
+  )
+  let disabled = disabled_session_store()
+
+  assert_true(session_store_summary(store).contains("store=cookie"))
+  assert_eq(remember_store.expire_after_seconds, Some(60 * 60 * 24 * 30))
+  assert_true(session_store_summary(cache_store).contains("store=cache"))
+  assert_eq(redis_store.same_site, cookie_same_site_none())
+  assert_true(session_store_summary(disabled).contains("store=disabled"))
+
+  let signed = signed_cookie(
+    name="preview",
+    value="token-1",
+    secret=config.secret_key_base,
+    domain=Some("example.com"),
+    max_age_seconds=Some(60),
+    expires_at=Some("Wed, 26 Mar 2026 10:00:00 GMT"),
+  )
+  assert_true(cookie_header(signed).contains("Domain=example.com"))
+  assert_true(
+    cookie_header(signed).contains("Expires=Wed, 26 Mar 2026 10:00:00 GMT"),
+  )
+  match
+    verify_signed_cookie_value("preview", signed.value, config.secret_key_base) {
+    Some(value) => assert_eq(value, "token-1")
+    None => assert_true(false)
+  }
+  assert_eq(
+    verify_signed_cookie_value("preview", signed.value, "wrong-secret"),
+    None,
+  )
+
+  let parsed = parse_cookie_header("preview=one; session=two; theme=dark")
+  assert_eq(find_cookie(parsed, "session"), Some("two"))
+  assert_eq(find_cookie(parsed, "missing"), None)
+  assert_true(
+    sign_cookie_value("preview", "token-1", config.secret_key_base).contains(
+      "--",
+    ),
+  )
+
+  assert_eq(forgery_strategy_summary(request_forgery_exception()), "exception")
+  match
+    protect_from_forgery(
+      Some(session),
+      Some("wrong"),
+      request_forgery_null_session(),
+    ) {
+    NullSession => ()
+    _ => assert_true(false)
+  }
+  match
+    protect_from_forgery(
+      Some(session),
+      Some("wrong"),
+      request_forgery_reset_session(),
+    ) {
+    ResetSession => ()
+    _ => assert_true(false)
+  }
+  match
+    protect_from_forgery(
+      Some(session),
+      Some("wrong"),
+      request_forgery_exception(),
+    ) {
+    Rejected(message) => assert_eq(message, "invalid_csrf_token")
+    _ => assert_true(false)
+  }
+  match
+    protect_from_forgery(
+      Some(session),
+      Some(session.csrf_token),
+      request_forgery_exception(),
+    ) {
+    Verified(Some(current)) => assert_eq(current.id, session.id)
+    _ => assert_true(false)
+  }
 }
 
 ///|

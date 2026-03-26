@@ -29,20 +29,39 @@ This makes requirements inspectable and easy to feed into controller plans.
 Session helpers include:
 
 - `issue_session(...)`
+- `session_store_for_config(...)`
 - `session_cookie(...)`
+- `session_cookie_with_store(...)`
 - `csrf_valid(...)`
+- `protect_from_forgery(...)`
+- `signed_cookie(...)`
+- `parse_cookie_header(...)`
 - `issue_password_reset(...)`
 - `issue_email_verification(...)`
 
-The current implementation is intentionally lightweight but typed.
+The current implementation is still lightweight, but it now models:
+
+- typed cookie SameSite policies
+- explicit cookie / cache / redis session stores
+- signed cookie values
+- explicit forgery strategies such as exception, null-session, and reset-session
 
 Example:
 
 ```moonbit
+let store = session_store_for_config(
+  config=config,
+  remember_me=true,
+)
 let cookie = session_cookie(
   config=config,
   session=session,
   remember_me=true,
+)
+let checked = protect_from_forgery(
+  Some(session),
+  Some(session.csrf_token),
+  request_forgery_exception(),
 )
 ```
 

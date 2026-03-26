@@ -25,7 +25,41 @@ pub struct Session {
   user_id : String
   csrf_token : String
   fresh : Bool
-}
+} derive(Eq, Show)
+
+///|
+/// Lists the cookie SameSite policies supported by the auth helpers.
+pub enum CookieSameSite {
+  SameSiteStrict
+  SameSiteLax
+  SameSiteNone
+} derive(Eq, Show)
+
+///|
+/// Lists the session backends modeled by the auth layer.
+pub enum SessionStoreKind {
+  CookieStore
+  CacheStore
+  RedisStore
+  DisabledStore
+} derive(Eq, Show)
+
+///|
+/// Lists the request forgery strategies supported by the auth helpers.
+pub enum RequestForgeryStrategy {
+  ExceptionStrategy
+  NullSessionStrategy
+  ResetSessionStrategy
+} derive(Eq, Show)
+
+///|
+/// Represents the result of a request forgery check.
+pub enum RequestForgeryOutcome {
+  Verified(Session?)
+  NullSession
+  ResetSession
+  Rejected(String)
+} derive(Eq, Show)
 
 ///|
 /// Declares policy checks for resource-oriented authorization.
@@ -61,10 +95,29 @@ pub struct AuthCookie {
   name : String
   value : String
   path : String
+  domain : String?
   http_only : Bool
   secure : Bool
-  same_site : String
+  same_site : CookieSameSite
+  signed : Bool
   max_age_seconds : Int?
+  expires_at : String?
+}
+
+///|
+/// Describes how sessions are persisted between requests.
+pub struct SessionStore {
+  kind : SessionStoreKind
+  key : String
+  expire_after_seconds : Int?
+  secure : Bool
+  http_only : Bool
+  same_site : CookieSameSite
+  signed : Bool
+  path : String
+  domain : String?
+  renew : Bool
+  signing_secret : String?
 }
 
 ///|
@@ -79,6 +132,7 @@ pub struct AuthConfig {
   password_reset_path : String
   verify_email_path : String
   remember_cookie : String
+  secret_key_base : String
 }
 
 ///|
@@ -94,6 +148,7 @@ pub fn default_auth_config() -> AuthConfig {
     password_reset_path: "/password/reset",
     verify_email_path: "/verify-email",
     remember_cookie: "_mbt_on_rails_remember",
+    secret_key_base: "mbt_on_rails_dev_secret_key_base",
   }
 }
 
