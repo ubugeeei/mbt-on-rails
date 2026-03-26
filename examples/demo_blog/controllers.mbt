@@ -11,6 +11,7 @@ pub fn demo_pages_controller() -> @controller.ControllerDefinition {
 pub fn demo_sessions_controller() -> @controller.ControllerDefinition {
   @controller.controller_named("SessionsController")
   .for_resource("sessions")
+  .with_around_action(@controller.around_each().running("with_request_store"))
   .with_before_action(
     @controller.before_only("new").requiring(@auth.auth_guest_only()),
   )
@@ -19,6 +20,7 @@ pub fn demo_sessions_controller() -> @controller.ControllerDefinition {
     .requiring(@auth.auth_guest_only())
     .permitting(["email", "password"]),
   )
+  .with_after_action(@controller.after_only("create").running("audit_session"))
   .with_action(
     @controller.action_plan("new")
     .require_auth(@auth.auth_guest_only())

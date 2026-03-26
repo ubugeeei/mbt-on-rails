@@ -34,6 +34,20 @@ pub struct BeforeAction {
 }
 
 ///|
+/// Declares an after-action callback for a controller.
+pub struct AfterAction {
+  action_name : String?
+  function_name : String
+}
+
+///|
+/// Declares an around-action callback for a controller.
+pub struct AroundAction {
+  action_name : String?
+  function_name : String
+}
+
+///|
 /// Describes one controller action and its execution plan.
 pub struct ActionDefinition {
   name : String
@@ -52,6 +66,8 @@ pub struct ControllerDefinition {
   resource_name : String?
   layout_name : String
   before_actions : Array[BeforeAction]
+  after_actions : Array[AfterAction]
+  around_actions : Array[AroundAction]
   actions : Array[ActionDefinition]
 }
 
@@ -63,6 +79,24 @@ pub fn before_action(
   allowed_params : Array[String],
 ) -> BeforeAction {
   { action_name, requirement, allowed_params }
+}
+
+///|
+/// Builds an `AfterAction` callback declaration.
+pub fn after_action(
+  action_name : String?,
+  function_name : String,
+) -> AfterAction {
+  { action_name, function_name }
+}
+
+///|
+/// Builds an `AroundAction` callback declaration.
+pub fn around_action(
+  action_name : String?,
+  function_name : String,
+) -> AroundAction {
+  { action_name, function_name }
 }
 
 ///|
@@ -86,9 +120,19 @@ pub fn controller(
   resource_name : String?,
   layout_name : String,
   before_actions : Array[BeforeAction],
+  after_actions : Array[AfterAction],
+  around_actions : Array[AroundAction],
   actions : Array[ActionDefinition],
 ) -> ControllerDefinition {
-  { name, resource_name, layout_name, before_actions, actions }
+  {
+    name,
+    resource_name,
+    layout_name,
+    before_actions,
+    after_actions,
+    around_actions,
+    actions,
+  }
 }
 
 ///|

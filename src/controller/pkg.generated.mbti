@@ -10,6 +10,18 @@ pub fn action(String, Array[ActionStep], String?, Bool, Array[String], Array[Res
 
 pub fn action_plan(String) -> ActionDefinition
 
+pub fn after_action(String?, String) -> AfterAction
+
+pub fn after_each() -> AfterAction
+
+pub fn after_only(String) -> AfterAction
+
+pub fn around_action(String?, String) -> AroundAction
+
+pub fn around_each() -> AroundAction
+
+pub fn around_only(String) -> AroundAction
+
 pub fn authorize_step(String, String) -> ActionStep
 
 pub fn before_action(String?, @auth.AuthRequirement?, Array[String]) -> BeforeAction
@@ -18,7 +30,7 @@ pub fn before_each() -> BeforeAction
 
 pub fn before_only(String) -> BeforeAction
 
-pub fn controller(String, String?, String, Array[BeforeAction], Array[ActionDefinition]) -> ControllerDefinition
+pub fn controller(String, String?, String, Array[BeforeAction], Array[AfterAction], Array[AroundAction], Array[ActionDefinition]) -> ControllerDefinition
 
 pub fn controller_action(ControllerDefinition, String) -> ActionDefinition?
 
@@ -115,6 +127,18 @@ pub enum ActionStep {
 }
 pub impl Show for ActionStep
 
+pub struct AfterAction {
+  action_name : String?
+  function_name : String
+}
+pub fn AfterAction::running(Self, String) -> Self
+
+pub struct AroundAction {
+  action_name : String?
+  function_name : String
+}
+pub fn AroundAction::running(Self, String) -> Self
+
 pub struct BeforeAction {
   action_name : String?
   requirement : @auth.AuthRequirement?
@@ -128,10 +152,14 @@ pub struct ControllerDefinition {
   resource_name : String?
   layout_name : String
   before_actions : Array[BeforeAction]
+  after_actions : Array[AfterAction]
+  around_actions : Array[AroundAction]
   actions : Array[ActionDefinition]
 }
 pub fn ControllerDefinition::for_resource(Self, String) -> Self
 pub fn ControllerDefinition::with_action(Self, ActionDefinition) -> Self
+pub fn ControllerDefinition::with_after_action(Self, AfterAction) -> Self
+pub fn ControllerDefinition::with_around_action(Self, AroundAction) -> Self
 pub fn ControllerDefinition::with_before_action(Self, BeforeAction) -> Self
 pub fn ControllerDefinition::with_layout(Self, String) -> Self
 

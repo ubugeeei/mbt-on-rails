@@ -194,11 +194,13 @@ test "auth enforces roles and permissions" {
 test "declarative controller and app builders preserve inferred metadata" {
   let controller = controller_named("SessionsController")
     .for_resource("sessions")
+    .with_around_action(around_each().running("with_request_store"))
     .with_before_action(
       before_only("create")
       .requiring(auth_guest_only())
       .permitting(["email", "password"]),
     )
+    .with_after_action(after_only("create").running("audit_session"))
     .with_action(
       action_plan("create")
       .require_auth(auth_guest_only())
@@ -220,6 +222,11 @@ test "declarative controller and app builders preserve inferred metadata" {
     }
     None => assert_true(false)
   }
+  assert_eq(controller.after_actions.length(), 1)
+  assert_eq(controller.around_actions.length(), 1)
+  let summary = controller_summary(controller)
+  assert_true(summary.contains("  around: *:with_request_store"))
+  assert_true(summary.contains("  after: create:audit_session"))
 
   let app = app_named("demo")
     .with_controller(controller)

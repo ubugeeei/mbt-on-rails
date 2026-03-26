@@ -61,7 +61,6 @@ The largest gaps versus Rails are still:
 
 - Active Model-style errors/typed attributes
 - Active Record query interface depth, scopes, and callback execution
-- controller `after_action` and `around_action`
 - helpers, partials, and form builders
 - job adapters and retry policies
 - railties/generator/initializer depth

@@ -71,12 +71,18 @@ The source audit in this batch was anchored to the official Rails repository at:
 - `ModelSchema` now carries named `scope(...)` definitions, with `with_scope(...)` and `find_scope(...)` for reuse
 - Public relation tests now cover grouped SQL, merged scopes, and existence/pluck rendering
 
+## Eighth batch added here
+
+- The controller DSL now carries `after_action` and `around_action` style callback metadata in addition to `before_action`
+- `controller_summary(...)` renders before/around/after callback declarations so generated plans stay inspectable
+- The demo app and public tests now show controller callback metadata alongside action plans
+
 ## Biggest gaps still open
 
 - `activesupport`: concern/autoloading/deprecation/timezones/notifications subscribers
 - `activemodel`: typed attributes/serialization/validator objects
 - `activerecord`: callback chains/database adapters/query execution
-- `actionpack`: cookies/session store/responders/after_action/around_action/request forgery strategy
+- `actionpack`: cookies/session store/responders/request forgery strategy
 - `actionview`: partials/helpers/form builders/template lookup
 - `activejob`: adapters/serialization
 - `actioncable`: connection lifecycle and richer subscription adapters
@@ -84,7 +90,6 @@ The source audit in this batch was anchored to the official Rails repository at:
 
 ## Recommended next batches
 
-1. Add `after_action` and `around_action` style controller callbacks.
-2. Add partial rendering plus a small helper/form-builder layer so the scaffolded frontend can become less template-string-heavy.
-3. Expand the validation library with reusable validator objects and richer message customization.
-4. Add Active Job adapters and serialization contracts.
+1. Add partial rendering plus a small helper/form-builder layer so the scaffolded frontend can become less template-string-heavy.
+2. Expand the validation library with reusable validator objects and richer message customization.
+3. Add Active Job adapters and serialization contracts.

@@ -44,9 +44,15 @@ pub fn add_reference_step(table_name~ : String, column_name~ : String, target_ta
 
 pub fn add_timestamps_step(String, nullable? : Bool) -> @migration.MigrationStep
 
+pub fn after_action(String?, String) -> @controller.AfterAction
+
 pub fn after_create(String) -> @active_record.Callback
 
 pub fn after_destroy(String) -> @active_record.Callback
+
+pub fn after_each() -> @controller.AfterAction
+
+pub fn after_only(String) -> @controller.AfterAction
 
 pub fn after_save(String) -> @active_record.Callback
 
@@ -69,6 +75,12 @@ pub fn apply_request_middleware(Array[@middleware.Middleware], @http.Request) ->
 pub fn apply_response_middleware(Array[@middleware.Middleware], @http.Request, @http.Response) -> @http.Response
 
 pub fn apply_seed(@active_record.MemoryDatabase, @fixture.SeedPlan) -> @active_record.MemoryDatabase
+
+pub fn around_action(String?, String) -> @controller.AroundAction
+
+pub fn around_each() -> @controller.AroundAction
+
+pub fn around_only(String) -> @controller.AroundAction
 
 #label_migration(script_urls, allow_positional=true)
 #label_migration(style_urls, allow_positional=true)
@@ -178,7 +190,7 @@ pub fn config_summary(@production.DeploymentConfig) -> String
 #label_migration(pattern, allow_positional=true)
 pub fn contains(pattern~ : String) -> @validation.FieldRule
 
-pub fn controller(String, String?, String, Array[@controller.BeforeAction], Array[@controller.ActionDefinition]) -> @controller.ControllerDefinition
+pub fn controller(String, String?, String, Array[@controller.BeforeAction], Array[@controller.AfterAction], Array[@controller.AroundAction], Array[@controller.ActionDefinition]) -> @controller.ControllerDefinition
 
 pub fn controller_action(@controller.ControllerDefinition, String) -> @controller.ActionDefinition?
 
@@ -982,6 +994,10 @@ pub fn worker_process(String, String, Int, Array[String], Array[String]) -> @pro
 pub using @controller {type ActionDefinition}
 
 pub using @controller {type ActionStep}
+
+pub using @controller {type AfterAction}
+
+pub using @controller {type AroundAction}
 
 pub using @view {type AssetManifest}
 

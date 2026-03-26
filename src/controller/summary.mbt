@@ -18,6 +18,28 @@ pub fn controller_summary(controller : ControllerDefinition) -> String {
     }
     lines.push("  before: " + filters.join(", "))
   }
+  if not(controller.around_actions.is_empty()) {
+    let callbacks : Array[String] = []
+    for callback in controller.around_actions {
+      let target = match callback.action_name {
+        Some(action_name) => action_name
+        None => "*"
+      }
+      callbacks.push(target + ":" + callback.function_name)
+    }
+    lines.push("  around: " + callbacks.join(", "))
+  }
+  if not(controller.after_actions.is_empty()) {
+    let callbacks : Array[String] = []
+    for callback in controller.after_actions {
+      let target = match callback.action_name {
+        Some(action_name) => action_name
+        None => "*"
+      }
+      callbacks.push(target + ":" + callback.function_name)
+    }
+    lines.push("  after: " + callbacks.join(", "))
+  }
   for action in controller.actions {
     let step_labels : Array[String] = []
     for step in action.steps {

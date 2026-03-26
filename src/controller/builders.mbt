@@ -11,6 +11,30 @@ pub fn before_only(action_name : String) -> BeforeAction {
 }
 
 ///|
+/// Starts an after-action declaration that applies to every action.
+pub fn after_each() -> AfterAction {
+  { action_name: None, function_name: "" }
+}
+
+///|
+/// Starts an after-action declaration for a single action name.
+pub fn after_only(action_name : String) -> AfterAction {
+  { action_name: Some(action_name), function_name: "" }
+}
+
+///|
+/// Starts an around-action declaration that applies to every action.
+pub fn around_each() -> AroundAction {
+  { action_name: None, function_name: "" }
+}
+
+///|
+/// Starts an around-action declaration for a single action name.
+pub fn around_only(action_name : String) -> AroundAction {
+  { action_name: Some(action_name), function_name: "" }
+}
+
+///|
 /// Chainable way to require auth from a before-action.
 pub fn BeforeAction::requiring(
   self : BeforeAction,
@@ -26,6 +50,24 @@ pub fn BeforeAction::permitting(
   allowed_params : Array[String],
 ) -> BeforeAction {
   { ..self, allowed_params: @support.clone_array(allowed_params) }
+}
+
+///|
+/// Chainable way to assign a function name to an after-action.
+pub fn AfterAction::running(
+  self : AfterAction,
+  function_name : String,
+) -> AfterAction {
+  { ..self, function_name, }
+}
+
+///|
+/// Chainable way to assign a function name to an around-action.
+pub fn AroundAction::running(
+  self : AroundAction,
+  function_name : String,
+) -> AroundAction {
+  { ..self, function_name, }
 }
 
 ///|
@@ -50,6 +92,8 @@ pub fn controller_named(name : String) -> ControllerDefinition {
     resource_name: None,
     layout_name: "application",
     before_actions: [],
+    after_actions: [],
+    around_actions: [],
     actions: [],
   }
 }
@@ -268,6 +312,26 @@ pub fn ControllerDefinition::with_before_action(
   let before_actions = @support.clone_array(self.before_actions)
   before_actions.push(before_action)
   { ..self, before_actions, }
+}
+
+///|
+pub fn ControllerDefinition::with_after_action(
+  self : ControllerDefinition,
+  after_action : AfterAction,
+) -> ControllerDefinition {
+  let after_actions = @support.clone_array(self.after_actions)
+  after_actions.push(after_action)
+  { ..self, after_actions, }
+}
+
+///|
+pub fn ControllerDefinition::with_around_action(
+  self : ControllerDefinition,
+  around_action : AroundAction,
+) -> ControllerDefinition {
+  let around_actions = @support.clone_array(self.around_actions)
+  around_actions.push(around_action)
+  { ..self, around_actions, }
 }
 
 ///|

@@ -47,6 +47,8 @@ The public tests in [`../../tests/public/http_edges_wbtest.mbt`](../../tests/pub
 Unlike classic Rails, this repository models controller behavior as data:
 
 - `before_only(...)`
+- `after_only(...)`
+- `around_each(...)`
 - `action_plan(...)`
 - `require_auth(...)`
 - `permit_params(...)`
@@ -58,6 +60,8 @@ Example:
 ```moonbit
 let controller = controller_named("SessionsController")
   .for_resource("sessions")
+  .with_around_action(around_each().running("with_request_store"))
+  .with_after_action(after_only("create").running("audit_session"))
   .with_action(
     action_plan("create")
       .require_auth(auth_guest_only())
@@ -75,6 +79,7 @@ This makes the controller layer:
 - easier to inspect
 - easier to generate
 - easier to validate
+- closer to Rails-style callback metadata without hiding behavior in macros
 
 ## Exercise
 
