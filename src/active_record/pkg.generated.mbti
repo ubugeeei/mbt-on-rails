@@ -57,6 +57,8 @@ pub fn distinct_records(Relation) -> Relation
 
 pub fn empty_memory_database() -> MemoryDatabase
 
+pub fn execute_relation(ModelSchema, MemoryDatabase, Relation) -> RelationExecutionOutcome
+
 pub fn exists_sql(Relation) -> String
 
 pub fn find_column(ModelSchema, String) -> Column?
@@ -124,6 +126,8 @@ pub fn preload(Relation, String) -> Relation
 pub fn record(String, Array[(String, String)]) -> Record
 
 pub fn references_column(String, String) -> Column
+
+pub fn relation_execution_issue(String, String) -> RelationExecutionIssue
 
 pub fn relation_for(ModelSchema) -> Relation
 
@@ -365,7 +369,9 @@ pub struct MemoryDatabase {
 }
 pub fn MemoryDatabase::begin_transaction(Self) -> MemoryTransaction
 pub fn MemoryDatabase::destroy(Self, ModelSchema, String, deleted_at? : String?) -> DestroyOutcome
+pub fn MemoryDatabase::execute_relation(Self, ModelSchema, Relation) -> RelationExecutionOutcome
 pub fn MemoryDatabase::find_record_by_primary_key(Self, ModelSchema, String) -> Record?
+pub fn MemoryDatabase::insert_record(Self, Record) -> Self
 
 pub struct MemoryTable {
   name : String
@@ -458,6 +464,24 @@ pub fn Relation::where_like(Self, String, String) -> Self
 pub fn Relation::where_lt(Self, String, String) -> Self
 pub fn Relation::where_not_eq(Self, String, String) -> Self
 pub fn Relation::where_raw(Self, String) -> Self
+
+pub struct RelationExecutionIssue {
+  feature : String
+  detail : String
+}
+pub fn RelationExecutionIssue::message(Self) -> String
+pub impl Eq for RelationExecutionIssue
+pub impl Show for RelationExecutionIssue
+
+pub enum RelationExecutionOutcome {
+  ExecutedRecords(Array[Record])
+  RelationExecutionFailed(Array[RelationExecutionIssue])
+}
+pub fn RelationExecutionOutcome::count(Self) -> Int
+pub fn RelationExecutionOutcome::exists(Self) -> Bool
+pub fn RelationExecutionOutcome::first(Self) -> Record?
+pub fn RelationExecutionOutcome::issues(Self) -> Array[RelationExecutionIssue]
+pub fn RelationExecutionOutcome::records(Self) -> Array[Record]
 
 pub enum SaveOutcome {
   Saved(MemoryDatabase, Record)

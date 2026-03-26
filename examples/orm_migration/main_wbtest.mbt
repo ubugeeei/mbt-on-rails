@@ -21,6 +21,31 @@ test "orm migration example builders keep relation migration and validation stab
     @mbor.relation_to_sql(relation),
     "SELECT * FROM posts WHERE author_id = 7 AND title LIKE '%MoonBit%' ORDER BY created_at DESC LIMIT 5",
   )
+  let executed = @mbor.empty_memory_database()
+    .insert_record(
+      @mbor.record("posts", [
+        ("id", "1"),
+        ("title", "MoonBit Launch"),
+        ("slug", "moonbit-launch"),
+        ("body", "Shipping MoonBit on Rails"),
+        ("author_id", "7"),
+      ]),
+    )
+    .execute_relation(
+      schema,
+      @mbor.relation_for(schema)
+      .where_eq("author_id", "7")
+      .where_like("title", "%MoonBit%")
+      .select_columns(["id", "title"]),
+    )
+  assert_eq(executed.count(), 1)
+  assert_eq(
+    match executed.first() {
+      Some(row) => @mbor.find_entry(row.fields, "title")
+      None => None
+    },
+    Some("MoonBit Launch"),
+  )
 
   let migration = @mbor.migration_from_model(
     "20260323040201", "create_posts", schema,
@@ -101,6 +126,7 @@ test "orm migration example builders keep relation migration and validation stab
 test "orm migration example print helpers and main smoke stay runnable" {
   let schema = post_model()
   print_relation_example(schema)
+  print_relation_execution_example(schema)
   print_migration_example(schema)
   print_typed_attribute_example(schema)
   print_memory_example(schema)

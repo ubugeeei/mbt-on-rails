@@ -39,6 +39,15 @@ pub fn insert_record(db : MemoryDatabase, row : Record) -> MemoryDatabase {
 }
 
 ///|
+/// Chainable alias for `insert_record`.
+pub fn MemoryDatabase::insert_record(
+  self : MemoryDatabase,
+  row : Record,
+) -> MemoryDatabase {
+  insert_record(self, row)
+}
+
+///|
 /// Finds records in the in-memory adapter by exact field value.
 pub fn find_records(
   db : MemoryDatabase,

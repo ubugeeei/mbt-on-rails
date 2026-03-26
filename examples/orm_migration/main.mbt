@@ -36,6 +36,48 @@ fn print_relation_example(model : @mbor.ModelSchema) -> Unit {
 }
 
 ///|
+/// Prints in-memory relation execution for the same query shape.
+fn print_relation_execution_example(model : @mbor.ModelSchema) -> Unit {
+  let db = @mbor.empty_memory_database()
+    .insert_record(
+      @mbor.record("posts", [
+        ("id", "1"),
+        ("title", "MoonBit Launch"),
+        ("slug", "moonbit-launch"),
+        ("body", "Shipping MoonBit on Rails"),
+        ("author_id", "7"),
+      ]),
+    )
+    .insert_record(
+      @mbor.record("posts", [
+        ("id", "2"),
+        ("title", "Rails Notes"),
+        ("slug", "rails-notes"),
+        ("body", "Operational notes"),
+        ("author_id", "8"),
+      ]),
+    )
+  let relation = @mbor.relation_for(model)
+    .where_eq("author_id", "7")
+    .where_like("title", "%MoonBit%")
+    .select_columns(["id", "title"])
+
+  println("Relation Execution")
+  let outcome = db.execute_relation(model, relation)
+  println("count = " + outcome.count().to_string())
+  match outcome.first() {
+    Some(row) => {
+      let title = match @mbor.find_entry(row.fields, "title") {
+        Some(value) => value
+        None => "missing"
+      }
+      println("first title = " + title)
+    }
+    None => println("first title = missing")
+  }
+}
+
+///|
 /// Builds a phased, deployment-safe migration example.
 fn publish_backfill_migration() -> @mbor.Migration {
   @mbor.migration_plan("20260326030101", "backfill_post_published")
@@ -186,6 +228,8 @@ fn run_example() -> Unit {
   println("=======================")
   println("")
   print_relation_example(model)
+  println("")
+  print_relation_execution_example(model)
   println("")
   print_migration_example(model)
   println("")

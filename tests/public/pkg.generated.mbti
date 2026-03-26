@@ -368,6 +368,8 @@ pub fn env_keys_summary(@process.ProcessDefinition) -> String
 
 pub fn escape_html(String) -> String
 
+pub fn execute_relation(@active_record.ModelSchema, @active_record.MemoryDatabase, @active_record.Relation) -> @active_record.RelationExecutionOutcome
+
 pub fn execute_sql_step(String) -> @migration.MigrationStep
 
 pub fn exists_sql(@active_record.Relation) -> String
@@ -769,6 +771,8 @@ pub fn redirect_to_step(String) -> @controller.ActionStep
 pub fn redis_session_store(key~ : String, expire_after_seconds? : Int?, secure? : Bool, http_only? : Bool, same_site? : @auth.CookieSameSite, path? : String, domain? : String?, renew? : Bool) -> @auth.SessionStore
 
 pub fn references_column(String, String) -> @active_record.Column
+
+pub fn relation_execution_issue(String, String) -> @active_record.RelationExecutionIssue
 
 pub fn relation_for(@active_record.ModelSchema) -> @active_record.Relation
 
@@ -1421,6 +1425,10 @@ pub using @production {type RateLimitRule}
 pub using @active_record {type Record}
 
 pub using @active_record {type Relation}
+
+pub using @active_record {type RelationExecutionIssue}
+
+pub using @active_record {type RelationExecutionOutcome}
 
 pub using @process {type ReleaseTask}
 
