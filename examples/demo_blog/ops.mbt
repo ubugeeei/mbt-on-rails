@@ -7,19 +7,33 @@ pub fn demo_mailers() -> Array[@mailer.MailerDefinition] {
 ///|
 /// Builds the job queues shown by the demo app.
 pub fn demo_job_queues() -> Array[@job.JobQueue] {
+  let reindex_job = @job.job(
+    name="posts.reindex",
+    queue="default",
+    argument_types=[("resource", "String"), ("id", "String")],
+    retry_limit=3,
+    unique_key=Some("posts:search"),
+  )
+  .retry_on("TimeoutError", attempts=4, wait=@job.fixed_wait(seconds=5))
+  .discard_on("DeserializationError")
+  let publish_job = @job.job(
+    name="posts.publish",
+    queue="default",
+    argument_types=[("id", "String")],
+    retry_limit=2,
+    unique_key=None,
+  ).retry_on(
+    "RemoteApiError",
+    attempts=3,
+    wait=@job.polynomially_longer(),
+  )
   let default_queue = @job.enqueue_at(
     @job.enqueue_now(
-      @job.job_queue("default"),
-      @job.job(
-        "posts.reindex",
-        "default",
-        [("resource", "String"), ("id", "String")],
-        3,
-        Some("posts:search"),
-      ),
+      @job.job_queue(name="default"),
+      reindex_job,
       [("resource", "posts"), ("id", "42")],
     ),
-    @job.job("posts.publish", "default", [("id", "String")], 2, None),
+    publish_job,
     [("id", "42")],
     "2026-03-26T09:00:00Z",
   )
@@ -31,8 +45,8 @@ pub fn demo_job_queues() -> Array[@job.JobQueue] {
       [("name", "MoonBit Rails")],
     ) {
     Some(delivery) =>
-      @mailer.enqueue_delivery(@job.job_queue("mailers"), delivery, None)
-    None => @job.job_queue("mailers")
+      @mailer.enqueue_delivery(@job.job_queue(name="mailers"), delivery, None)
+    None => @job.job_queue(name="mailers")
   }
   [default_queue, mailer_queue]
 }

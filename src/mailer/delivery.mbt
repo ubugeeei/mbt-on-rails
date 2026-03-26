@@ -44,13 +44,13 @@ pub fn delivery_job(
 ) -> @job.EnqueuedJob {
   let definition = mail_delivery_definition(delivery, queue_name)
   @job.enqueued_job(
-    definition,
-    delivery_payload(delivery),
-    match run_at {
+    definition=definition,
+    payload=delivery_payload(delivery),
+    run_at=match run_at {
       Some(timestamp) => timestamp
       None => ""
     },
-    0,
+    attempts=0,
   )
 }
 
@@ -107,15 +107,15 @@ fn mail_delivery_definition(
   queue_name : String,
 ) -> @job.JobDefinition {
   @job.job(
-    "mailers.deliver",
-    queue_name,
-    [
+    name="mailers.deliver",
+    queue=queue_name,
+    argument_types=[
       ("mailer_name", "String"),
       ("action_name", "String"),
       ("to", "String"),
       ("subject", "String"),
     ],
-    5,
-    Some("mail:" + delivery.mailer_name + ":" + delivery.action_name),
+    retry_limit=5,
+    unique_key=Some("mail:" + delivery.mailer_name + ":" + delivery.action_name),
   )
 }

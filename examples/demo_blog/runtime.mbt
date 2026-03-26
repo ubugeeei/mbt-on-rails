@@ -60,6 +60,13 @@ pub fn demo_fixtures() -> Array[@fixture.FixtureSet] {
 ///|
 /// Builds the seed plans configured by the demo app.
 pub fn demo_seeds() -> Array[@fixture.SeedPlan] {
+  let search_reindex_job = @job.job(
+    name="search.reindex",
+    queue="default",
+    argument_types=[("scope", "String")],
+    retry_limit=2,
+    unique_key=None,
+  ).retry_on("TimeoutError", attempts=3, wait=@job.fixed_wait(seconds=3))
   [
     @fixture.seed_plan(
       "bootstrap",
@@ -73,10 +80,10 @@ pub fn demo_seeds() -> Array[@fixture.SeedPlan] {
       ],
       [
         @job.enqueued_job(
-          @job.job("search.reindex", "default", [("scope", "String")], 2, None),
-          [("scope", "posts")],
-          "",
-          0,
+          definition=search_reindex_job,
+          payload=[("scope", "posts")],
+          run_at="",
+          attempts=0,
         ),
       ],
     ),

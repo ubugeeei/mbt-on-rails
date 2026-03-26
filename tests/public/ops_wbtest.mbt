@@ -73,6 +73,92 @@ test "jobs mailers and cache support rails style workflows" {
 }
 
 ///|
+test "job failure policies support retry_on discard_on and queue overrides" {
+  let definition = job(
+    name="SearchIndexJob",
+    queue="default",
+    argument_types=[("id", "String")],
+    retry_limit=0,
+    unique_key=None,
+  )
+  .retry_on(
+    "TimeoutError",
+    attempts=3,
+    wait=fixed_wait(seconds=5),
+    queue=Some("low"),
+  )
+  .discard_on("DeserializationError", report=true)
+
+  let current = enqueued_job(
+    definition=definition,
+    payload=[("id", "42")],
+    run_at="",
+    attempts=0,
+  )
+
+  match handle_job_failure(
+    current,
+    "TimeoutError",
+    "2026-03-26T09:00:00Z",
+  ) {
+    Retried(next_job) => {
+      assert_eq(next_job.queue, "low")
+      assert_eq(next_job.attempts, 1)
+      assert_eq(next_job.run_at, "2026-03-26T09:00:05Z")
+    }
+    _ => assert_true(false)
+  }
+
+  match handle_job_failure(
+    current,
+    "DeserializationError",
+    "2026-03-26T09:00:00Z",
+  ) {
+    Discarded(discarded) => assert_eq(discarded.name, "SearchIndexJob")
+    _ => assert_true(false)
+  }
+
+  let exhausted = enqueued_job(
+    definition=definition,
+    payload=[("id", "42")],
+    run_at="",
+    attempts=2,
+  )
+  match handle_job_failure(
+    exhausted,
+    "TimeoutError",
+    "2026-03-26T09:00:00Z",
+  ) {
+    RetryStopped(stopped) => assert_eq(stopped.attempts, 2)
+    _ => assert_true(false)
+  }
+
+  let slow = job(
+    name="RemoteCallJob",
+    queue="default",
+    argument_types=[],
+  ).retry_on(
+    "NetTimeout",
+    attempts=4,
+    wait=polynomially_longer(),
+  )
+  let pending = enqueued_job(
+    definition=slow,
+    payload=[],
+    run_at="",
+    attempts=1,
+  )
+  match handle_job_failure(
+    pending,
+    "NetTimeout",
+    "2026-03-26T09:00:00Z",
+  ) {
+    Retried(next_job) => assert_eq(next_job.run_at, "2026-03-26T09:00:18Z")
+    _ => assert_true(false)
+  }
+}
+
+///|
 test "component contracts surface server client boundaries in manifests" {
   let action = server_action(
     "posts.create",

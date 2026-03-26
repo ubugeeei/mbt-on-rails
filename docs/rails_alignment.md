@@ -39,6 +39,12 @@ The source audit in this batch was anchored to the official Rails repository at:
 - `ActiveRecord` validation wrappers can now bridge to generic rules through `validates(field=..., rule=...)`
 - Validation constructors and association constructors now support labelled arguments for a more declarative API
 
+## Third batch added here
+
+- `ActiveJob`-style `retry_on` / `discard_on` failure policies with typed `RetryWait` and `JobFailurePolicy`
+- Failure handling now returns `JobFailureOutcome` and can reschedule jobs using fixed or polynomial backoff
+- Active Job notifications now include `discard.active_job` in addition to retry-related events
+
 ## Biggest gaps still open
 
 - `activesupport`: concern/autoloading/deprecation/timezones/notifications subscribers
@@ -46,7 +52,7 @@ The source audit in this batch was anchored to the official Rails repository at:
 - `activerecord`: transactions/dirty tracking/query interface/scopes/callback chains
 - `actionpack`: cookies/session store/responders/after_action/around_action/request forgery strategy
 - `actionview`: partials/helpers/form builders/template lookup
-- `activejob`: adapters/serialization/retry_on/discard_on
+- `activejob`: adapters/serialization
 - `actioncable`: connection lifecycle and richer subscription adapters
 - `railties`: generators/initializers/config loading/engines
 
@@ -54,5 +60,5 @@ The source audit in this batch was anchored to the official Rails repository at:
 
 1. Add `after_action` and `around_action` style controller callbacks.
 2. Expand the validation library with reusable validator objects and richer message customization.
-3. Add `retry_on` / `discard_on` style job policy structs.
+3. Add Active Job adapters and serialization contracts.
 4. Add partial rendering and a small helper/form-builder layer.

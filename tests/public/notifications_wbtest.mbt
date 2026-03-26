@@ -25,7 +25,13 @@ test "notifications capture cache operations with Rails-style names" {
 
 ///|
 test "notifications capture job and mailer instrumentation" {
-  let reindex = job("posts.reindex", "default", [("id", "String")], 3, None)
+  let reindex = job(
+    name="posts.reindex",
+    queue="default",
+    argument_types=[("id", "String")],
+    retry_limit=3,
+    unique_key=None,
+  )
   let (queue, enqueue_events) = enqueue_now_with_notifications(
     queue=job_queue("default"),
     definition=reindex,
@@ -44,6 +50,66 @@ test "notifications capture job and mailer instrumentation" {
     None => assert_true(false)
   }
   assert_eq(retry_events.named("enqueue_retry.active_job").length(), 1)
+
+  let policy_job = enqueued_job(
+    definition=job(
+      name="search.sync",
+      queue="default",
+      argument_types=[("id", "String")],
+    )
+    .retry_on("TimeoutError", attempts=2, wait=fixed_wait(seconds=5))
+    .discard_on("DeserializationError"),
+    payload=[("id", "7")],
+    run_at="",
+    attempts=0,
+  )
+  let (handled_retry, handled_retry_events) = handle_job_failure_with_notifications(
+    job=policy_job,
+    error_name="TimeoutError",
+    now="2026-03-26T09:00:00Z",
+    notifications=notifications(),
+  )
+  match handled_retry {
+    Retried(next_job) => assert_eq(next_job.run_at, "2026-03-26T09:00:05Z")
+    _ => assert_true(false)
+  }
+  assert_eq(handled_retry_events.named("enqueue_retry.active_job").length(), 1)
+
+  let (handled_discard, handled_discard_events) = handle_job_failure_with_notifications(
+    job=policy_job,
+    error_name="DeserializationError",
+    now="2026-03-26T09:00:00Z",
+    notifications=notifications(),
+  )
+  match handled_discard {
+    Discarded(_) => assert_true(true)
+    _ => assert_true(false)
+  }
+  assert_eq(handled_discard_events.named("discard.active_job").length(), 1)
+
+  let stopped_job = enqueued_job(
+    definition=job(
+      name="search.sync",
+      queue="default",
+      argument_types=[("id", "String")],
+    )
+    .retry_on("TimeoutError", attempts=2, wait=fixed_wait(seconds=5))
+    .discard_on("DeserializationError"),
+    payload=[("id", "7")],
+    run_at="",
+    attempts=1,
+  )
+  let (handled_stopped, handled_stopped_events) = handle_job_failure_with_notifications(
+    job=stopped_job,
+    error_name="TimeoutError",
+    now="2026-03-26T09:00:00Z",
+    notifications=notifications(),
+  )
+  match handled_stopped {
+    RetryStopped(_) => assert_true(true)
+    _ => assert_true(false)
+  }
+  assert_eq(handled_stopped_events.named("retry_stopped.active_job").length(), 1)
 
   let (delivery, mail_events) = compose_mail_with_notifications(
     mailer=mailer("SessionMailer", "noreply@example.com", None, [
