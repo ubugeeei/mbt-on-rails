@@ -34,8 +34,10 @@ test "orm migration example builders keep relation migration and validation stab
   assert_eq(down_sql[down_sql.length() - 1], "DROP TABLE posts")
 
   let phased = publish_backfill_migration()
+  let constraints = validate_post_constraints_migration()
   let phased_up = @mbor.migration_up_sql(phased)
   let phased_down = @mbor.migration_down_sql(phased)
+  let constraint_up = @mbor.migration_up_sql(constraints)
   assert_true(@mbor.migration_safe(phased))
   assert_eq(@mbor.migration_risk_level(phased).to_string(), "Safe")
   assert_true(
@@ -54,6 +56,17 @@ test "orm migration example builders keep relation migration and validation stab
     ),
   )
   assert_eq(phased_down[0], "DROP INDEX CONCURRENTLY idx_posts_published")
+  assert_true(@mbor.migration_safe(constraints))
+  assert_true(
+    constraint_up.contains(
+      "ALTER TABLE posts ADD CONSTRAINT posts_slug_present CHECK (slug <> '') NOT VALID",
+    ),
+  )
+  assert_true(
+    constraint_up.contains(
+      "ALTER TABLE posts VALIDATE CONSTRAINT fk_posts_author_id",
+    ),
+  )
 
   let db = @mbor.insert_record(
     @mbor.empty_memory_database(),

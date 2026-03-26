@@ -46,12 +46,34 @@ fn publish_backfill_migration() -> @mbor.Migration {
 }
 
 ///|
+/// Builds a phased constraint-validation example for legacy tables.
+fn validate_post_constraints_migration() -> @mbor.Migration {
+  @mbor.migration_plan("20260326030102", "validate_post_constraints")
+  .add_check_constraint(
+    "posts",
+    "posts_slug_present",
+    "slug <> ''",
+    validate=false,
+  )
+  .add_foreign_key(
+    "posts",
+    "author_id",
+    "users",
+    validate=false,
+    on_delete=Some("RESTRICT"),
+  )
+  .validate_check_constraint("posts", "posts_slug_present")
+  .validate_foreign_key("posts", "author_id", "users")
+}
+
+///|
 /// Prints migration up/down SQL for the model.
 fn print_migration_example(model : @mbor.ModelSchema) -> Unit {
   let create_posts = @mbor.migration_from_model(
     "20260323040201", "create_posts", model,
   )
   let phased = publish_backfill_migration()
+  let constraints = validate_post_constraints_migration()
 
   println("Create Migration Up")
   for statement in @mbor.migration_up_sql(create_posts) {
@@ -73,6 +95,14 @@ fn print_migration_example(model : @mbor.ModelSchema) -> Unit {
   println("")
   println("Phased Migration Down")
   for statement in @mbor.migration_down_sql(phased) {
+    println(statement)
+  }
+  println("")
+  println("Constraint Validation Safety")
+  println(@mbor.migration_safety_summary(constraints))
+  println("")
+  println("Constraint Validation Up")
+  for statement in @mbor.migration_up_sql(constraints) {
     println(statement)
   }
 }

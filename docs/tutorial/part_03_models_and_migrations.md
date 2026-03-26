@@ -9,6 +9,8 @@ Learn the data-modeling surface, the opinionated migration DSL, and the safe pha
 - [`../../src/active_record/schema.mbt`](../../src/active_record/schema.mbt)
 - [`../../src/active_record/behavior.mbt`](../../src/active_record/behavior.mbt)
 - [`../../src/migration/migration.mbt`](../../src/migration/migration.mbt)
+- [`../../src/migration/render.mbt`](../../src/migration/render.mbt)
+- [`../../src/migration/safety.mbt`](../../src/migration/safety.mbt)
 - [`../../examples/orm_migration/main.mbt`](../../examples/orm_migration/main.mbt)
 
 ## Define A Model
@@ -92,11 +94,44 @@ The DSL also includes:
 
 - `add_reference(...)`
 - `add_timestamps(...)`
+- `add_check_constraint(...)`
+- `validate_check_constraint(...)`
+- `add_foreign_key(...)`
+- `validate_foreign_key(...)`
 - `remove_index_concurrently(...)`
 - `rename_column(...)`
 - `rename_table(...)`
 - `execute_sql(...)`
 - `reversible(...)`
+
+For production-style retrofits, the new phased constraint pattern is:
+
+```moonbit
+let constraints = migration_plan(
+  "20260326030102",
+  "validate_post_constraints",
+)
+  .add_check_constraint(
+    "posts",
+    "posts_slug_present",
+    "slug <> ''",
+    validate=false,
+  )
+  .add_foreign_key(
+    "posts",
+    "author_id",
+    "users",
+    validate=false,
+  )
+  .validate_check_constraint("posts", "posts_slug_present")
+  .validate_foreign_key("posts", "author_id", "users")
+```
+
+That keeps the rollout in two phases:
+
+- add the constraint as `NOT VALID`
+- backfill or clean data if needed
+- validate in a later step without changing the DSL shape
 
 ## Check Migration Safety
 
@@ -117,6 +152,8 @@ The analyzer classifies steps into:
 Typical examples:
 
 - `add_column(..., boolean_column("published"))` is flagged because it is `NOT NULL` from the start
+- `add_check_constraint(..., validate=false)` and `add_foreign_key(..., validate=false)` can stay `Safe`
+- immediate validated constraint creation is flagged for `Review`
 - `remove_column(...)` is flagged as destructive
 - `execute_sql(...)` is flagged for manual review
 - phased nullable/backfill/concurrent-index plans can stay `Safe`
@@ -125,6 +162,7 @@ Typical examples:
 
 - [`../../examples/orm_migration/main.mbt`](../../examples/orm_migration/main.mbt)
 - [`../../tests/public/core_wbtest.mbt`](../../tests/public/core_wbtest.mbt)
+- [`../../tests/public/migration_constraints_wbtest.mbt`](../../tests/public/migration_constraints_wbtest.mbt)
 - [`../../examples/orm_migration/main_wbtest.mbt`](../../examples/orm_migration/main_wbtest.mbt)
 - [`../../tests/public/relation_render_wbtest.mbt`](../../tests/public/relation_render_wbtest.mbt)
 

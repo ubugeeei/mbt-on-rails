@@ -127,6 +127,12 @@ The source audit in this batch was anchored to the official Rails repository at:
 - Schema column defaults and `timestamps=true` are now applied by the in-memory persistence path, which keeps examples closer to the SQL schema they generate
 - `find_record_by_primary_key(...)` and `destroy_record(...)` add the basic lookup and destroy lifecycle expected from an Active Record-style adapter, including soft-delete aware tombstones
 
+## Seventeenth batch added here
+
+- The migration package is now split into smaller files so the public DSL, SQL rendering, and safety analyzer stay readable instead of living in one monolith
+- Phased constraint APIs now cover `add_check_constraint(..., validate=false)` / `validate_check_constraint(...)` and `add_foreign_key(..., validate=false)` / `validate_foreign_key(...)`
+- Safety analysis treats `NOT VALID` constraint rollout as safe while still flagging immediately validated constraints and constraint removals for review
+
 ## Biggest gaps still open
 
 - `activesupport`: concern/autoloading/deprecation/timezones/notifications subscribers
