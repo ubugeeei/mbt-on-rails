@@ -9,8 +9,44 @@ pub fn prop_contract(
   type_name~ : String,
   required~ : Bool,
   description~ : String,
+  default_value? : String? = None,
 ) -> PropContract {
-  { name, type_name, required, description }
+  { name, type_name, required, description, default_value }
+}
+
+///|
+/// Builds one emit contract entry for a server or client component.
+#label_migration(name, allow_positional=true)
+#label_migration(signature, allow_positional=true)
+pub fn emit_contract(
+  name~ : String,
+  signature~ : String,
+  description? : String? = None,
+) -> EmitContract {
+  { name, signature, description }
+}
+
+///|
+/// Builds one slot contract entry for a server or client component.
+#label_migration(name, allow_positional=true)
+#label_migration(signature, allow_positional=true)
+pub fn slot_contract(
+  name~ : String,
+  signature~ : String,
+  required? : Bool = false,
+  description? : String? = None,
+) -> SlotContract {
+  { name, signature, required, description }
+}
+
+///|
+/// Builds one template ref contract entry for a compiled component.
+#label_migration(ref_name, allow_positional=true)
+pub fn template_ref_contract(
+  ref_name~ : String,
+  binding_name? : String? = None,
+) -> TemplateRefContract {
+  { ref_name, binding_name }
 }
 
 ///|
@@ -20,14 +56,53 @@ pub fn prop_contract(
 pub fn server_contract(
   props~ : Array[PropContract],
   async_only~ : Bool,
+  props_binding? : String? = None,
+  emits_binding? : String? = None,
+  slots_binding? : String? = None,
+  emits? : Array[EmitContract] = [],
+  slots? : Array[SlotContract] = [],
+  template_refs? : Array[TemplateRefContract] = [],
+  transport? : String = "json",
 ) -> ComponentContract {
-  { boundary: ServerBoundary, props, transport: "json", async_only }
+  {
+    boundary: ServerBoundary,
+    props: @support.clone_array(props),
+    props_binding,
+    emits_binding,
+    slots_binding,
+    emits: @support.clone_array(emits),
+    slots: @support.clone_array(slots),
+    template_refs: @support.clone_array(template_refs),
+    transport,
+    async_only,
+  }
 }
 
 ///|
 /// Builds a client-side component contract.
-pub fn client_contract(props : Array[PropContract]) -> ComponentContract {
-  { boundary: ClientBoundary, props, transport: "json", async_only: false }
+#label_migration(props, allow_positional=true)
+pub fn client_contract(
+  props~ : Array[PropContract],
+  props_binding? : String? = None,
+  emits_binding? : String? = None,
+  slots_binding? : String? = None,
+  emits? : Array[EmitContract] = [],
+  slots? : Array[SlotContract] = [],
+  template_refs? : Array[TemplateRefContract] = [],
+  transport? : String = "json",
+) -> ComponentContract {
+  {
+    boundary: ClientBoundary,
+    props: @support.clone_array(props),
+    props_binding,
+    emits_binding,
+    slots_binding,
+    emits: @support.clone_array(emits),
+    slots: @support.clone_array(slots),
+    template_refs: @support.clone_array(template_refs),
+    transport,
+    async_only: false,
+  }
 }
 
 ///|

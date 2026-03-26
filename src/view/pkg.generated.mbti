@@ -22,7 +22,10 @@ pub fn class_names(Array[(String, Bool)]) -> String
 #label_migration(source_path, allow_positional=true)
 pub fn client_component(name~ : String, source_path~ : @support.MbtvPath, props~ : Array[(String, String)], hydration~ : HydrationMode) -> VaporComponentRef
 
-pub fn client_contract(Array[PropContract]) -> ComponentContract
+#label_migration(props, allow_positional=true)
+pub fn client_contract(props~ : Array[PropContract], props_binding? : String?, emits_binding? : String?, slots_binding? : String?, emits? : Array[EmitContract], slots? : Array[SlotContract], template_refs? : Array[TemplateRefContract], transport? : String) -> ComponentContract
+
+pub fn client_module_path(String) -> String
 
 pub fn content_tag(name~ : String, content~ : String, attrs? : Array[(String, String)], escape? : Bool) -> String
 
@@ -41,6 +44,10 @@ pub fn dynamic_force_static() -> DynamicMode
 pub fn dynamic_revalidate(Int) -> DynamicMode
 
 pub fn email_field(name~ : String, label~ : String, required? : Bool, placeholder? : String?, value? : String?, autocomplete? : String?, help_text? : String?) -> FormField
+
+#label_migration(name, allow_positional=true)
+#label_migration(signature, allow_positional=true)
+pub fn emit_contract(name~ : String, signature~ : String, description? : String?) -> EmitContract
 
 #label_migration(action_name, allow_positional=true)
 #label_migration(name, allow_positional=true)
@@ -89,6 +96,12 @@ pub fn link_to(label~ : String, href~ : String, attrs? : Array[(String, String)]
 #label_migration(revalidate_seconds, allow_positional=true)
 pub fn loader_module(name~ : String, cache_key~ : String, revalidate_seconds~ : Int?, depends_on~ : Array[String]) -> LoaderModule
 
+pub fn make_scope_id(String) -> String
+
+pub fn merge_class_names(Array[String]) -> String
+
+pub fn merge_styles(Array[String]) -> String
+
 pub fn mount_import(import_name~ : String, props~ : Array[(String, String)]) -> VaporNode
 
 #label_migration(component, allow_positional=true)
@@ -108,7 +121,9 @@ pub fn pluralize(Int, String, plural? : String?) -> String
 #label_migration(name, allow_positional=true)
 #label_migration(required, allow_positional=true)
 #label_migration(type_name, allow_positional=true)
-pub fn prop_contract(name~ : String, type_name~ : String, required~ : Bool, description~ : String) -> PropContract
+pub fn prop_contract(name~ : String, type_name~ : String, required~ : Bool, description~ : String, default_value? : String?) -> PropContract
+
+pub fn props_to_json(Array[(String, String)]) -> String
 
 pub fn render_bundle_plan(PageModule) -> String
 
@@ -134,6 +149,8 @@ pub fn render_server_action_manifest(Array[ServerAction]) -> String
 
 pub fn safe_join(Array[String], separator? : String) -> String
 
+pub fn scope_css(String, String) -> String
+
 #label_migration(csrf_protected, allow_positional=true)
 #label_migration(input_fields, allow_positional=true)
 #label_migration(name, allow_positional=true)
@@ -148,7 +165,13 @@ pub fn server_component(name~ : String, source_path~ : @support.MbtvPath, props~
 
 #label_migration(async_only, allow_positional=true)
 #label_migration(props, allow_positional=true)
-pub fn server_contract(props~ : Array[PropContract], async_only~ : Bool) -> ComponentContract
+pub fn server_contract(props~ : Array[PropContract], async_only~ : Bool, props_binding? : String?, emits_binding? : String?, slots_binding? : String?, emits? : Array[EmitContract], slots? : Array[SlotContract], template_refs? : Array[TemplateRefContract], transport? : String) -> ComponentContract
+
+pub fn show_style(Bool, String) -> String
+
+#label_migration(name, allow_positional=true)
+#label_migration(signature, allow_positional=true)
+pub fn slot_contract(name~ : String, signature~ : String, required? : Bool, description? : String?) -> SlotContract
 
 pub fn suspense_boundary(name~ : String, fallback_html~ : String, children~ : Array[VaporNode]) -> VaporNode
 
@@ -160,9 +183,16 @@ pub fn template_component_usages(String) -> Array[String]
 
 pub fn template_import(local_name~ : String, component~ : VaporComponentRef) -> TemplateImport
 
+#label_migration(ref_name, allow_positional=true)
+pub fn template_ref_contract(ref_name~ : String, binding_name? : String?) -> TemplateRefContract
+
 pub fn text_field(name~ : String, label~ : String, required? : Bool, placeholder? : String?, value? : String?, autocomplete? : String?, help_text? : String?) -> FormField
 
 pub fn textarea_field(name~ : String, label~ : String, required? : Bool, placeholder? : String?, value? : String?, autocomplete? : String?, help_text? : String?) -> FormField
+
+pub fn use_id(String, Int) -> String
+
+pub fn[T] use_template_ref(String) -> TemplateRef[T]
 
 pub fn validate_component_tree(VaporComponentRef) -> Array[String]
 
@@ -216,6 +246,12 @@ pub impl Show for BoundaryKind
 pub struct ComponentContract {
   boundary : BoundaryKind
   props : Array[PropContract]
+  props_binding : String?
+  emits_binding : String?
+  slots_binding : String?
+  emits : Array[EmitContract]
+  slots : Array[SlotContract]
+  template_refs : Array[TemplateRefContract]
   transport : String
   async_only : Bool
 }
@@ -228,6 +264,12 @@ pub enum DynamicMode {
 }
 pub impl Eq for DynamicMode
 pub impl Show for DynamicMode
+
+pub struct EmitContract {
+  name : String
+  signature : String
+  description : String?
+}
 
 pub struct FormBinding {
   name : String
@@ -328,6 +370,7 @@ pub struct PropContract {
   type_name : String
   required : Bool
   description : String
+  default_value : String?
 }
 
 pub struct RenderedPage {
@@ -346,6 +389,13 @@ pub struct ServerAction {
   csrf_protected : Bool
 }
 
+pub struct SlotContract {
+  name : String
+  signature : String
+  required : Bool
+  description : String?
+}
+
 pub struct SuspenseBoundary {
   name : String
   fallback_html : String
@@ -355,6 +405,17 @@ pub struct SuspenseBoundary {
 pub struct TemplateImport {
   local_name : String
   component : VaporComponentRef
+}
+
+pub struct TemplateRef[T] {
+  name : String
+  phantom : T?
+}
+pub fn[T] TemplateRef::name(Self[T]) -> String
+
+pub struct TemplateRefContract {
+  ref_name : String
+  binding_name : String?
 }
 
 pub struct VaporComponentRef {

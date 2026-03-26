@@ -214,6 +214,109 @@ test "action view style helpers render concise typed html fragments" {
 }
 
 ///|
+test "vapor moon compatibility helpers expose richer component metadata" {
+  let root_ref : TemplateRef[String] = use_template_ref("root")
+  let island = client_component(
+    name="CounterPanel",
+    source_path=mbtv_path(
+      "examples/demo_blog/views/components/counter_panel.mbtv",
+    ),
+    props=[("title", "Dashboard")],
+    hydration=hydrate_load(),
+  ).with_contract(
+    client_contract(
+      props=[
+        prop_contract(
+          name="title",
+          type_name="String",
+          required=true,
+          description="Panel heading",
+        ),
+        prop_contract(
+          name="count",
+          type_name="Int",
+          required=true,
+          description="Visible count",
+          default_value=Some("0"),
+        ),
+      ],
+      props_binding=Some("props"),
+      emits_binding=Some("emit"),
+      slots_binding=Some("slots"),
+      emits=[
+        emit_contract(
+          name="save",
+          signature="String",
+          description=Some("Persist one value"),
+        ),
+      ],
+      slots=[
+        slot_contract(
+          name="footer",
+          signature="String",
+          description=Some("Footer slot"),
+        ),
+      ],
+      template_refs=[
+        template_ref_contract(ref_name="root", binding_name=Some("root_ref")),
+      ],
+      transport="json",
+    ),
+  )
+  let page = page_module(
+    route_name="dashboard",
+    route_path="/dashboard",
+    file_path=mbtv_path("examples/demo_blog/views/pages/home.mbtv"),
+    title="Dashboard",
+    component=server_component(
+      name="DashboardPage",
+      source_path=mbtv_path("examples/demo_blog/views/pages/home.mbtv"),
+      props=[],
+    ),
+  ).with_island(island)
+
+  let manifest = render_component_manifest(page)
+  let rendered = render_page(page, [], [], [])
+
+  assert_eq(root_ref.name(), "root")
+  assert_true(manifest.contains("\"scope_id\": \"vm-"))
+  assert_true(
+    manifest.contains("\"client_module_path\": \"/_vapor_moon/CounterPanel-"),
+  )
+  assert_true(manifest.contains("\"default_value\": \"0\""))
+  assert_true(manifest.contains("\"emits_binding\": \"emit\""))
+  assert_true(manifest.contains("\"slots_binding\": \"slots\""))
+  assert_true(manifest.contains("\"signature\": \"String\""))
+  assert_true(manifest.contains("\"ref_name\": \"root\""))
+  assert_true(rendered.html.contains("data-mbor-scope=\"vm-"))
+  assert_true(
+    rendered.html.contains(
+      "data-mbor-client-module=\"/_vapor_moon/CounterPanel-",
+    ),
+  )
+  assert_true(
+    client_module_path("CounterPanel").has_prefix("/_vapor_moon/CounterPanel-"),
+  )
+  assert_true(make_scope_id("CounterPanel").has_prefix("vm-"))
+  assert_eq(
+    props_to_json([("count", "1"), ("ready", "true")]),
+    "{\"count\": 1, \"ready\": true}",
+  )
+  assert_true(
+    scope_css(".panel { color: red; }", make_scope_id("CounterPanel")).contains(
+      "[data-vm-scope=\"",
+    ),
+  )
+  assert_eq(show_style(false, "color: red;"), "color: red; display: none;")
+  assert_eq(merge_class_names(["panel", "", "island"]), "panel island")
+  assert_eq(
+    merge_styles(["color: red", "display: block;"]),
+    "color: red; display: block;",
+  )
+  assert_true(use_id("CounterPanel", 2).contains("-id-2"))
+}
+
+///|
 test "scaffold and demo app expose richer rails style surfaces" {
   let scaffold = scaffold_resource("comments", [
     scaffold_field("body", text_column("body")),

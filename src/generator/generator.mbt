@@ -342,7 +342,7 @@ fn scaffold_counter_island(resource_name : String) -> @view.VaporComponentRef {
       ),
       "<button type=\"button\">0</button>",
     ),
-    @view.client_contract([
+    @view.client_contract(props=[
       @view.prop_contract(
         name="count",
         type_name="Int",

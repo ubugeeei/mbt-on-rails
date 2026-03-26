@@ -28,6 +28,7 @@ moon run examples/demo_blog
 - Auth, sessions, policies, and CSRF helpers
 - `.mbtv` pages, layouts, partials, Action View-style HTML helpers, server components, client islands, and suspense-like boundaries
 - Server actions, form bindings, typed form builders, and generated typed route/action helpers
+- Vapor Moon-compatible scope ids, client module paths, template refs, and prop/emit/slot metadata
 - Jobs, adapter contracts, serialized job envelopes, mailers, cache, cable, turbo stream, and production helpers
 - Rails-style runtime notifications for controller, view, cache, job, and mailer flows
 

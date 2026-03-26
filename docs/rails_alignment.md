@@ -101,6 +101,12 @@ The source audit in this batch was anchored to the official Rails repository at:
 - `link_to(...)`, `button_to(...)`, and `image_tag(...)` now cover the most common helper-driven template fragments
 - `class_names(...)`, `safe_join(...)`, `dom_id(...)`, and `pluralize(...)` keep `.mbtv` call sites compact without giving up typed, explicit inputs
 
+## Thirteenth batch added here
+
+- The Vapor-facing view layer now carries richer `prop_contract(...)`, `emit_contract(...)`, `slot_contract(...)`, and `template_ref_contract(...)` metadata
+- Component manifests now expose Vapor Moon-style `scope_id`, `client_module_path`, prop defaults, binding names, emits, slots, and template refs
+- Runtime helpers such as `make_scope_id(...)`, `client_module_path(...)`, `scope_css(...)`, `show_style(...)`, `merge_class_names(...)`, `merge_styles(...)`, `use_id(...)`, and `use_template_ref(...)` now mirror Vapor Moon's current helper surface more directly
+
 ## Biggest gaps still open
 
 - `activesupport`: concern/autoloading/deprecation/timezones/notifications subscribers
@@ -116,4 +122,4 @@ The source audit in this batch was anchored to the official Rails repository at:
 
 1. Add typed attribute/serialization support on top of the validation layer.
 2. Add deeper Active Job execution backend and monitoring behavior.
-3. Add broader Action View helper and template lookup coverage.
+3. Add broader Vapor Moon compile/tooling integration instead of only runtime-compatible metadata.

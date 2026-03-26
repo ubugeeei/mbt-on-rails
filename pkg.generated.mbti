@@ -183,7 +183,10 @@ pub fn classify(String) -> String
 #label_migration(source_path, allow_positional=true)
 pub fn client_component(name~ : String, source_path~ : @support.MbtvPath, props~ : Array[(String, String)], hydration~ : @view.HydrationMode) -> @view.VaporComponentRef
 
-pub fn client_contract(Array[@view.PropContract]) -> @view.ComponentContract
+#label_migration(props, allow_positional=true)
+pub fn client_contract(props~ : Array[@view.PropContract], props_binding? : String?, emits_binding? : String?, slots_binding? : String?, emits? : Array[@view.EmitContract], slots? : Array[@view.SlotContract], template_refs? : Array[@view.TemplateRefContract], transport? : String) -> @view.ComponentContract
+
+pub fn client_module_path(String) -> String
 
 pub fn[T] clone_array(Array[T]) -> Array[T]
 
@@ -290,6 +293,10 @@ pub fn dynamic_force_static() -> @view.DynamicMode
 pub fn dynamic_revalidate(Int) -> @view.DynamicMode
 
 pub fn email_field(name~ : String, label~ : String, required? : Bool, placeholder? : String?, value? : String?, autocomplete? : String?, help_text? : String?) -> @view.FormField
+
+#label_migration(name, allow_positional=true)
+#label_migration(signature, allow_positional=true)
+pub fn emit_contract(name~ : String, signature~ : String, description? : String?) -> @view.EmitContract
 
 pub fn empty_memory_database() -> @active_record.MemoryDatabase
 
@@ -534,6 +541,8 @@ pub fn mailer(name~ : String, from~ : String, layout_name~ : String?, templates~
 
 pub fn mailer_summary(@mailer.MailerDefinition) -> String
 
+pub fn make_scope_id(String) -> String
+
 pub fn masked_secret_summary(@secrets.SecretsConfig) -> String
 
 pub fn match_route(@http.RoutePattern, String) -> Array[(String, String)]?
@@ -543,9 +552,13 @@ pub fn max_length(maximum~ : Int) -> @validation.FieldRule
 
 pub fn mbtv_path(String) -> @support.MbtvPath
 
+pub fn merge_class_names(Array[String]) -> String
+
 pub fn merge_params(Array[(String, String)], Array[(String, String)], Array[(String, String)]) -> @params.Parameters
 
 pub fn merge_relation(@active_record.Relation, @active_record.Relation) -> @active_record.Relation
+
+pub fn merge_styles(Array[String]) -> String
 
 pub fn metric_value(@metrics.MetricsRegistry, String, Array[(String, String)]) -> Int
 
@@ -680,7 +693,9 @@ pub fn process_summary(Array[@process.ProcessDefinition]) -> String
 #label_migration(name, allow_positional=true)
 #label_migration(required, allow_positional=true)
 #label_migration(type_name, allow_positional=true)
-pub fn prop_contract(name~ : String, type_name~ : String, required~ : Bool, description~ : String) -> @view.PropContract
+pub fn prop_contract(name~ : String, type_name~ : String, required~ : Bool, description~ : String, default_value? : String?) -> @view.PropContract
+
+pub fn props_to_json(Array[(String, String)]) -> String
 
 pub fn rate_limit_rule(String, String, Int, Int) -> @production.RateLimitRule
 
@@ -837,6 +852,8 @@ pub fn schema_sql(Array[@migration.Migration]) -> Array[String]
 #label_migration(relation, allow_positional=true)
 pub fn scope(name~ : String, relation~ : @active_record.Relation) -> @active_record.ScopeDefinition
 
+pub fn scope_css(String, String) -> String
+
 pub fn scope_routes(String, String, Array[@http.RouteSpec]) -> Array[@http.RouteSpec]
 
 pub fn secret_value(@secrets.SecretsConfig, String) -> String?
@@ -884,7 +901,7 @@ pub fn server_component(name~ : String, source_path~ : @support.MbtvPath, props~
 
 #label_migration(async_only, allow_positional=true)
 #label_migration(props, allow_positional=true)
-pub fn server_contract(props~ : Array[@view.PropContract], async_only~ : Bool) -> @view.ComponentContract
+pub fn server_contract(props~ : Array[@view.PropContract], async_only~ : Bool, props_binding? : String?, emits_binding? : String?, slots_binding? : String?, emits? : Array[@view.EmitContract], slots? : Array[@view.SlotContract], template_refs? : Array[@view.TemplateRefContract], transport? : String) -> @view.ComponentContract
 
 #label_migration(config, allow_positional=true)
 #label_migration(remember_me, allow_positional=true)
@@ -893,7 +910,13 @@ pub fn session_cookie(config~ : @auth.AuthConfig, session~ : @auth.Session, reme
 
 pub fn set_metric(@metrics.MetricsRegistry, String, Array[(String, String)], Int) -> @metrics.MetricsRegistry
 
+pub fn show_style(Bool, String) -> String
+
 pub fn singularize(String) -> String
+
+#label_migration(name, allow_positional=true)
+#label_migration(signature, allow_positional=true)
+pub fn slot_contract(name~ : String, signature~ : String, required? : Bool, description? : String?) -> @view.SlotContract
 
 pub fn solid_queue_adapter(queue_prefix? : String?) -> @job.JobAdapter
 
@@ -913,6 +936,9 @@ pub fn template_component_imports(String) -> Array[String]
 pub fn template_component_usages(String) -> Array[String]
 
 pub fn template_import(local_name~ : String, component~ : @view.VaporComponentRef) -> @view.TemplateImport
+
+#label_migration(ref_name, allow_positional=true)
+pub fn template_ref_contract(ref_name~ : String, binding_name? : String?) -> @view.TemplateRefContract
 
 pub fn test_adapter() -> @job.JobAdapter
 
@@ -941,6 +967,10 @@ pub fn update_sql(@active_record.ModelSchema, @active_record.Record, String) -> 
 pub fn update_stream(String, String) -> @turbo.TurboStream
 
 pub fn upsert_sql(@active_record.ModelSchema, @active_record.Record, String) -> String
+
+pub fn use_id(String, Int) -> String
+
+pub fn[T] use_template_ref(String) -> @view.TemplateRef[T]
 
 pub fn validate_component_tree(@view.VaporComponentRef) -> Array[String]
 
@@ -1147,6 +1177,8 @@ pub using @view {type DynamicMode}
 
 pub using @auth {type EmailVerificationToken}
 
+pub using @view {type EmitContract}
+
 pub using @job {type EnqueuedJob}
 
 pub using @production {type Environment}
@@ -1313,9 +1345,15 @@ pub using @view {type ServerAction}
 
 pub using @auth {type Session}
 
+pub using @view {type SlotContract}
+
 pub using @view {type SuspenseBoundary}
 
 pub using @view {type TemplateImport}
+
+pub using @view {type TemplateRef}
+
+pub using @view {type TemplateRefContract}
 
 pub using @active_record {type TransactionSaveOutcome}
 

@@ -206,6 +206,8 @@ fn render_component_entry(component : VaporComponentRef) -> String {
     Some(contract) => render_boundary_kind(contract.boundary)
     None => if component.is_server_component { "server" } else { "client" }
   }
+  let scope_id = @support.json_string(make_scope_id(component.name))
+  let client_path = @support.json_string(client_module_path(component.name))
   let transport = match component.contract {
     Some(contract) => @support.json_string(contract.transport)
     None => "null"
@@ -216,6 +218,30 @@ fn render_component_entry(component : VaporComponentRef) -> String {
   }
   let props = match component.contract {
     Some(contract) => render_prop_contracts(contract.props)
+    None => "[]"
+  }
+  let props_binding = match component.contract {
+    Some(contract) => render_optional_json(contract.props_binding)
+    None => "null"
+  }
+  let emits_binding = match component.contract {
+    Some(contract) => render_optional_json(contract.emits_binding)
+    None => "null"
+  }
+  let slots_binding = match component.contract {
+    Some(contract) => render_optional_json(contract.slots_binding)
+    None => "null"
+  }
+  let emits = match component.contract {
+    Some(contract) => render_emit_contracts(contract.emits)
+    None => "[]"
+  }
+  let slots = match component.contract {
+    Some(contract) => render_slot_contracts(contract.slots)
+    None => "[]"
+  }
+  let template_refs = match component.contract {
+    Some(contract) => render_template_ref_contracts(contract.template_refs)
     None => "[]"
   }
   let fallback_html = match component.fallback_html {
@@ -229,6 +255,10 @@ fn render_component_entry(component : VaporComponentRef) -> String {
   @support.json_string(component.name) +
   ", \"source_path\": " +
   @support.json_string(component.source_path.as_string()) +
+  ", \"scope_id\": " +
+  scope_id +
+  ", \"client_module_path\": " +
+  client_path +
   ", \"boundary\": " +
   @support.json_string(boundary) +
   ", \"transport\": " +
@@ -237,6 +267,18 @@ fn render_component_entry(component : VaporComponentRef) -> String {
   async_only +
   ", \"props\": " +
   props +
+  ", \"props_binding\": " +
+  props_binding +
+  ", \"emits_binding\": " +
+  emits_binding +
+  ", \"slots_binding\": " +
+  slots_binding +
+  ", \"emits\": " +
+  emits +
+  ", \"slots\": " +
+  slots +
+  ", \"template_refs\": " +
+  template_refs +
   ", \"fallback_html\": " +
   fallback_html +
   ", \"template_imports\": " +
@@ -281,6 +323,62 @@ fn render_prop_contracts(props : Array[PropContract]) -> String {
       (if prop.required { "true" } else { "false" }) +
       ", \"description\": " +
       @support.json_string(prop.description) +
+      ", \"default_value\": " +
+      render_optional_json(prop.default_value) +
+      "}",
+    )
+  }
+  "[" + entries.join(", ") + "]"
+}
+
+///|
+fn render_emit_contracts(emits : Array[EmitContract]) -> String {
+  let entries : Array[String] = []
+  for emit in emits {
+    entries.push(
+      "{" +
+      "\"name\": " +
+      @support.json_string(emit.name) +
+      ", \"signature\": " +
+      @support.json_string(emit.signature) +
+      ", \"description\": " +
+      render_optional_json(emit.description) +
+      "}",
+    )
+  }
+  "[" + entries.join(", ") + "]"
+}
+
+///|
+fn render_slot_contracts(slots : Array[SlotContract]) -> String {
+  let entries : Array[String] = []
+  for slot in slots {
+    entries.push(
+      "{" +
+      "\"name\": " +
+      @support.json_string(slot.name) +
+      ", \"signature\": " +
+      @support.json_string(slot.signature) +
+      ", \"required\": " +
+      (if slot.required { "true" } else { "false" }) +
+      ", \"description\": " +
+      render_optional_json(slot.description) +
+      "}",
+    )
+  }
+  "[" + entries.join(", ") + "]"
+}
+
+///|
+fn render_template_ref_contracts(refs : Array[TemplateRefContract]) -> String {
+  let entries : Array[String] = []
+  for template_ref in refs {
+    entries.push(
+      "{" +
+      "\"ref_name\": " +
+      @support.json_string(template_ref.ref_name) +
+      ", \"binding_name\": " +
+      render_optional_json(template_ref.binding_name) +
       "}",
     )
   }

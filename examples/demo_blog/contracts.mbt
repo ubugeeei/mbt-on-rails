@@ -106,14 +106,40 @@ pub fn demo_post_composer_island(mode : String) -> @view.VaporComponentRef {
   )
   .with_fallback("<div class=\"composer-shell\">Preparing composer...</div>")
   .with_contract(
-    @view.client_contract([
-      @view.prop_contract(
-        name="mode",
-        type_name="String",
-        required=true,
-        description="Composer mode selector",
-      ),
-    ]),
+    @view.client_contract(
+      props=[
+        @view.prop_contract(
+          name="mode",
+          type_name="String",
+          required=false,
+          description="Composer mode selector",
+          default_value=Some("create"),
+        ),
+      ],
+      props_binding=Some("props"),
+      emits_binding=Some("emit"),
+      slots_binding=Some("slots"),
+      emits=[
+        @view.emit_contract(
+          name="submit",
+          signature="String",
+          description=Some("Submit composer payload"),
+        ),
+      ],
+      slots=[
+        @view.slot_contract(
+          name="footer",
+          signature="String",
+          description=Some("Footer content"),
+        ),
+      ],
+      template_refs=[
+        @view.template_ref_contract(
+          ref_name="composer",
+          binding_name=Some("composer_ref"),
+        ),
+      ],
+    ),
   )
 }
 
@@ -128,14 +154,32 @@ pub fn demo_post_composer_idle_island() -> @view.VaporComponentRef {
   )
   .with_fallback("<div class=\"composer-shell\">Preparing composer...</div>")
   .with_contract(
-    @view.client_contract([
-      @view.prop_contract(
-        name="mode",
-        type_name="String",
-        required=true,
-        description="Composer mode selector",
-      ),
-    ]),
+    @view.client_contract(
+      props=[
+        @view.prop_contract(
+          name="mode",
+          type_name="String",
+          required=false,
+          description="Composer mode selector",
+          default_value=Some("home"),
+        ),
+      ],
+      props_binding=Some("props"),
+      emits_binding=Some("emit"),
+      emits=[
+        @view.emit_contract(
+          name="submit",
+          signature="String",
+          description=Some("Submit composer payload"),
+        ),
+      ],
+      template_refs=[
+        @view.template_ref_contract(
+          ref_name="composer",
+          binding_name=Some("composer_ref"),
+        ),
+      ],
+    ),
   )
 }
 
@@ -152,13 +196,31 @@ pub fn demo_like_button_island() -> @view.VaporComponentRef {
     "<button type=\"button\" class=\"like-button\">12 likes</button>",
   )
   .with_contract(
-    @view.client_contract([
-      @view.prop_contract(
-        name="kind",
-        type_name="String",
-        required=true,
-        description="Visual reaction kind",
-      ),
-    ]),
+    @view.client_contract(
+      props=[
+        @view.prop_contract(
+          name="kind",
+          type_name="String",
+          required=false,
+          description="Visual reaction kind",
+          default_value=Some("heart"),
+        ),
+      ],
+      props_binding=Some("props"),
+      emits_binding=Some("emit"),
+      emits=[
+        @view.emit_contract(
+          name="toggle",
+          signature="Unit",
+          description=Some("Toggle the reaction state"),
+        ),
+      ],
+      template_refs=[
+        @view.template_ref_contract(
+          ref_name="button",
+          binding_name=Some("button_ref"),
+        ),
+      ],
+    ),
   )
 }

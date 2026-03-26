@@ -183,6 +183,11 @@ fn render_component_placeholder_with_import(
     "\" ",
   )
   attrs.write_string(
+    "data-mbor-scope=\"" +
+    @support.escape_html(make_scope_id(component.name)) +
+    "\" ",
+  )
+  attrs.write_string(
     "data-mbor-props='" + @support.escape_html(props_json) + "' ",
   )
   attrs.write_string(
@@ -208,6 +213,11 @@ fn render_component_placeholder_with_import(
     attrs.write_string("data-mbor-server-component=\"true\" ")
   } else {
     attrs.write_string("data-mbor-island=\"true\" ")
+    attrs.write_string(
+      "data-mbor-client-module=\"" +
+      @support.escape_html(client_module_path(component.name)) +
+      "\" ",
+    )
     match component.hydration {
       Some(mode) =>
         attrs.write_string(

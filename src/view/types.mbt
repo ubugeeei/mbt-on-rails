@@ -20,6 +20,13 @@ pub enum DynamicMode {
 } derive(Eq, Show)
 
 ///|
+/// Stores one typed template ref handle in a Vapor Moon-compatible shape.
+pub struct TemplateRef[T] {
+  name : String
+  phantom : T?
+}
+
+///|
 /// Distinguishes server-rendered components from client islands.
 pub enum BoundaryKind {
   ServerBoundary
@@ -33,6 +40,31 @@ pub struct PropContract {
   type_name : String
   required : Bool
   description : String
+  default_value : String?
+}
+
+///|
+/// Declares one typed emit callback exposed by a component.
+pub struct EmitContract {
+  name : String
+  signature : String
+  description : String?
+}
+
+///|
+/// Declares one typed slot accepted by a component.
+pub struct SlotContract {
+  name : String
+  signature : String
+  required : Bool
+  description : String?
+}
+
+///|
+/// Declares one template ref surfaced from the compiled component.
+pub struct TemplateRefContract {
+  ref_name : String
+  binding_name : String?
 }
 
 ///|
@@ -40,6 +72,12 @@ pub struct PropContract {
 pub struct ComponentContract {
   boundary : BoundaryKind
   props : Array[PropContract]
+  props_binding : String?
+  emits_binding : String?
+  slots_binding : String?
+  emits : Array[EmitContract]
+  slots : Array[SlotContract]
+  template_refs : Array[TemplateRefContract]
   transport : String
   async_only : Bool
 }

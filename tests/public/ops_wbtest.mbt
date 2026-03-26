@@ -212,7 +212,7 @@ test "component contracts surface server client boundaries in manifests" {
       ),
       "<button type=\"button\">1</button>",
     ),
-    client_contract([
+    client_contract(props=[
       prop_contract(
         name="initial",
         type_name="Int",
