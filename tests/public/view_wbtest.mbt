@@ -1,12 +1,12 @@
 ///|
 test "rendered page includes islands forms and route tree data" {
   let layout = layout_module(
-    "application",
-    mbtv_path("examples/demo_blog/views/layouts/application.mbtv"),
-    server_component(
-      "ApplicationLayout",
-      mbtv_path("examples/demo_blog/views/layouts/application.mbtv"),
-      [],
+    name="application",
+    file_path=mbtv_path("examples/demo_blog/views/layouts/application.mbtv"),
+    component=server_component(
+      name="ApplicationLayout",
+      source_path=mbtv_path("examples/demo_blog/views/layouts/application.mbtv"),
+      props=[],
     ),
   )
   let page = page_module(
@@ -15,30 +15,37 @@ test "rendered page includes islands forms and route tree data" {
       file_path=mbtv_path("examples/demo_blog/views/pages/posts/show.mbtv"),
       title="Post",
       component=server_component(
-        "PostsShowPage",
-        mbtv_path("examples/demo_blog/views/pages/posts/show.mbtv"),
-        [],
+        name="PostsShowPage",
+        source_path=mbtv_path("examples/demo_blog/views/pages/posts/show.mbtv"),
+        props=[],
       ),
     )
     .with_layout(layout)
-    .with_loader(loader_module("load_post", "posts:show", Some(60), ["posts"]))
+    .with_loader(
+      loader_module(
+        name="load_post",
+        cache_key="posts:show",
+        revalidate_seconds=Some(60),
+        depends_on=["posts"],
+      ),
+    )
     .with_action_name("posts.update")
     .with_dynamic_mode(dynamic_revalidate(60))
     .with_island(
       client_component(
-        "LikeButton",
-        mbtv_path("examples/demo_blog/views/components/like_button.mbtv"),
-        [("kind", "heart")],
-        hydrate_visible(),
+        name="LikeButton",
+        source_path=mbtv_path("examples/demo_blog/views/components/like_button.mbtv"),
+        props=[("kind", "heart")],
+        hydration=hydrate_visible(),
       ),
     )
     .with_form(
       form_binding(
-        "post_update",
-        "posts.update",
-        "POST",
-        Some("post"),
-        Some("/posts/[id]"),
+        name="post_update",
+        action_name="posts.update",
+        verb="POST",
+        optimistic_key=Some("post"),
+        redirect_to=Some("/posts/[id]"),
       ),
     )
   let actions = [
