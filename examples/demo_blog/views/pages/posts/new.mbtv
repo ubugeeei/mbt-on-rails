@@ -3,6 +3,7 @@ import {
   "mizchi/luna/js/resource" @reactivity,
   let signal = @reactivity.signal,
   let computed = @reactivity.computed,
+  component PostForm,
 }
 
 let preview_open = signal(false)

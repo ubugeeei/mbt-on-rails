@@ -84,7 +84,7 @@ fn print_job_and_mailer_example() -> Unit {
       @mbor.mail_template(
         "launch",
         "Launch update",
-        "examples/demo_blog/views/mailer/welcome.html.mbtv",
+        @mbor.mbtv_path("examples/demo_blog/views/mailer/welcome.html.mbtv"),
         Some("examples/demo_blog/views/mailer/welcome.text"),
       ),
     ],

@@ -2,12 +2,12 @@
 /// Builds the layout shared by the example pages.
 fn note_layout() -> @mbor.LayoutModule {
   @mbor.layout_module(
-    "application",
-    "examples/resource_app/views/layouts/application.mbtv",
-    @mbor.server_component(
-      "NoteLayout",
-      "examples/resource_app/views/layouts/application.mbtv",
-      [],
+    name="application",
+    file_path=view_layouts_application(),
+    component=@mbor.server_component(
+      name="NoteLayout",
+      source_path=view_layouts_application(),
+      props=[],
     ),
   )
 }
@@ -17,104 +17,114 @@ fn note_layout() -> @mbor.LayoutModule {
 fn note_pages(layout : @mbor.LayoutModule) -> Array[@mbor.PageModule] {
   [
     @mbor.page_module(
-      "notes_index",
-      "/notes",
-      "examples/resource_app/views/pages/notes/index.mbtv",
-      "Notes",
-      @mbor.server_component(
-        "NotesIndexPage",
-        "examples/resource_app/views/pages/notes/index.mbtv",
-        [],
+      route_name="notes_index",
+      route_path="/notes",
+      file_path=view_pages_notes_index(),
+      title="Notes",
+      component=@mbor.server_component(
+        name="NotesIndexPage",
+        source_path=view_pages_notes_index(),
+        props=[],
       ),
     )
     .with_layout(layout)
-    .with_loader(@mbor.loader_module("load_notes", "notes:index", Some(30), [
-      "notes",
-    ]))
+    .with_loader(
+      @mbor.loader_module(
+        name="load_notes",
+        cache_key="notes:index",
+        revalidate_seconds=Some(30),
+        depends_on=["notes"],
+      ),
+    )
     .with_action_name("notes.create")
     .with_dynamic_mode(@mbor.dynamic_revalidate(30))
     .with_island(
       @mbor.client_component(
-        "NoteCounter",
-        "examples/resource_app/views/components/note_counter.mbtv",
-        [("count", "12")],
-        @mbor.hydrate_visible(),
+        name="NoteCounter",
+        source_path=view_components_note_counter(),
+        props=[("count", "12")],
+        hydration=@mbor.hydrate_visible(),
       ),
     )
     .with_form(
       @mbor.form_binding(
-        "note_create",
-        "notes.create",
-        "POST",
-        Some("notes"),
-        Some("/notes"),
+        name="note_create",
+        action_name="notes.create",
+        verb="POST",
+        optimistic_key=Some("notes"),
+        redirect_to=Some("/notes"),
       ),
     ),
     @mbor.page_module(
-      "notes_show",
-      "/notes/[id]",
-      "examples/resource_app/views/pages/notes/show.mbtv",
-      "Note",
-      @mbor.server_component(
-        "NotesShowPage",
-        "examples/resource_app/views/pages/notes/show.mbtv",
-        [],
+      route_name="notes_show",
+      route_path="/notes/[id]",
+      file_path=view_pages_notes_show(),
+      title="Note",
+      component=@mbor.server_component(
+        name="NotesShowPage",
+        source_path=view_pages_notes_show(),
+        props=[],
       ),
     )
     .with_layout(layout)
-    .with_loader(@mbor.loader_module("load_note", "notes:show", None, [
-      "notes",
-    ]))
+    .with_loader(
+      @mbor.loader_module(
+        name="load_note",
+        cache_key="notes:show",
+        revalidate_seconds=None,
+        depends_on=["notes"],
+      ),
+    )
     .with_action_name("notes.update")
     .with_form(
       @mbor.form_binding(
-        "note_update",
-        "notes.update",
-        "POST",
-        Some("note"),
-        Some("/notes/[id]"),
+        name="note_update",
+        action_name="notes.update",
+        verb="POST",
+        optimistic_key=Some("note"),
+        redirect_to=Some("/notes/[id]"),
       ),
     ),
     @mbor.page_module(
-      "notes_new",
-      "/notes/new",
-      "examples/resource_app/views/pages/notes/new.mbtv",
-      "New Note",
-      @mbor.server_component(
-        "NotesNewPage",
-        "examples/resource_app/views/pages/notes/new.mbtv",
-        [],
+      route_name="notes_new",
+      route_path="/notes/new",
+      file_path=view_pages_notes_new(),
+      title="New Note",
+      component=@mbor.server_component(
+        name="NotesNewPage",
+        source_path=view_pages_notes_new(),
+        props=[],
       ),
     )
     .with_layout(layout)
     .with_form(
       @mbor.form_binding(
-        "note_new",
-        "notes.create",
-        "POST",
-        None,
-        Some("/notes"),
+        name="note_new",
+        action_name="notes.create",
+        verb="POST",
+        optimistic_key=None,
+        redirect_to=Some("/notes"),
       ),
     ),
     @mbor.page_module(
-      "notes_edit",
-      "/notes/[id]/edit",
-      "examples/resource_app/views/pages/notes/edit.mbtv",
-      "Edit Note",
-      @mbor.server_component(
-        "NotesEditPage",
-        "examples/resource_app/views/pages/notes/edit.mbtv",
-        [],
+      route_name="notes_edit",
+      route_path="/notes/[id]/edit",
+      file_path=view_pages_notes_edit(),
+      title="Edit Note",
+      component=@mbor.server_component(
+        name="NotesEditPage",
+        source_path=view_pages_notes_edit(),
+        props=[],
       ),
     )
     .with_layout(layout)
     .with_form(
       @mbor.form_binding(
-        "note_edit",
-        "notes.update",
-        "POST",
-        None,
-        Some("/notes/[id]"),
+        name="note_edit",
+        action_name="notes.update",
+        verb="POST",
+        optimistic_key=None,
+        redirect_to=Some("/notes/[id]"),
       ),
     ),
   ]
@@ -125,30 +135,30 @@ fn note_pages(layout : @mbor.LayoutModule) -> Array[@mbor.PageModule] {
 fn note_server_actions() -> Array[@mbor.ServerAction] {
   [
     @mbor.server_action(
-      "notes.create",
-      "/_actions/notes.create",
-      [("title", "String"), ("body", "String"), ("slug", "String")],
-      "NotePayload",
-      true,
+      name="notes.create",
+      route="/_actions/notes.create",
+      input_fields=[("title", "String"), ("body", "String"), ("slug", "String")],
+      output_type="NotePayload",
+      csrf_protected=true,
     ),
     @mbor.server_action(
-      "notes.update",
-      "/_actions/notes.update",
-      [
+      name="notes.update",
+      route="/_actions/notes.update",
+      input_fields=[
         ("id", "String"),
         ("title", "String"),
         ("body", "String"),
         ("slug", "String"),
       ],
-      "NotePayload",
-      true,
+      output_type="NotePayload",
+      csrf_protected=true,
     ),
     @mbor.server_action(
-      "notes.destroy",
-      "/_actions/notes.destroy",
-      [("id", "String")],
-      "Unit",
-      true,
+      name="notes.destroy",
+      route="/_actions/notes.destroy",
+      input_fields=[("id", "String")],
+      output_type="Unit",
+      csrf_protected=true,
     ),
   ]
 }

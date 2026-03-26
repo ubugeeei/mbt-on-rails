@@ -2,21 +2,21 @@
 test "rendered page includes islands forms and route tree data" {
   let layout = layout_module(
     "application",
-    "examples/demo_blog/views/layouts/application.mbtv",
+    mbtv_path("examples/demo_blog/views/layouts/application.mbtv"),
     server_component(
       "ApplicationLayout",
-      "examples/demo_blog/views/layouts/application.mbtv",
+      mbtv_path("examples/demo_blog/views/layouts/application.mbtv"),
       [],
     ),
   )
   let page = page_module(
     "posts_show",
     "/posts/[id]",
-    "examples/demo_blog/views/pages/posts/show.mbtv",
+    mbtv_path("examples/demo_blog/views/pages/posts/show.mbtv"),
     "Post",
     server_component(
       "PostsShowPage",
-      "examples/demo_blog/views/pages/posts/show.mbtv",
+      mbtv_path("examples/demo_blog/views/pages/posts/show.mbtv"),
       [],
     ),
   )
@@ -27,7 +27,7 @@ test "rendered page includes islands forms and route tree data" {
   .with_island(
     client_component(
       "LikeButton",
-      "examples/demo_blog/views/components/like_button.mbtv",
+      mbtv_path("examples/demo_blog/views/components/like_button.mbtv"),
       [("kind", "heart")],
       hydrate_visible(),
     ),

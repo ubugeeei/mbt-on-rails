@@ -1,30 +1,20 @@
 ///|
 /// Builds a `Post` schema used for ORM and migration examples.
 fn post_model() -> @mbor.ModelSchema {
-  @mbor.with_callback(
-    @mbor.with_association(
-      @mbor.with_validation(
-        @mbor.with_validation(
-          @mbor.model(
-            "Post",
-            "posts",
-            [
-              @mbor.string_column("title"),
-              @mbor.indexed(@mbor.string_column("slug")),
-              @mbor.text_column("body"),
-              @mbor.references_column("author_id", "users"),
-            ],
-            true,
-            false,
-          ),
-          @mbor.validates_presence("title"),
-        ),
-        @mbor.validates_uniqueness("slug"),
-      ),
-      @mbor.belongs_to("author", "User", "author_id"),
-    ),
-    @mbor.before_validation("slugify_title"),
+  @mbor.model(
+    name="Post",
+    table="posts",
+    columns=[
+      @mbor.string_column("title"),
+      @mbor.indexed(@mbor.string_column("slug")),
+      @mbor.text_column("body"),
+      @mbor.references_column("author_id", "users"),
+    ],
   )
+  .with_validation(@mbor.validates_presence("title"))
+  .with_validation(@mbor.validates_uniqueness("slug"))
+  .with_association(@mbor.belongs_to("author", "User", "author_id"))
+  .with_callback(@mbor.before_validation("slugify_title"))
 }
 
 ///|

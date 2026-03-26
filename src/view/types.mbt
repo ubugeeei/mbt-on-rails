@@ -45,6 +45,35 @@ pub struct ComponentContract {
 }
 
 ///|
+/// Declares one explicit component import available to a template.
+pub struct TemplateImport {
+  local_name : String
+  component : VaporComponentRef
+}
+
+///|
+/// Mounts one imported component inside a server-rendered component tree.
+pub struct MountedComponent {
+  import_name : String
+  props : Array[(String, String)]
+}
+
+///|
+/// Describes one suspense-like boundary for deferred server rendering.
+pub struct SuspenseBoundary {
+  name : String
+  fallback_html : String
+  children : Array[VaporNode]
+}
+
+///|
+/// Represents one nested node in a server-rendered component tree.
+pub enum VaporNode {
+  Mounted(MountedComponent)
+  Suspense(SuspenseBoundary)
+}
+
+///|
 /// References a Vapor-style component module and its props.
 pub struct VaporComponentRef {
   name : String
@@ -54,6 +83,8 @@ pub struct VaporComponentRef {
   is_server_component : Bool
   contract : ComponentContract?
   fallback_html : String?
+  template_imports : Array[TemplateImport]
+  children : Array[VaporNode]
 }
 
 ///|

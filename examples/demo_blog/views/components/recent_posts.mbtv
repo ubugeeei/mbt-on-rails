@@ -1,0 +1,17 @@
+<template>
+  <aside class="recent-posts">
+    <h2>Recent Posts</h2>
+    <ul>
+      <li>MoonBit on Rails</li>
+      <li>Typed islands</li>
+      <li>Route manifests</li>
+    </ul>
+  </aside>
+</template>
+
+<style scoped>
+.recent-posts {
+  display: grid;
+  gap: 8px;
+}
+</style>

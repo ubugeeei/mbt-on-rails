@@ -151,13 +151,16 @@ pub fn with_default(column : Column, default_value : String) -> Column {
 }
 
 ///|
-/// Builds a model schema with standard primary key defaults.
+/// Builds a model schema with labeled arguments and standard defaults.
+#label_migration(name, allow_positional=true)
+#label_migration(table, allow_positional=true)
+#label_migration(columns, allow_positional=true)
 pub fn model(
-  name : String,
-  table : String,
-  columns : Array[Column],
-  timestamps : Bool,
-  soft_delete : Bool,
+  name~ : String,
+  table~ : String,
+  columns~ : Array[Column],
+  timestamps? : Bool = true,
+  soft_delete? : Bool = false,
 ) -> ModelSchema {
   {
     name,

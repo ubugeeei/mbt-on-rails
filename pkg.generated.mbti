@@ -20,6 +20,7 @@ import {
   "ubugeeei/mbt_on_rails/src/process",
   "ubugeeei/mbt_on_rails/src/production",
   "ubugeeei/mbt_on_rails/src/secrets",
+  "ubugeeei/mbt_on_rails/src/support",
   "ubugeeei/mbt_on_rails/src/turbo",
   "ubugeeei/mbt_on_rails/src/view",
 }
@@ -57,7 +58,9 @@ pub fn apply_response_middleware(Array[@middleware.Middleware], @http.Request, @
 
 pub fn apply_seed(@active_record.MemoryDatabase, @fixture.SeedPlan) -> @active_record.MemoryDatabase
 
-pub fn asset_manifest(Array[String], Array[String]) -> @view.AssetManifest
+#label_migration(script_urls, allow_positional=true)
+#label_migration(style_urls, allow_positional=true)
+pub fn asset_manifest(style_urls~ : Array[String], script_urls~ : Array[String]) -> @view.AssetManifest
 
 pub fn auth_guest_only() -> @auth.AuthRequirement
 
@@ -121,7 +124,11 @@ pub fn cache_write(@cache.CacheStore, String, String, String?, String?, Array[St
 
 pub fn classify(String) -> String
 
-pub fn client_component(String, String, Array[(String, String)], @view.HydrationMode) -> @view.VaporComponentRef
+#label_migration(hydration, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(props, allow_positional=true)
+#label_migration(source_path, allow_positional=true)
+pub fn client_component(name~ : String, source_path~ : @support.MbtvPath, props~ : Array[(String, String)], hydration~ : @view.HydrationMode) -> @view.VaporComponentRef
 
 pub fn client_contract(Array[@view.PropContract]) -> @view.ComponentContract
 
@@ -227,7 +234,12 @@ pub fn fixture_summary(@fixture.FixtureSet) -> String
 
 pub fn flash(String, String) -> @controller.ActionStep
 
-pub fn form_binding(String, String, String, String?, String?) -> @view.FormBinding
+#label_migration(action_name, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(optimistic_key, allow_positional=true)
+#label_migration(redirect_to, allow_positional=true)
+#label_migration(verb, allow_positional=true)
+pub fn form_binding(name~ : String, action_name~ : String, verb~ : String, optimistic_key~ : String?, redirect_to~ : String?) -> @view.FormBinding
 
 pub fn gauge(String, Array[(String, String)], Int) -> @metrics.MetricSample
 
@@ -325,7 +337,10 @@ pub fn json_response(Int, String) -> @http.Response
 
 pub fn json_string(String) -> String
 
-pub fn layout_module(String, String, @view.VaporComponentRef) -> @view.LayoutModule
+#label_migration(component, allow_positional=true)
+#label_migration(file_path, allow_positional=true)
+#label_migration(name, allow_positional=true)
+pub fn layout_module(name~ : String, file_path~ : @support.MbtvPath, component~ : @view.VaporComponentRef) -> @view.LayoutModule
 
 pub fn limit_to(@active_record.Relation, Int) -> @active_record.Relation
 
@@ -337,19 +352,33 @@ pub fn load_fixtures(@active_record.MemoryDatabase, Array[@fixture.FixtureSet]) 
 
 pub fn load_member_step(String) -> @controller.ActionStep
 
-pub fn loader_module(String, String, Int?, Array[String]) -> @view.LoaderModule
+#label_migration(cache_key, allow_positional=true)
+#label_migration(depends_on, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(revalidate_seconds, allow_positional=true)
+pub fn loader_module(name~ : String, cache_key~ : String, revalidate_seconds~ : Int?, depends_on~ : Array[String]) -> @view.LoaderModule
 
 pub fn log_event(String, String, String?, Array[(String, String)]) -> @production.LogEvent
 
-pub fn mail_template(String, String, String, String?) -> @mailer.MailTemplate
+#label_migration(action_name, allow_positional=true)
+#label_migration(html_path, allow_positional=true)
+#label_migration(subject, allow_positional=true)
+#label_migration(text_path, allow_positional=true)
+pub fn mail_template(action_name~ : String, subject~ : String, html_path~ : @support.MbtvPath, text_path~ : String?) -> @mailer.MailTemplate
 
-pub fn mailer(String, String, String?, Array[@mailer.MailTemplate]) -> @mailer.MailerDefinition
+#label_migration(from, allow_positional=true)
+#label_migration(layout_name, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(templates, allow_positional=true)
+pub fn mailer(name~ : String, from~ : String, layout_name~ : String?, templates~ : Array[@mailer.MailTemplate]) -> @mailer.MailerDefinition
 
 pub fn mailer_summary(@mailer.MailerDefinition) -> String
 
 pub fn masked_secret_summary(@secrets.SecretsConfig) -> String
 
 pub fn match_route(@http.RoutePattern, String) -> Array[(String, String)]?
+
+pub fn mbtv_path(String) -> @support.MbtvPath
 
 pub fn merge_params(Array[(String, String)], Array[(String, String)], Array[(String, String)]) -> @params.Parameters
 
@@ -377,7 +406,12 @@ pub fn migration_up_sql(@migration.Migration) -> Array[String]
 
 pub fn missing_secrets(@secrets.SecretsConfig) -> Array[String]
 
-pub fn model(String, String, Array[@active_record.Column], Bool, Bool) -> @active_record.ModelSchema
+#label_migration(columns, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(table, allow_positional=true)
+pub fn model(name~ : String, table~ : String, columns~ : Array[@active_record.Column], timestamps? : Bool, soft_delete? : Bool) -> @active_record.ModelSchema
+
+pub fn mount_import(import_name~ : String, props~ : Array[(String, String)]) -> @view.VaporNode
 
 pub fn namespace_routes(String, Array[@http.RouteSpec]) -> Array[@http.RouteSpec]
 
@@ -401,7 +435,12 @@ pub fn ok_turbo_stream(Array[@turbo.TurboStream]) -> @http.Response
 
 pub fn order_by(@active_record.Relation, String, Bool) -> @active_record.Relation
 
-pub fn page_module(String, String, String, String, @view.VaporComponentRef) -> @view.PageModule
+#label_migration(component, allow_positional=true)
+#label_migration(file_path, allow_positional=true)
+#label_migration(route_name, allow_positional=true)
+#label_migration(route_path, allow_positional=true)
+#label_migration(title, allow_positional=true)
+pub fn page_module(route_name~ : String, route_path~ : String, file_path~ : @support.MbtvPath, title~ : String, component~ : @view.VaporComponentRef) -> @view.PageModule
 
 pub fn param_value(@params.Parameters, String) -> String?
 
@@ -503,7 +542,13 @@ pub fn render_turbo_stream(Array[@turbo.TurboStream]) -> String
 
 pub fn replace_stream(String, String) -> @turbo.TurboStream
 
-pub fn request(@http.HttpMethod, String, Array[(String, String)], Array[(String, String)], String?, String) -> @http.Request
+#label_migration(body, allow_positional=true)
+#label_migration(form, allow_positional=true)
+#label_migration(path, allow_positional=true)
+#label_migration(query, allow_positional=true)
+#label_migration(session_id, allow_positional=true)
+#label_migration(verb, allow_positional=true)
+pub fn request(verb~ : @http.HttpMethod, path~ : String, query~ : Array[(String, String)], form~ : Array[(String, String)], session_id~ : String?, body~ : String) -> @http.Request
 
 pub fn require_auth(@auth.AuthRequirement) -> @controller.ActionStep
 
@@ -519,7 +564,13 @@ pub fn reversible_step(String, String) -> @migration.MigrationStep
 
 pub fn role_access(String) -> @auth.AuthRequirement
 
-pub fn route(String, @http.HttpMethod, String, String, String, String?) -> @http.RouteSpec
+#label_migration(action, allow_positional=true)
+#label_migration(controller, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(page_name, allow_positional=true)
+#label_migration(path, allow_positional=true)
+#label_migration(verb, allow_positional=true)
+pub fn route(name~ : String, verb~ : @http.HttpMethod, path~ : String, controller~ : String, action~ : String, page_name~ : String?) -> @http.RouteSpec
 
 pub fn save_record(@active_record.ModelSchema, @active_record.MemoryDatabase, @active_record.Record) -> @active_record.SaveOutcome
 
@@ -551,9 +602,17 @@ pub fn seed_summary(@fixture.SeedPlan) -> String
 
 pub fn select_columns(@active_record.Relation, Array[String]) -> @active_record.Relation
 
-pub fn server_action(String, String, Array[(String, String)], String, Bool) -> @view.ServerAction
+#label_migration(csrf_protected, allow_positional=true)
+#label_migration(input_fields, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(output_type, allow_positional=true)
+#label_migration(route, allow_positional=true)
+pub fn server_action(name~ : String, route~ : String, input_fields~ : Array[(String, String)], output_type~ : String, csrf_protected~ : Bool) -> @view.ServerAction
 
-pub fn server_component(String, String, Array[(String, String)]) -> @view.VaporComponentRef
+#label_migration(name, allow_positional=true)
+#label_migration(props, allow_positional=true)
+#label_migration(source_path, allow_positional=true)
+pub fn server_component(name~ : String, source_path~ : @support.MbtvPath, props~ : Array[(String, String)]) -> @view.VaporComponentRef
 
 pub fn server_contract(Array[@view.PropContract], Bool) -> @view.ComponentContract
 
@@ -566,6 +625,14 @@ pub fn singularize(String) -> String
 pub fn split_path(String) -> Array[String]
 
 pub fn string_column(String) -> @active_record.Column
+
+pub fn suspense_boundary(name~ : String, fallback_html~ : String, children~ : Array[@view.VaporNode]) -> @view.VaporNode
+
+pub fn template_component_imports(String) -> Array[String]
+
+pub fn template_component_usages(String) -> Array[String]
+
+pub fn template_import(local_name~ : String, component~ : @view.VaporComponentRef) -> @view.TemplateImport
 
 pub fn text_column(String) -> @active_record.Column
 
@@ -585,7 +652,13 @@ pub fn update_stream(String, String) -> @turbo.TurboStream
 
 pub fn upsert_sql(@active_record.ModelSchema, @active_record.Record, String) -> String
 
+pub fn validate_component_tree(@view.VaporComponentRef) -> Array[String]
+
+pub fn validate_page_tree(@view.PageModule) -> Array[String]
+
 pub fn validate_record(@active_record.ModelSchema, @active_record.Record, @active_record.MemoryDatabase) -> Array[String]
+
+pub fn validate_template_component_imports(String, String) -> Array[String]
 
 pub fn validates_confirmation(String, String) -> @active_record.Validation
 
@@ -631,6 +704,8 @@ pub fn with_callback(@active_record.ModelSchema, @active_record.Callback) -> @ac
 
 pub fn with_cc(@mailer.MailDelivery, Array[String]) -> @mailer.MailDelivery
 
+pub fn with_child(@view.VaporComponentRef, @view.VaporNode) -> @view.VaporComponentRef
+
 pub fn with_collection_action(@http.ResourceOptions, String, @http.HttpMethod) -> @http.ResourceOptions
 
 pub fn with_contract(@view.VaporComponentRef, @view.ComponentContract) -> @view.VaporComponentRef
@@ -662,6 +737,8 @@ pub fn with_param_name(@http.ResourceOptions, String) -> @http.ResourceOptions
 pub fn with_request_header(@middleware.Middleware, String, String) -> @middleware.Middleware
 
 pub fn with_response_header(@middleware.Middleware, String, String) -> @middleware.Middleware
+
+pub fn with_template_import(@view.VaporComponentRef, @view.TemplateImport) -> @view.VaporComponentRef
 
 pub fn with_validation(@active_record.ModelSchema, @active_record.Validation) -> @active_record.ModelSchema
 
@@ -762,6 +839,8 @@ pub using @http {type MatchedRoute}
 
 pub using @app {type MbtOnRailsApp}
 
+pub using @support {type MbtvPath}
+
 pub using @active_record {type MemoryDatabase}
 
 pub using @active_record {type MemoryTable}
@@ -779,6 +858,8 @@ pub using @migration {type Migration}
 pub using @migration {type MigrationStep}
 
 pub using @active_record {type ModelSchema}
+
+pub using @view {type MountedComponent}
 
 pub using @active_record {type OrderBy}
 
@@ -842,6 +923,10 @@ pub using @view {type ServerAction}
 
 pub using @auth {type Session}
 
+pub using @view {type SuspenseBoundary}
+
+pub using @view {type TemplateImport}
+
 pub using @turbo {type TurboStream}
 
 pub using @turbo {type TurboStreamAction}
@@ -851,6 +936,8 @@ pub using @active_record {type Validation}
 pub using @active_record {type ValidationRule}
 
 pub using @view {type VaporComponentRef}
+
+pub using @view {type VaporNode}
 
 // Traits
 

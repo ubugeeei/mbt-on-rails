@@ -26,6 +26,8 @@ pub fn json_string(String) -> String
 
 pub fn json_value(String) -> String
 
+pub fn mbtv_path(String) -> MbtvPath
+
 pub fn normalize_path(String) -> String
 
 pub fn remove_query_string(String) -> String
@@ -39,6 +41,12 @@ pub fn sql_literal(String) -> String
 // Errors
 
 // Types and methods
+pub struct MbtvPath {
+  value : String
+}
+pub fn MbtvPath::as_string(Self) -> String
+pub impl Eq for MbtvPath
+pub impl Show for MbtvPath
 
 // Type aliases
 

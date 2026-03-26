@@ -50,11 +50,23 @@ pub fn redirect_response(String) -> Response
 
 pub fn render_response_body(ResponseBody) -> String
 
-pub fn request(HttpMethod, String, Array[(String, String)], Array[(String, String)], String?, String) -> Request
+#label_migration(body, allow_positional=true)
+#label_migration(form, allow_positional=true)
+#label_migration(path, allow_positional=true)
+#label_migration(query, allow_positional=true)
+#label_migration(session_id, allow_positional=true)
+#label_migration(verb, allow_positional=true)
+pub fn request(verb~ : HttpMethod, path~ : String, query~ : Array[(String, String)], form~ : Array[(String, String)], session_id~ : String?, body~ : String) -> Request
 
 pub fn resources(String, String, ResourceOptions) -> Array[RouteSpec]
 
-pub fn route(String, HttpMethod, String, String, String, String?) -> RouteSpec
+#label_migration(action, allow_positional=true)
+#label_migration(controller, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(page_name, allow_positional=true)
+#label_migration(path, allow_positional=true)
+#label_migration(verb, allow_positional=true)
+pub fn route(name~ : String, verb~ : HttpMethod, path~ : String, controller~ : String, action~ : String, page_name~ : String?) -> RouteSpec
 
 pub fn scope_routes(String, String, Array[RouteSpec]) -> Array[RouteSpec]
 

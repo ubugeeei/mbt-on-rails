@@ -60,15 +60,13 @@ test "resources and namespace routes recognize member and collection actions" {
 ///|
 test "active record relation and validation cover rails-like basics" {
   let user_model = model(
-    "User",
-    "users",
-    [
+    name="User",
+    table="users",
+    columns=[
       string_column("email").indexed().unique(),
       string_column("password"),
       string_column("password_confirmation"),
     ],
-    true,
-    false,
   )
   .with_validation(validates_presence("email"))
   .with_validation(validates_uniqueness("email"))
@@ -105,11 +103,12 @@ test "active record relation and validation cover rails-like basics" {
 ///|
 test "migration generation produces reversible down sql" {
   let user_model = model(
-    "User",
-    "users",
-    [string_column("email").indexed().unique(), string_column("password_digest")],
-    true,
-    false,
+    name="User",
+    table="users",
+    columns=[
+      string_column("email").indexed().unique(),
+      string_column("password_digest"),
+    ],
   )
 
   let create_users = migration_from_model(

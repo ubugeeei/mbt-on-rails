@@ -3,6 +3,8 @@ import {
   "mizchi/luna/js/resource" @reactivity,
   let signal = @reactivity.signal,
   let computed = @reactivity.computed,
+  component PostComposer,
+  component PostsTable,
 }
 
 let feed = signal("published")

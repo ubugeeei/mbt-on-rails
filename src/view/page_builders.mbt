@@ -1,11 +1,16 @@
 ///|
 /// Builds a page module with empty optional metadata.
+#label_migration(route_name, allow_positional=true)
+#label_migration(route_path, allow_positional=true)
+#label_migration(file_path, allow_positional=true)
+#label_migration(title, allow_positional=true)
+#label_migration(component, allow_positional=true)
 pub fn page_module(
-  route_name : String,
-  route_path : String,
-  file_path : @support.MbtvPath,
-  title : String,
-  component : VaporComponentRef,
+  route_name~ : String,
+  route_path~ : String,
+  file_path~ : @support.MbtvPath,
+  title~ : String,
+  component~ : VaporComponentRef,
 ) -> PageModule {
   {
     route_name,

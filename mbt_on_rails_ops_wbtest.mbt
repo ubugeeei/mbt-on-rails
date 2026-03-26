@@ -31,7 +31,7 @@ test "jobs mailers and cache support rails style workflows" {
       mail_template(
         "launch",
         "Launch update",
-        "examples/demo_blog/views/mailer/welcome.html.mbtv",
+        mbtv_path("examples/demo_blog/views/mailer/welcome.html.mbtv"),
         Some("examples/demo_blog/views/mailer/welcome.text"),
       ),
     ],
@@ -85,7 +85,7 @@ test "component contracts surface server client boundaries in manifests" {
     with_fallback(
       client_component(
         "NoteCounter",
-        "examples/resource_app/views/components/note_counter.mbtv",
+        mbtv_path("examples/resource_app/views/components/note_counter.mbtv"),
         [("initial", "1")],
         hydrate_visible(),
       ),
@@ -97,12 +97,12 @@ test "component contracts surface server client boundaries in manifests" {
     page_module(
       "notes_index",
       "/notes",
-      "examples/resource_app/views/pages/notes/index.mbtv",
+      mbtv_path("examples/resource_app/views/pages/notes/index.mbtv"),
       "Notes",
       with_contract(
         server_component(
           "NotesIndexPage",
-          "examples/resource_app/views/pages/notes/index.mbtv",
+          mbtv_path("examples/resource_app/views/pages/notes/index.mbtv"),
           [],
         ),
         server_contract([], true),

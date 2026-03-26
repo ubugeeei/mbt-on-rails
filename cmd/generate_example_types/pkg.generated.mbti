@@ -1,0 +1,14 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "ubugeeei/mbt_on_rails/cmd/generate_example_types"
+
+// Values
+
+// Errors
+
+// Types and methods
+type GenerateExampleTypesCommand
+
+// Type aliases
+
+// Traits
+

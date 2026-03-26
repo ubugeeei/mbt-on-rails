@@ -2,9 +2,9 @@
 /// Builds the application layout used by the demo pages.
 pub fn demo_application_layout() -> @view.LayoutModule {
   @view.layout_module(
-    "application",
-    "examples/demo_blog/views/layouts/application.mbtv",
-    demo_application_layout_component(),
+    name="application",
+    file_path=view_layouts_application(),
+    component=demo_application_layout_component(),
   )
 }
 
@@ -26,51 +26,51 @@ pub fn demo_pages(layout : @view.LayoutModule) -> Array[@view.PageModule] {
 pub fn demo_server_actions() -> Array[@view.ServerAction] {
   [
     @view.server_action(
-      "sessions.create",
-      "/_actions/sessions.create",
-      [("email", "String"), ("password", "String")],
-      "SessionPayload",
-      true,
+      name="sessions.create",
+      route="/_actions/sessions.create",
+      input_fields=[("email", "String"), ("password", "String")],
+      output_type="SessionPayload",
+      csrf_protected=true,
     ),
     @view.server_action(
-      "sessions.destroy",
-      "/_actions/sessions.destroy",
-      [],
-      "Unit",
-      true,
+      name="sessions.destroy",
+      route="/_actions/sessions.destroy",
+      input_fields=[],
+      output_type="Unit",
+      csrf_protected=true,
     ),
     @view.server_action(
-      "posts.create",
-      "/_actions/posts.create",
-      [("title", "String"), ("slug", "String"), ("body", "String")],
-      "PostPayload",
-      true,
+      name="posts.create",
+      route="/_actions/posts.create",
+      input_fields=[("title", "String"), ("slug", "String"), ("body", "String")],
+      output_type="PostPayload",
+      csrf_protected=true,
     ),
     @view.server_action(
-      "posts.update",
-      "/_actions/posts.update",
-      [
+      name="posts.update",
+      route="/_actions/posts.update",
+      input_fields=[
         ("id", "String"),
         ("title", "String"),
         ("slug", "String"),
         ("body", "String"),
       ],
-      "PostPayload",
-      true,
+      output_type="PostPayload",
+      csrf_protected=true,
     ),
     @view.server_action(
-      "posts.destroy",
-      "/_actions/posts.destroy",
-      [("id", "String")],
-      "Unit",
-      true,
+      name="posts.destroy",
+      route="/_actions/posts.destroy",
+      input_fields=[("id", "String")],
+      output_type="Unit",
+      csrf_protected=true,
     ),
     @view.server_action(
-      "posts.publish",
-      "/_actions/posts.publish",
-      [("id", "String")],
-      "PostPayload",
-      true,
+      name="posts.publish",
+      route="/_actions/posts.publish",
+      input_fields=[("id", "String")],
+      output_type="PostPayload",
+      csrf_protected=true,
     ),
   ]
 }
@@ -79,15 +79,22 @@ pub fn demo_server_actions() -> Array[@view.ServerAction] {
 /// Builds the demo home page module.
 fn demo_home_page(layout : @view.LayoutModule) -> @view.PageModule {
   @view.page_module(
-    "home",
-    "/",
-    "examples/demo_blog/views/pages/home.mbtv",
-    "mbt on rails",
-    demo_home_page_component(),
+    route_name="home",
+    route_path="/",
+    file_path=view_pages_home(),
+    title="mbt on rails",
+    component=demo_home_page_component(),
   )
   .with_layout(layout)
   .with_metadata("description", "MoonBit on Rails with Vapor Moon delivery")
-  .with_loader(@view.loader_module("load_home", "home", Some(30), []))
+  .with_loader(
+    @view.loader_module(
+      name="load_home",
+      cache_key="home",
+      revalidate_seconds=Some(30),
+      depends_on=[],
+    ),
+  )
   .with_island(demo_post_composer_idle_island())
 }
 
@@ -95,16 +102,22 @@ fn demo_home_page(layout : @view.LayoutModule) -> @view.PageModule {
 /// Builds the demo sign-in page module.
 fn demo_sign_in_page(layout : @view.LayoutModule) -> @view.PageModule {
   @view.page_module(
-    "sign_in",
-    "/sign-in",
-    "examples/demo_blog/views/pages/sign_in.mbtv",
-    "Sign In",
-    demo_sign_in_page_component(),
+    route_name="sign_in",
+    route_path="/sign-in",
+    file_path=view_pages_sign_in(),
+    title="Sign In",
+    component=demo_sign_in_page_component(),
   )
   .with_layout(layout)
   .with_action_name("sessions.create")
   .with_form(
-    @view.form_binding("sign_in", "sessions.create", "POST", None, Some("/")),
+    @view.form_binding(
+      name="sign_in",
+      action_name="sessions.create",
+      verb="POST",
+      optimistic_key=None,
+      redirect_to=Some("/"),
+    ),
   )
 }
 
@@ -112,26 +125,31 @@ fn demo_sign_in_page(layout : @view.LayoutModule) -> @view.PageModule {
 /// Builds the demo posts index page module.
 fn demo_posts_index_page(layout : @view.LayoutModule) -> @view.PageModule {
   @view.page_module(
-    "posts_index",
-    "/posts",
-    "examples/demo_blog/views/pages/posts/index.mbtv",
-    "Posts",
-    demo_posts_index_page_component(),
+    route_name="posts_index",
+    route_path="/posts",
+    file_path=view_pages_posts_index(),
+    title="Posts",
+    component=demo_posts_index_page_component(),
   )
   .with_layout(layout)
   .with_action_name("posts.create")
-  .with_loader(@view.loader_module("load_posts", "posts:index", Some(60), [
-    "posts",
-  ]))
+  .with_loader(
+    @view.loader_module(
+      name="load_posts",
+      cache_key="posts:index",
+      revalidate_seconds=Some(60),
+      depends_on=["posts"],
+    ),
+  )
   .with_dynamic_mode(@view.dynamic_revalidate(60))
   .with_island(demo_post_composer_island("index"))
   .with_form(
     @view.form_binding(
-      "post_create",
-      "posts.create",
-      "POST",
-      Some("posts"),
-      Some("/posts"),
+      name="post_create",
+      action_name="posts.create",
+      verb="POST",
+      optimistic_key=Some("posts"),
+      redirect_to=Some("/posts"),
     ),
   )
 }
@@ -140,25 +158,30 @@ fn demo_posts_index_page(layout : @view.LayoutModule) -> @view.PageModule {
 /// Builds the demo posts show page module.
 fn demo_posts_show_page(layout : @view.LayoutModule) -> @view.PageModule {
   @view.page_module(
-    "posts_show",
-    "/posts/[id]",
-    "examples/demo_blog/views/pages/posts/show.mbtv",
-    "Post",
-    demo_posts_show_page_component(),
+    route_name="posts_show",
+    route_path="/posts/[id]",
+    file_path=view_pages_posts_show(),
+    title="Post",
+    component=demo_posts_show_page_component(),
   )
   .with_layout(layout)
   .with_action_name("posts.update")
-  .with_loader(@view.loader_module("load_post", "posts:show", None, [
-    "posts", "authors",
-  ]))
+  .with_loader(
+    @view.loader_module(
+      name="load_post",
+      cache_key="posts:show",
+      revalidate_seconds=None,
+      depends_on=["posts", "authors"],
+    ),
+  )
   .with_island(demo_like_button_island())
   .with_form(
     @view.form_binding(
-      "post_update",
-      "posts.update",
-      "POST",
-      Some("post"),
-      Some("/posts/[id]"),
+      name="post_update",
+      action_name="posts.update",
+      verb="POST",
+      optimistic_key=Some("post"),
+      redirect_to=Some("/posts/[id]"),
     ),
   )
 }
@@ -167,20 +190,20 @@ fn demo_posts_show_page(layout : @view.LayoutModule) -> @view.PageModule {
 /// Builds the demo posts new page module.
 fn demo_posts_new_page(layout : @view.LayoutModule) -> @view.PageModule {
   @view.page_module(
-    "posts_new",
-    "/posts/new",
-    "examples/demo_blog/views/pages/posts/new.mbtv",
-    "New Post",
-    demo_posts_new_page_component(),
+    route_name="posts_new",
+    route_path="/posts/new",
+    file_path=view_pages_posts_new(),
+    title="New Post",
+    component=demo_posts_new_page_component(),
   )
   .with_layout(layout)
   .with_form(
     @view.form_binding(
-      "post_create_page",
-      "posts.create",
-      "POST",
-      None,
-      Some("/posts"),
+      name="post_create_page",
+      action_name="posts.create",
+      verb="POST",
+      optimistic_key=None,
+      redirect_to=Some("/posts"),
     ),
   )
 }
@@ -189,23 +212,28 @@ fn demo_posts_new_page(layout : @view.LayoutModule) -> @view.PageModule {
 /// Builds the demo posts edit page module.
 fn demo_posts_edit_page(layout : @view.LayoutModule) -> @view.PageModule {
   @view.page_module(
-    "posts_edit",
-    "/posts/[id]/edit",
-    "examples/demo_blog/views/pages/posts/edit.mbtv",
-    "Edit Post",
-    demo_posts_edit_page_component(),
+    route_name="posts_edit",
+    route_path="/posts/[id]/edit",
+    file_path=view_pages_posts_edit(),
+    title="Edit Post",
+    component=demo_posts_edit_page_component(),
   )
   .with_layout(layout)
-  .with_loader(@view.loader_module("load_post_for_edit", "posts:edit", None, [
-    "posts",
-  ]))
+  .with_loader(
+    @view.loader_module(
+      name="load_post_for_edit",
+      cache_key="posts:edit",
+      revalidate_seconds=None,
+      depends_on=["posts"],
+    ),
+  )
   .with_form(
     @view.form_binding(
-      "post_edit",
-      "posts.update",
-      "POST",
-      None,
-      Some("/posts/[id]"),
+      name="post_edit",
+      action_name="posts.update",
+      verb="POST",
+      optimistic_key=None,
+      redirect_to=Some("/posts/[id]"),
     ),
   )
 }

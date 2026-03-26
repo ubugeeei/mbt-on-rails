@@ -1,11 +1,59 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "ubugeeei/mbt_on_rails/examples/resource_app"
 
+import {
+  "ubugeeei/mbt_on_rails/src/support",
+}
+
 // Values
+pub fn notes_edit_path(NotesEditRouteParams) -> String
+
+pub fn notes_edit_route_params(id~ : String) -> NotesEditRouteParams
+
+pub fn notes_edit_route_pattern() -> String
+
+pub fn notes_index_path() -> String
+
+pub fn notes_index_route_params() -> Array[(String, String)]
+
+pub fn notes_index_route_pattern() -> String
+
+pub fn notes_new_path() -> String
+
+pub fn notes_new_route_params() -> Array[(String, String)]
+
+pub fn notes_new_route_pattern() -> String
+
+pub fn notes_show_path(NotesShowRouteParams) -> String
+
+pub fn notes_show_route_params(id~ : String) -> NotesShowRouteParams
+
+pub fn notes_show_route_pattern() -> String
+
+pub fn view_components_note_counter() -> @support.MbtvPath
+
+pub fn view_layouts_application() -> @support.MbtvPath
+
+pub fn view_pages_notes_edit() -> @support.MbtvPath
+
+pub fn view_pages_notes_index() -> @support.MbtvPath
+
+pub fn view_pages_notes_new() -> @support.MbtvPath
+
+pub fn view_pages_notes_show() -> @support.MbtvPath
 
 // Errors
 
 // Types and methods
+pub struct NotesEditRouteParams {
+  id : String
+}
+pub fn NotesEditRouteParams::entries(Self) -> Array[(String, String)]
+
+pub struct NotesShowRouteParams {
+  id : String
+}
+pub fn NotesShowRouteParams::entries(Self) -> Array[(String, String)]
 
 // Type aliases
 

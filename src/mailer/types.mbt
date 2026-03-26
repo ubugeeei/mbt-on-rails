@@ -31,22 +31,30 @@ pub struct MailDelivery {
 
 ///|
 /// Builds one mailer template descriptor.
+#label_migration(action_name, allow_positional=true)
+#label_migration(subject, allow_positional=true)
+#label_migration(html_path, allow_positional=true)
+#label_migration(text_path, allow_positional=true)
 pub fn mail_template(
-  action_name : String,
-  subject : String,
-  html_path : @support.MbtvPath,
-  text_path : String?,
+  action_name~ : String,
+  subject~ : String,
+  html_path~ : @support.MbtvPath,
+  text_path~ : String?,
 ) -> MailTemplate {
   { action_name, subject, html_path, text_path }
 }
 
 ///|
 /// Builds one mailer definition.
+#label_migration(name, allow_positional=true)
+#label_migration(from, allow_positional=true)
+#label_migration(layout_name, allow_positional=true)
+#label_migration(templates, allow_positional=true)
 pub fn mailer(
-  name : String,
-  from : String,
-  layout_name : String?,
-  templates : Array[MailTemplate],
+  name~ : String,
+  from~ : String,
+  layout_name~ : String?,
+  templates~ : Array[MailTemplate],
 ) -> MailerDefinition {
   { name, from, layout_name, templates }
 }

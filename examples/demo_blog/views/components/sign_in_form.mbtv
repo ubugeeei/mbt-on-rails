@@ -1,0 +1,20 @@
+<template>
+  <form class="sign-in-form">
+    <label>
+      <span>Email</span>
+      <input type="email" placeholder="demo@example.com" />
+    </label>
+    <label>
+      <span>Password</span>
+      <input type="password" placeholder="password" />
+    </label>
+    <button type="submit">Sign In</button>
+  </form>
+</template>
+
+<style scoped>
+.sign-in-form {
+  display: grid;
+  gap: 12px;
+}
+</style>

@@ -3,10 +3,10 @@
 fn render_test_layout() -> LayoutModule {
   layout_module(
     "application",
-    "examples/demo_blog/views/layouts/application.mbtv",
+    mbtv_path("examples/demo_blog/views/layouts/application.mbtv"),
     server_component(
       "ApplicationLayout",
-      "examples/demo_blog/views/layouts/application.mbtv",
+      mbtv_path("examples/demo_blog/views/layouts/application.mbtv"),
       [],
     ),
   )
@@ -14,7 +14,11 @@ fn render_test_layout() -> LayoutModule {
 
 ///|
 test "relation sql covers joins selects predicates counts and offsets" {
-  let schema = model("Post", "posts", [string_column("title")], true, false)
+  let schema = model(
+    name="Post",
+    table="posts",
+    columns=[string_column("title")],
+  )
   let relation = offset_by(
     limit_to(
       order_by(
@@ -76,11 +80,11 @@ test "render_page covers hydration variants assets metadata and dynamic modes" {
           page_module(
             "render_modes",
             "/render-modes",
-            "examples/demo_blog/views/pages/home.mbtv",
+            mbtv_path("examples/demo_blog/views/pages/home.mbtv"),
             "Render Modes",
             server_component(
               "RenderModesPage",
-              "examples/demo_blog/views/pages/home.mbtv",
+              mbtv_path("examples/demo_blog/views/pages/home.mbtv"),
               [],
             ),
           ),
@@ -103,35 +107,35 @@ test "render_page covers hydration variants assets metadata and dynamic modes" {
             base,
             client_component(
               "ManualIsland",
-              "examples/demo_blog/views/components/like_button.mbtv",
+              mbtv_path("examples/demo_blog/views/components/like_button.mbtv"),
               [],
               hydrate_manual(),
             ),
           ),
           client_component(
             "IdleIsland",
-            "examples/demo_blog/views/components/like_button.mbtv",
+            mbtv_path("examples/demo_blog/views/components/like_button.mbtv"),
             [],
             hydrate_idle(),
           ),
         ),
         client_component(
           "MediaIsland",
-          "examples/demo_blog/views/components/like_button.mbtv",
+          mbtv_path("examples/demo_blog/views/components/like_button.mbtv"),
           [],
           hydrate_media("(max-width: 700px)"),
         ),
       ),
       client_component(
         "OnlyIsland",
-        "examples/demo_blog/views/components/like_button.mbtv",
+        mbtv_path("examples/demo_blog/views/components/like_button.mbtv"),
         [],
         hydrate_only(),
       ),
     ),
     client_component(
       "DeferredIsland",
-      "examples/demo_blog/views/components/like_button.mbtv",
+      mbtv_path("examples/demo_blog/views/components/like_button.mbtv"),
       [],
       defer_on_server(),
     ),

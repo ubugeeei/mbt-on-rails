@@ -128,13 +128,19 @@ pub fn http_options() -> HttpMethod {
 
 ///|
 /// Builds a normalized request value from raw request parts.
+#label_migration(verb, allow_positional=true)
+#label_migration(path, allow_positional=true)
+#label_migration(query, allow_positional=true)
+#label_migration(form, allow_positional=true)
+#label_migration(session_id, allow_positional=true)
+#label_migration(body, allow_positional=true)
 pub fn request(
-  verb : HttpMethod,
-  path : String,
-  query : Array[(String, String)],
-  form : Array[(String, String)],
-  session_id : String?,
-  body : String,
+  verb~ : HttpMethod,
+  path~ : String,
+  query~ : Array[(String, String)],
+  form~ : Array[(String, String)],
+  session_id~ : String?,
+  body~ : String,
 ) -> Request {
   {
     verb,
@@ -169,13 +175,19 @@ pub fn append_request_header(
 
 ///|
 /// Builds a route spec and parses its route pattern.
+#label_migration(name, allow_positional=true)
+#label_migration(verb, allow_positional=true)
+#label_migration(path, allow_positional=true)
+#label_migration(controller, allow_positional=true)
+#label_migration(action, allow_positional=true)
+#label_migration(page_name, allow_positional=true)
 pub fn route(
-  name : String,
-  verb : HttpMethod,
-  path : String,
-  controller : String,
-  action : String,
-  page_name : String?,
+  name~ : String,
+  verb~ : HttpMethod,
+  path~ : String,
+  controller~ : String,
+  action~ : String,
+  page_name~ : String?,
 ) -> RouteSpec {
   {
     name,

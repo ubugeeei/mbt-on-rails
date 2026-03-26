@@ -151,6 +151,13 @@ fn render_layout_placeholder(layout : LayoutModule) -> String {
 ///|
 /// Renders one component placeholder tag.
 fn render_component_placeholder(component : VaporComponentRef) -> String {
+  render_component_placeholder_with_import(component, None)
+}
+
+fn render_component_placeholder_with_import(
+  component : VaporComponentRef,
+  import_name : String?,
+) -> String {
   let props_json = @support.entries_to_json(component.props)
   let attrs = StringBuilder::new()
   let boundary = match component.contract {
@@ -171,6 +178,20 @@ fn render_component_placeholder(component : VaporComponentRef) -> String {
   attrs.write_string(
     "data-mbor-boundary=\"" + @support.escape_html(boundary) + "\" ",
   )
+  match import_name {
+    Some(name) =>
+      attrs.write_string(
+        "data-mbor-import=\"" + @support.escape_html(name) + "\" ",
+      )
+    None => ()
+  }
+  if not(component.template_imports.is_empty()) {
+    attrs.write_string(
+      "data-mbor-template-imports='" +
+      @support.escape_html(render_template_import_names(component.template_imports)) +
+      "' ",
+    )
+  }
   if component.is_server_component {
     attrs.write_string("data-mbor-server-component=\"true\" ")
   } else {
@@ -198,11 +219,53 @@ fn render_component_placeholder(component : VaporComponentRef) -> String {
     Some(html) => "<template data-mbor-fallback>" + html + "</template>"
     None => ""
   }
+  let nested = render_component_children(component)
   "<section class=\"mbor-component\" " +
   attrs.to_string().trim().to_string() +
   ">" +
   fallback +
+  nested +
   "</section>"
+}
+
+fn render_component_children(component : VaporComponentRef) -> String {
+  let parts : Array[String] = []
+  for child in component.children {
+    parts.push(render_tree_node(component, child))
+  }
+  parts.join("")
+}
+
+fn render_tree_node(parent : VaporComponentRef, node : VaporNode) -> String {
+  match node {
+    Mounted(mounted) =>
+      match render_resolve_template_import(parent, mounted.import_name) {
+        Some(imported) => {
+          let child = {
+            ..imported.component,
+            props: render_merge_props(imported.component.props, mounted.props),
+          }
+          render_component_placeholder_with_import(child, Some(imported.local_name))
+        }
+        None =>
+          "<div class=\"mbor-error\" data-mbor-missing-import=\"" +
+          @support.escape_html(mounted.import_name) +
+          "\"></div>"
+      }
+    Suspense(boundary) => {
+      let children : Array[String] = []
+      for nested in boundary.children {
+        children.push(render_tree_node(parent, nested))
+      }
+      "<div class=\"mbor-suspense\" data-mbor-suspense=\"" +
+      @support.escape_html(boundary.name) +
+      "\"><template data-mbor-suspense-fallback>" +
+      boundary.fallback_html +
+      "</template>" +
+      children.join("") +
+      "</div>"
+    }
+  }
 }
 
 ///|
@@ -237,4 +300,44 @@ fn render_boundary_attr(kind : BoundaryKind) -> String {
     ServerBoundary => "server"
     ClientBoundary => "client"
   }
+}
+
+fn render_template_import_names(imports : Array[TemplateImport]) -> String {
+  let names : Array[String] = []
+  for imported in imports {
+    names.push(@support.json_string(imported.local_name))
+  }
+  "[" + names.join(", ") + "]"
+}
+
+fn render_resolve_template_import(
+  component : VaporComponentRef,
+  local_name : String,
+) -> TemplateImport? {
+  for imported in component.template_imports {
+    if imported.local_name == local_name {
+      return Some(imported)
+    }
+  }
+  None
+}
+
+fn render_merge_props(
+  base : Array[(String, String)],
+  overrides : Array[(String, String)],
+) -> Array[(String, String)] {
+  let merged = @support.clone_array(base)
+  for entry in overrides {
+    let mut replaced = false
+    for i = 0; i < merged.length(); i = i + 1 {
+      if merged[i].0 == entry.0 {
+        merged[i] = entry
+        replaced = true
+      }
+    }
+    if not(replaced) {
+      merged.push(entry)
+    }
+  }
+  merged
 }

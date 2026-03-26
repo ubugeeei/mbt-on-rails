@@ -1,0 +1,13 @@
+import {
+  "moonbitlang/core/encoding/utf8" @utf8,
+  "moonbitlang/core/env" @env,
+  "ubugeeei/mbt_on_rails/src/generator" @generator,
+}
+
+options(
+  "is-main": true,
+  targets: {
+    "io_native.mbt": [ "native", "llvm" ],
+    "io_wasm.mbt": [ "wasm", "wasm-gc" ],
+  },
+)

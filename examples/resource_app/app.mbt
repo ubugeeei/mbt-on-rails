@@ -36,7 +36,7 @@ fn print_example(app : @mbor.MbtOnRailsApp) -> Unit {
   println(app.route_tree())
   println("")
   println("SSR Example: /notes/42")
-  match app.example_html("/notes/42") {
+  match app.example_html(notes_show_path(notes_show_route_params(id="42"))) {
     Some(html) => println(html)
     None => println("no html")
   }
@@ -45,12 +45,12 @@ fn print_example(app : @mbor.MbtOnRailsApp) -> Unit {
   let action_response = @mbor.handle_request(
     app,
     @mbor.request(
-      @mbor.http_post(),
-      "/_actions/notes.create",
-      [],
-      [],
-      None,
-      "{\"title\":\"hello\"}",
+      verb=@mbor.http_post(),
+      path="/_actions/notes.create",
+      query=[],
+      form=[],
+      session_id=None,
+      body="{\"title\":\"hello\"}",
     ),
   )
   println(@mbor.render_response_body(action_response.body))

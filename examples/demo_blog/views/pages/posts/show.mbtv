@@ -3,6 +3,8 @@ import {
   "mizchi/luna/js/resource" @reactivity,
   let signal = @reactivity.signal,
   let computed = @reactivity.computed,
+  component PostHero,
+  component LikeButton,
 }
 
 let meta_open = signal(false)

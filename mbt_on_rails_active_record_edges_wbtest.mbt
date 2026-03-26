@@ -2,11 +2,10 @@
 /// Builds a schema that exercises validation and save branches.
 fn account_schema() -> ModelSchema {
   let base = model(
-    "Account",
-    "accounts",
-    [string_column("title")],
-    false,
-    false,
+    name="Account",
+    table="accounts",
+    columns=[string_column("title")],
+    timestamps=false,
   )
   let with_presence = with_validation(base, validates_presence("title"))
   let with_required_category = with_validation(

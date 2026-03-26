@@ -9,11 +9,17 @@ import {
 }
 
 // Values
+pub fn generate_example_types_source(views_dir~ : String, template_paths~ : Array[String], frontend_source~ : String, generator_name? : String) -> String
+
+pub fn route_helpers(String) -> Array[RouteHelperSpec]
+
 pub fn scaffold_field(String, @active_record.Column) -> ScaffoldField
 
 pub fn scaffold_resource(String, Array[ScaffoldField]) -> ScaffoldPlan
 
 pub fn scaffold_summary(ScaffoldPlan) -> String
+
+pub fn template_helpers(views_dir~ : String, template_paths~ : Array[String]) -> Array[TemplateHelperSpec]
 
 // Errors
 
@@ -21,6 +27,24 @@ pub fn scaffold_summary(ScaffoldPlan) -> String
 pub struct GeneratedArtifact {
   path : String
   description : String
+}
+
+pub struct RouteHelperSpec {
+  route_name : String
+  route_path : String
+  params : Array[RouteParamSpec]
+}
+
+pub(all) enum RouteParamKind {
+  Param
+  CatchAll
+  OptionalCatchAll
+}
+
+pub struct RouteParamSpec {
+  raw_name : String
+  field_name : String
+  kind : RouteParamKind
 }
 
 pub struct ScaffoldField {
@@ -36,6 +60,11 @@ pub struct ScaffoldPlan {
   pages : Array[@view.PageModule]
   server_actions : Array[@view.ServerAction]
   artifacts : Array[GeneratedArtifact]
+}
+
+pub struct TemplateHelperSpec {
+  function_name : String
+  source_path : String
 }
 
 // Type aliases

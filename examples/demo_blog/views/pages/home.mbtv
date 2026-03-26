@@ -3,6 +3,8 @@ import {
   "mizchi/luna/js/resource" @reactivity,
   let signal = @reactivity.signal,
   let computed = @reactivity.computed,
+  component RecentPosts,
+  component PostComposer,
 }
 
 struct Props {

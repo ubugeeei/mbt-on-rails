@@ -1,0 +1,17 @@
+<template>
+  <section class="posts-table">
+    <h2>Published</h2>
+    <ul>
+      <li>Typed pages</li>
+      <li>Strict contracts</li>
+      <li>Hydration triggers</li>
+    </ul>
+  </section>
+</template>
+
+<style scoped>
+.posts-table {
+  display: grid;
+  gap: 8px;
+}
+</style>

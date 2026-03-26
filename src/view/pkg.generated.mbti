@@ -1,10 +1,20 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "ubugeeei/mbt_on_rails/src/view"
 
-// Values
-pub fn asset_manifest(Array[String], Array[String]) -> AssetManifest
+import {
+  "ubugeeei/mbt_on_rails/src/support",
+}
 
-pub fn client_component(String, String, Array[(String, String)], HydrationMode) -> VaporComponentRef
+// Values
+#label_migration(script_urls, allow_positional=true)
+#label_migration(style_urls, allow_positional=true)
+pub fn asset_manifest(style_urls~ : Array[String], script_urls~ : Array[String]) -> AssetManifest
+
+#label_migration(hydration, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(props, allow_positional=true)
+#label_migration(source_path, allow_positional=true)
+pub fn client_component(name~ : String, source_path~ : @support.MbtvPath, props~ : Array[(String, String)], hydration~ : HydrationMode) -> VaporComponentRef
 
 pub fn client_contract(Array[PropContract]) -> ComponentContract
 
@@ -20,7 +30,12 @@ pub fn dynamic_force_static() -> DynamicMode
 
 pub fn dynamic_revalidate(Int) -> DynamicMode
 
-pub fn form_binding(String, String, String, String?, String?) -> FormBinding
+#label_migration(action_name, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(optimistic_key, allow_positional=true)
+#label_migration(redirect_to, allow_positional=true)
+#label_migration(verb, allow_positional=true)
+pub fn form_binding(name~ : String, action_name~ : String, verb~ : String, optimistic_key~ : String?, redirect_to~ : String?) -> FormBinding
 
 pub fn hydrate_idle() -> HydrationMode
 
@@ -34,11 +49,25 @@ pub fn hydrate_only() -> HydrationMode
 
 pub fn hydrate_visible() -> HydrationMode
 
-pub fn layout_module(String, String, VaporComponentRef) -> LayoutModule
+#label_migration(component, allow_positional=true)
+#label_migration(file_path, allow_positional=true)
+#label_migration(name, allow_positional=true)
+pub fn layout_module(name~ : String, file_path~ : @support.MbtvPath, component~ : VaporComponentRef) -> LayoutModule
 
-pub fn loader_module(String, String, Int?, Array[String]) -> LoaderModule
+#label_migration(cache_key, allow_positional=true)
+#label_migration(depends_on, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(revalidate_seconds, allow_positional=true)
+pub fn loader_module(name~ : String, cache_key~ : String, revalidate_seconds~ : Int?, depends_on~ : Array[String]) -> LoaderModule
 
-pub fn page_module(String, String, String, String, VaporComponentRef) -> PageModule
+pub fn mount_import(import_name~ : String, props~ : Array[(String, String)]) -> VaporNode
+
+#label_migration(component, allow_positional=true)
+#label_migration(file_path, allow_positional=true)
+#label_migration(route_name, allow_positional=true)
+#label_migration(route_path, allow_positional=true)
+#label_migration(title, allow_positional=true)
+pub fn page_module(route_name~ : String, route_path~ : String, file_path~ : @support.MbtvPath, title~ : String, component~ : VaporComponentRef) -> PageModule
 
 pub fn prop_contract(String, String, Bool, String) -> PropContract
 
@@ -58,15 +87,39 @@ pub fn render_router_manifest(Array[PageModule]) -> String
 
 pub fn render_server_action_manifest(Array[ServerAction]) -> String
 
-pub fn server_action(String, String, Array[(String, String)], String, Bool) -> ServerAction
+#label_migration(csrf_protected, allow_positional=true)
+#label_migration(input_fields, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(output_type, allow_positional=true)
+#label_migration(route, allow_positional=true)
+pub fn server_action(name~ : String, route~ : String, input_fields~ : Array[(String, String)], output_type~ : String, csrf_protected~ : Bool) -> ServerAction
 
-pub fn server_component(String, String, Array[(String, String)]) -> VaporComponentRef
+#label_migration(name, allow_positional=true)
+#label_migration(props, allow_positional=true)
+#label_migration(source_path, allow_positional=true)
+pub fn server_component(name~ : String, source_path~ : @support.MbtvPath, props~ : Array[(String, String)]) -> VaporComponentRef
 
 pub fn server_contract(Array[PropContract], Bool) -> ComponentContract
+
+pub fn suspense_boundary(name~ : String, fallback_html~ : String, children~ : Array[VaporNode]) -> VaporNode
+
+pub fn template_component_imports(String) -> Array[String]
+
+pub fn template_component_usages(String) -> Array[String]
+
+pub fn template_import(local_name~ : String, component~ : VaporComponentRef) -> TemplateImport
+
+pub fn validate_component_tree(VaporComponentRef) -> Array[String]
+
+pub fn validate_page_tree(PageModule) -> Array[String]
+
+pub fn validate_template_component_imports(String, String) -> Array[String]
 
 pub fn with_action_name(PageModule, String) -> PageModule
 
 pub fn with_assets(PageModule, AssetManifest) -> PageModule
+
+pub fn with_child(VaporComponentRef, VaporNode) -> VaporComponentRef
 
 pub fn with_contract(VaporComponentRef, ComponentContract) -> VaporComponentRef
 
@@ -83,6 +136,8 @@ pub fn with_layout(PageModule, LayoutModule) -> PageModule
 pub fn with_loader(PageModule, LoaderModule) -> PageModule
 
 pub fn with_metadata(PageModule, String, String) -> PageModule
+
+pub fn with_template_import(VaporComponentRef, TemplateImport) -> VaporComponentRef
 
 // Errors
 
@@ -137,7 +192,7 @@ pub impl Show for HydrationMode
 
 pub struct LayoutModule {
   name : String
-  file_path : String
+  file_path : @support.MbtvPath
   component : VaporComponentRef
 }
 
@@ -148,10 +203,15 @@ pub struct LoaderModule {
   depends_on : Array[String]
 }
 
+pub struct MountedComponent {
+  import_name : String
+  props : Array[(String, String)]
+}
+
 pub struct PageModule {
   route_name : String
   route_path : String
-  file_path : String
+  file_path : @support.MbtvPath
   title : String
   component : VaporComponentRef
   layouts : Array[LayoutModule]
@@ -194,17 +254,37 @@ pub struct ServerAction {
   csrf_protected : Bool
 }
 
+pub struct SuspenseBoundary {
+  name : String
+  fallback_html : String
+  children : Array[VaporNode]
+}
+
+pub struct TemplateImport {
+  local_name : String
+  component : VaporComponentRef
+}
+
 pub struct VaporComponentRef {
   name : String
-  source_path : String
+  source_path : @support.MbtvPath
   props : Array[(String, String)]
   hydration : HydrationMode?
   is_server_component : Bool
   contract : ComponentContract?
   fallback_html : String?
+  template_imports : Array[TemplateImport]
+  children : Array[VaporNode]
 }
+pub fn VaporComponentRef::with_child(Self, VaporNode) -> Self
 pub fn VaporComponentRef::with_contract(Self, ComponentContract) -> Self
 pub fn VaporComponentRef::with_fallback(Self, String) -> Self
+pub fn VaporComponentRef::with_template_import(Self, TemplateImport) -> Self
+
+pub enum VaporNode {
+  Mounted(MountedComponent)
+  Suspense(SuspenseBoundary)
+}
 
 // Type aliases
 

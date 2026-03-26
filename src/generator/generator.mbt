@@ -43,11 +43,9 @@ pub fn scaffold_resource(
   let model = @orm.with_callback(
     @orm.with_validation(
       @orm.model(
-        @support.classify(@support.singularize(resource_name)),
-        resource_name,
-        columns,
-        true,
-        false,
+        name=@support.classify(@support.singularize(resource_name)),
+        table=resource_name,
+        columns=columns,
       ),
       @orm.validates_presence("title"),
     ),
@@ -65,10 +63,10 @@ pub fn scaffold_resource(
   )
   let application_layout = @view.layout_module(
     "application",
-    "examples/scaffold/views/layouts/application.mbtv",
+    @support.mbtv_path("examples/scaffold/views/layouts/application.mbtv"),
     @view.server_component(
       "ApplicationLayout",
-      "examples/scaffold/views/layouts/application.mbtv",
+      @support.mbtv_path("examples/scaffold/views/layouts/application.mbtv"),
       [],
     ),
   )
@@ -78,11 +76,15 @@ pub fn scaffold_resource(
         @view.page_module(
           resource_name + "_index",
           "/" + resource_name,
-          "examples/scaffold/views/pages/" + resource_name + "/index.mbtv",
+          @support.mbtv_path(
+            "examples/scaffold/views/pages/" + resource_name + "/index.mbtv",
+          ),
           @support.classify(resource_name),
           @view.server_component(
             @support.classify(resource_name) + "IndexPage",
-            "examples/scaffold/views/pages/" + resource_name + "/index.mbtv",
+            @support.mbtv_path(
+              "examples/scaffold/views/pages/" + resource_name + "/index.mbtv",
+            ),
             [],
           ),
         ),
@@ -99,11 +101,15 @@ pub fn scaffold_resource(
       @view.page_module(
         resource_name + "_show",
         "/" + resource_name + "/[id]",
-        "examples/scaffold/views/pages/" + resource_name + "/show.mbtv",
+        @support.mbtv_path(
+          "examples/scaffold/views/pages/" + resource_name + "/show.mbtv",
+        ),
         @support.classify(@support.singularize(resource_name)),
         @view.server_component(
           @support.classify(resource_name) + "ShowPage",
-          "examples/scaffold/views/pages/" + resource_name + "/show.mbtv",
+          @support.mbtv_path(
+            "examples/scaffold/views/pages/" + resource_name + "/show.mbtv",
+          ),
           [],
         ),
       ),

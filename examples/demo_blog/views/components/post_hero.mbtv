@@ -1,0 +1,14 @@
+<template>
+  <header class="post-hero">
+    <p>Featured Post</p>
+    <h2>Client and Server Boundaries</h2>
+    <p>Nested islands with explicit imports and SSR fallbacks.</p>
+  </header>
+</template>
+
+<style scoped>
+.post-hero {
+  display: grid;
+  gap: 6px;
+}
+</style>

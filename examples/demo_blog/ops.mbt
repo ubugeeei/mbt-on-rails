@@ -63,18 +63,23 @@ pub fn demo_caches() -> Array[@cache.CacheStore] {
 ///|
 /// Builds the session mailer used by the demo app.
 fn demo_session_mailer() -> @mailer.MailerDefinition {
-  @mailer.mailer("SessionMailer", "noreply@mbt-on-rails.dev", Some("mailer"), [
-    @mailer.mail_template(
-      "welcome",
-      "Welcome to mbt on rails",
-      "examples/demo_blog/views/mailer/welcome.html.mbtv",
-      Some("examples/demo_blog/views/mailer/welcome.text"),
-    ),
-    @mailer.mail_template(
-      "password_reset",
-      "Reset your password",
-      "examples/demo_blog/views/mailer/password_reset.html.mbtv",
-      Some("examples/demo_blog/views/mailer/password_reset.text"),
-    ),
-  ])
+  @mailer.mailer(
+    name="SessionMailer",
+    from="noreply@mbt-on-rails.dev",
+    layout_name=Some("mailer"),
+    templates=[
+      @mailer.mail_template(
+        action_name="welcome",
+        subject="Welcome to mbt on rails",
+        html_path=view_mailer_welcome_html(),
+        text_path=Some("examples/demo_blog/views/mailer/welcome.text"),
+      ),
+      @mailer.mail_template(
+        action_name="password_reset",
+        subject="Reset your password",
+        html_path=view_mailer_password_reset_html(),
+        text_path=Some("examples/demo_blog/views/mailer/password_reset.text"),
+      ),
+    ],
+  )
 }

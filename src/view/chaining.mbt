@@ -17,6 +17,28 @@ pub fn VaporComponentRef::with_fallback(
 }
 
 ///|
+/// Chainable alias for `with_template_import`.
+pub fn VaporComponentRef::with_template_import(
+  self : VaporComponentRef,
+  imported : TemplateImport,
+) -> VaporComponentRef {
+  let template_imports = @support.clone_array(self.template_imports)
+  template_imports.push(imported)
+  { ..self, template_imports, }
+}
+
+///|
+/// Chainable alias for `with_child`.
+pub fn VaporComponentRef::with_child(
+  self : VaporComponentRef,
+  child : VaporNode,
+) -> VaporComponentRef {
+  let children = @support.clone_array(self.children)
+  children.push(child)
+  { ..self, children, }
+}
+
+///|
 /// Chainable alias for `with_layout`.
 pub fn PageModule::with_layout(
   self : PageModule,

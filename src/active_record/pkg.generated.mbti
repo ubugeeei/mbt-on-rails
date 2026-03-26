@@ -54,7 +54,10 @@ pub fn json_column(String) -> Column
 
 pub fn limit_to(Relation, Int) -> Relation
 
-pub fn model(String, String, Array[Column], Bool, Bool) -> ModelSchema
+#label_migration(columns, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(table, allow_positional=true)
+pub fn model(name~ : String, table~ : String, columns~ : Array[Column], timestamps? : Bool, soft_delete? : Bool) -> ModelSchema
 
 pub fn nullable(Column) -> Column
 
