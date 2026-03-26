@@ -139,6 +139,12 @@ The source audit in this batch was anchored to the official Rails repository at:
 - Generated attributes such as the primary key, `created_at` / `updated_at`, and soft-delete `deleted_at` are recognized during casting so adapter-facing rows do not need a second schema
 - `AttributeCastError` keeps serialization failures as inspectable data, which makes tutorials, generators, and tests safer than ad-hoc string coercion
 
+## Nineteenth batch added here
+
+- Relations can now execute against the in-memory adapter through `execute_relation(...)` instead of stopping at SQL rendering
+- The supported subset covers predicates, ordering, projection, distinct, limit, and offset using the model schema for type-aware comparison
+- Unsupported shapes such as raw predicates, joins, preload, group-by, and having clauses return typed `RelationExecutionIssue` values instead of silently guessing
+
 ## Biggest gaps still open
 
 - `activesupport`: concern/autoloading/deprecation/timezones/notifications subscribers

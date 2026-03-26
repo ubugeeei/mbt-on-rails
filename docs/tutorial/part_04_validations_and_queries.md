@@ -103,6 +103,7 @@ This repo ships an in-memory store for testing and examples:
 - `begin_transaction(...)`
 - `create_savepoint(...)`
 - `transaction_save(...)`
+- `execute_relation(...)`
 
 Dirty tracking is also explicit:
 
@@ -122,6 +123,9 @@ The persistence path is also less toy-like now:
 - `string_column(...).unique()` and other unique column metadata are enforced by the in-memory adapter even before a real database exists
 - `with_default(...)` columns and `timestamps=true` are applied during persistence, so examples get schema-shaped rows without a real database
 - `destroy_record(...)` removes rows or writes a `deleted_at` tombstone for soft-delete models
+- `execute_relation(...)` can run the supported subset of the same `Relation` objects used by `relation_to_sql(...)`
+
+Unsupported shapes like `where_raw(...)`, `join_relation(...)`, `group_by(...)`, `having_raw(...)`, and `preload(...)` return explicit issues instead of silently faking success.
 
 Example:
 
