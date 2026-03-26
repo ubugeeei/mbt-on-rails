@@ -587,7 +587,11 @@ pub fn process_definition(String, @process.ProcessRole, String, Int, Array[Strin
 
 pub fn process_summary(Array[@process.ProcessDefinition]) -> String
 
-pub fn prop_contract(String, String, Bool, String) -> @view.PropContract
+#label_migration(description, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(required, allow_positional=true)
+#label_migration(type_name, allow_positional=true)
+pub fn prop_contract(name~ : String, type_name~ : String, required~ : Bool, description~ : String) -> @view.PropContract
 
 pub fn rate_limit_rule(String, String, Int, Int) -> @production.RateLimitRule
 
@@ -752,7 +756,9 @@ pub fn server_action(name~ : String, route~ : String, input_fields~ : Array[(Str
 #label_migration(source_path, allow_positional=true)
 pub fn server_component(name~ : String, source_path~ : @support.MbtvPath, props~ : Array[(String, String)]) -> @view.VaporComponentRef
 
-pub fn server_contract(Array[@view.PropContract], Bool) -> @view.ComponentContract
+#label_migration(async_only, allow_positional=true)
+#label_migration(props, allow_positional=true)
+pub fn server_contract(props~ : Array[@view.PropContract], async_only~ : Bool) -> @view.ComponentContract
 
 #label_migration(config, allow_positional=true)
 #label_migration(remember_me, allow_positional=true)

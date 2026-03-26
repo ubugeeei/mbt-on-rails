@@ -10,11 +10,11 @@ test "rendered page includes islands forms and route tree data" {
     ),
   )
   let page = page_module(
-      "posts_show",
-      "/posts/[id]",
-      mbtv_path("examples/demo_blog/views/pages/posts/show.mbtv"),
-      "Post",
-      server_component(
+      route_name="posts_show",
+      route_path="/posts/[id]",
+      file_path=mbtv_path("examples/demo_blog/views/pages/posts/show.mbtv"),
+      title="Post",
+      component=server_component(
         "PostsShowPage",
         mbtv_path("examples/demo_blog/views/pages/posts/show.mbtv"),
         [],
@@ -43,11 +43,11 @@ test "rendered page includes islands forms and route tree data" {
     )
   let actions = [
     server_action(
-      "posts.update",
-      "/_actions/posts.update",
-      [("id", "String"), ("title", "String")],
-      "PostPayload",
-      true,
+      name="posts.update",
+      route="/_actions/posts.update",
+      input_fields=[("id", "String"), ("title", "String")],
+      output_type="PostPayload",
+      csrf_protected=true,
     ),
   ]
 
@@ -99,7 +99,14 @@ test "scaffold and demo app expose richer rails style surfaces" {
   let demo = demo_blog_app()
   let page_response = handle_request(
     demo,
-    request(http_get(), "/posts/42", [], [], None, ""),
+    request(
+      verb=http_get(),
+      path="/posts/42",
+      query=[],
+      form=[],
+      session_id=None,
+      body="",
+    ),
   )
   assert_eq(page_response.status, 200)
   assert_true(render_response_body(page_response.body).contains("posts_show"))
@@ -107,12 +114,12 @@ test "scaffold and demo app expose richer rails style surfaces" {
   let action_response = handle_request(
     demo,
     request(
-      http_post(),
-      "/_actions/posts.create",
-      [],
-      [],
-      None,
-      "{\"title\":\"hello\"}",
+      verb=http_post(),
+      path="/_actions/posts.create",
+      query=[],
+      form=[],
+      session_id=None,
+      body="{\"title\":\"hello\"}",
     ),
   )
   assert_eq(action_response.status, 200)

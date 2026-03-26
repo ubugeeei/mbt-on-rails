@@ -38,6 +38,9 @@ Then decorate it with:
 - `.with_dynamic_mode(...)`
 - `.with_metadata(...)`
 
+Favor labeled arguments for builders like `page_module(...)` so route names,
+paths, and titles stay readable at a glance.
+
 ## Explicit Template Imports
 
 When a component is used from a template, the template must import it explicitly.

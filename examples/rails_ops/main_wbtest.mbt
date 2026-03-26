@@ -32,7 +32,14 @@ test "rails ops example primitives produce stable summaries and runtime behavior
   ]
   let result = @mbor.apply_request_middleware(
     stack,
-    @mbor.request(@mbor.http_get(), "/admin", [], [], None, ""),
+    @mbor.request(
+      verb=@mbor.http_get(),
+      path="/admin",
+      query=[],
+      form=[],
+      session_id=None,
+      body="",
+    ),
   )
   match result.1 {
     Some(response) => assert_eq(response.status, 503)
@@ -60,15 +67,17 @@ test "rails ops example primitives produce stable summaries and runtime behavior
 ///|
 test "rails ops example covers jobs mailers turbo cache and main smoke" {
   let announcement_mailer = @mbor.mailer(
-    "AnnouncementMailer",
-    "noreply@example.com",
-    Some("mailer"),
-    [
+    name="AnnouncementMailer",
+    from="noreply@example.com",
+    layout_name=Some("mailer"),
+    templates=[
       @mbor.mail_template(
-        "launch",
-        "Launch update",
-        @mbor.mbtv_path("examples/demo_blog/views/mailer/welcome.html.mbtv"),
-        Some("examples/demo_blog/views/mailer/welcome.text"),
+        action_name="launch",
+        subject="Launch update",
+        html_path=@mbor.mbtv_path(
+          "examples/demo_blog/views/mailer/welcome.html.mbtv",
+        ),
+        text_path=Some("examples/demo_blog/views/mailer/welcome.text"),
       ),
     ],
   )
@@ -78,7 +87,7 @@ test "rails ops example covers jobs mailers turbo cache and main smoke" {
     ]) {
     Some(delivery) => {
       let queue = @mbor.enqueue_delivery(
-        @mbor.job_queue("mailers"),
+        @mbor.job_queue(name="mailers"),
         delivery,
         None,
       )

@@ -69,7 +69,11 @@ pub fn mount_import(import_name~ : String, props~ : Array[(String, String)]) -> 
 #label_migration(title, allow_positional=true)
 pub fn page_module(route_name~ : String, route_path~ : String, file_path~ : @support.MbtvPath, title~ : String, component~ : VaporComponentRef) -> PageModule
 
-pub fn prop_contract(String, String, Bool, String) -> PropContract
+#label_migration(description, allow_positional=true)
+#label_migration(name, allow_positional=true)
+#label_migration(required, allow_positional=true)
+#label_migration(type_name, allow_positional=true)
+pub fn prop_contract(name~ : String, type_name~ : String, required~ : Bool, description~ : String) -> PropContract
 
 pub fn render_bundle_plan(PageModule) -> String
 
@@ -101,7 +105,9 @@ pub fn server_action(name~ : String, route~ : String, input_fields~ : Array[(Str
 #label_migration(source_path, allow_positional=true)
 pub fn server_component(name~ : String, source_path~ : @support.MbtvPath, props~ : Array[(String, String)]) -> VaporComponentRef
 
-pub fn server_contract(Array[PropContract], Bool) -> ComponentContract
+#label_migration(async_only, allow_positional=true)
+#label_migration(props, allow_positional=true)
+pub fn server_contract(props~ : Array[PropContract], async_only~ : Bool) -> ComponentContract
 
 pub fn suspense_boundary(name~ : String, fallback_html~ : String, children~ : Array[VaporNode]) -> VaporNode
 

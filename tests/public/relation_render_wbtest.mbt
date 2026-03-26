@@ -2,12 +2,12 @@
 /// Builds a minimal page layout used by render-mode tests.
 fn render_test_layout() -> LayoutModule {
   layout_module(
-    "application",
-    mbtv_path("examples/demo_blog/views/layouts/application.mbtv"),
-    server_component(
-      "ApplicationLayout",
-      mbtv_path("examples/demo_blog/views/layouts/application.mbtv"),
-      [],
+    name="application",
+    file_path=mbtv_path("examples/demo_blog/views/layouts/application.mbtv"),
+    component=server_component(
+      name="ApplicationLayout",
+      source_path=mbtv_path("examples/demo_blog/views/layouts/application.mbtv"),
+      props=[],
     ),
   )
 }
@@ -76,14 +76,14 @@ test "render_page covers hydration variants assets metadata and dynamic modes" {
       with_dynamic_mode(
         with_layout(
           page_module(
-            "render_modes",
-            "/render-modes",
-            mbtv_path("examples/demo_blog/views/pages/home.mbtv"),
-            "Render Modes",
-            server_component(
-              "RenderModesPage",
-              mbtv_path("examples/demo_blog/views/pages/home.mbtv"),
-              [],
+            route_name="render_modes",
+            route_path="/render-modes",
+            file_path=mbtv_path("examples/demo_blog/views/pages/home.mbtv"),
+            title="Render Modes",
+            component=server_component(
+              name="RenderModesPage",
+              source_path=mbtv_path("examples/demo_blog/views/pages/home.mbtv"),
+              props=[],
             ),
           ),
           layout,
@@ -93,7 +93,7 @@ test "render_page covers hydration variants assets metadata and dynamic modes" {
       "robots",
       "noindex",
     ),
-    asset_manifest(["/assets/app.css"], [
+    asset_manifest(style_urls=["/assets/app.css"], script_urls=[
       "/assets/hydrate.js", "/assets/page.js",
     ]),
   )
@@ -104,38 +104,48 @@ test "render_page covers hydration variants assets metadata and dynamic modes" {
           with_island(
             base,
             client_component(
-              "ManualIsland",
-              mbtv_path("examples/demo_blog/views/components/like_button.mbtv"),
-              [],
-              hydrate_manual(),
+              name="ManualIsland",
+              source_path=mbtv_path(
+                "examples/demo_blog/views/components/like_button.mbtv",
+              ),
+              props=[],
+              hydration=hydrate_manual(),
             ),
           ),
           client_component(
-            "IdleIsland",
-            mbtv_path("examples/demo_blog/views/components/like_button.mbtv"),
-            [],
-            hydrate_idle(),
+            name="IdleIsland",
+            source_path=mbtv_path(
+              "examples/demo_blog/views/components/like_button.mbtv",
+            ),
+            props=[],
+            hydration=hydrate_idle(),
           ),
         ),
         client_component(
-          "MediaIsland",
-          mbtv_path("examples/demo_blog/views/components/like_button.mbtv"),
-          [],
-          hydrate_media("(max-width: 700px)"),
+          name="MediaIsland",
+          source_path=mbtv_path(
+            "examples/demo_blog/views/components/like_button.mbtv",
+          ),
+          props=[],
+          hydration=hydrate_media("(max-width: 700px)"),
         ),
       ),
       client_component(
-        "OnlyIsland",
-        mbtv_path("examples/demo_blog/views/components/like_button.mbtv"),
-        [],
-        hydrate_only(),
+        name="OnlyIsland",
+        source_path=mbtv_path(
+          "examples/demo_blog/views/components/like_button.mbtv",
+        ),
+        props=[],
+        hydration=hydrate_only(),
       ),
     ),
     client_component(
-      "DeferredIsland",
-      mbtv_path("examples/demo_blog/views/components/like_button.mbtv"),
-      [],
-      defer_on_server(),
+      name="DeferredIsland",
+      source_path=mbtv_path(
+        "examples/demo_blog/views/components/like_button.mbtv",
+      ),
+      props=[],
+      hydration=defer_on_server(),
     ),
   )
   let rendered = render_page(page, [], [], [])

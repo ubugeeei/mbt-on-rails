@@ -3,36 +3,36 @@
 fn api_routes() -> Array[@mbor.RouteSpec] {
   [
     @mbor.route(
-      "health",
-      @mbor.http_get(),
-      "/health",
-      "HealthController",
-      "show",
-      None,
+      name="health",
+      verb=@mbor.http_get(),
+      path="/health",
+      controller="HealthController",
+      action="show",
+      page_name=None,
     ),
     @mbor.route(
-      "ready",
-      @mbor.http_get(),
-      "/ready",
-      "ReadyController",
-      "show",
-      None,
+      name="ready",
+      verb=@mbor.http_get(),
+      path="/ready",
+      controller="ReadyController",
+      action="show",
+      page_name=None,
     ),
     @mbor.route(
-      "metrics",
-      @mbor.http_get(),
-      "/metrics",
-      "MetricsController",
-      "show",
-      None,
+      name="metrics",
+      verb=@mbor.http_get(),
+      path="/metrics",
+      controller="MetricsController",
+      action="show",
+      page_name=None,
     ),
     @mbor.route(
-      "post_show",
-      @mbor.http_get(),
-      "/api/v1/posts/[id]",
-      "Api::PostsController",
-      "show",
-      None,
+      name="post_show",
+      verb=@mbor.http_get(),
+      path="/api/v1/posts/[id]",
+      controller="Api::PostsController",
+      action="show",
+      page_name=None,
     ),
   ]
 }
@@ -133,22 +133,50 @@ fn run_example() -> Unit {
   let health = dispatch(
     routes,
     registry,
-    @mbor.request(@mbor.http_get(), "/health", [], [], None, ""),
+    @mbor.request(
+      verb=@mbor.http_get(),
+      path="/health",
+      query=[],
+      form=[],
+      session_id=None,
+      body="",
+    ),
   )
   let ready = dispatch(
     routes,
     registry,
-    @mbor.request(@mbor.http_get(), "/ready", [], [], None, ""),
+    @mbor.request(
+      verb=@mbor.http_get(),
+      path="/ready",
+      query=[],
+      form=[],
+      session_id=None,
+      body="",
+    ),
   )
   let metrics = dispatch(
     routes,
     registry,
-    @mbor.request(@mbor.http_get(), "/metrics", [], [], None, ""),
+    @mbor.request(
+      verb=@mbor.http_get(),
+      path="/metrics",
+      query=[],
+      form=[],
+      session_id=None,
+      body="",
+    ),
   )
   let post = dispatch(
     routes,
     registry,
-    @mbor.request(@mbor.http_get(), "/api/v1/posts/42", [], [], None, ""),
+    @mbor.request(
+      verb=@mbor.http_get(),
+      path="/api/v1/posts/42",
+      query=[],
+      form=[],
+      session_id=None,
+      body="",
+    ),
   )
 
   println("Health")

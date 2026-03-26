@@ -65,6 +65,9 @@ let entries = posts_create_action_entries(input)
 
 This is the current end-to-end type-safe path for routes plus mutations in the codebase.
 
+Builder-style APIs like `server_action(...)` and `request(...)` read best with
+labeled arguments, especially once booleans show up in the call site.
+
 ## Exercise
 
 - Open [`../../examples/resource_app/generated_types.mbt`](../../examples/resource_app/generated_types.mbt)

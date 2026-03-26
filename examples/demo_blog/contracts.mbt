@@ -5,7 +5,7 @@ pub fn demo_application_layout_component() -> @view.VaporComponentRef {
     name="ApplicationLayout",
     source_path=view_layouts_application(),
     props=[],
-  ).with_contract(@view.server_contract([], true))
+  ).with_contract(@view.server_contract(props=[], async_only=true))
 }
 
 ///|
@@ -17,8 +17,15 @@ pub fn demo_home_page_component() -> @view.VaporComponentRef {
   .with_fallback("<div class=\"mbor-shell\">Loading home...</div>")
   .with_contract(
     @view.server_contract(
-      [@view.prop_contract("title", "String", true, "Hero title for the page")],
-      true,
+      props=[
+        @view.prop_contract(
+          name="title",
+          type_name="String",
+          required=true,
+          description="Hero title for the page",
+        ),
+      ],
+      async_only=true,
     ),
   )
 }
@@ -28,7 +35,7 @@ pub fn demo_home_page_component() -> @view.VaporComponentRef {
 pub fn demo_sign_in_page_component() -> @view.VaporComponentRef {
   @view.server_component(name="SignInPage", source_path=view_pages_sign_in(), props=[])
   .with_fallback("<div class=\"mbor-shell\">Loading sign in...</div>")
-  .with_contract(@view.server_contract([], true))
+  .with_contract(@view.server_contract(props=[], async_only=true))
 }
 
 ///|
@@ -38,7 +45,7 @@ pub fn demo_posts_index_page_component() -> @view.VaporComponentRef {
     name="PostsIndexPage",
     source_path=view_pages_posts_index(),
     props=[],
-  ).with_contract(@view.server_contract([], true))
+  ).with_contract(@view.server_contract(props=[], async_only=true))
 }
 
 ///|
@@ -48,7 +55,7 @@ pub fn demo_posts_show_page_component() -> @view.VaporComponentRef {
     name="PostsShowPage",
     source_path=view_pages_posts_show(),
     props=[],
-  ).with_contract(@view.server_contract([], true))
+  ).with_contract(@view.server_contract(props=[], async_only=true))
 }
 
 ///|
@@ -58,7 +65,7 @@ pub fn demo_posts_new_page_component() -> @view.VaporComponentRef {
     name="PostsNewPage",
     source_path=view_pages_posts_new(),
     props=[],
-  ).with_contract(@view.server_contract([], true))
+  ).with_contract(@view.server_contract(props=[], async_only=true))
 }
 
 ///|
@@ -68,7 +75,7 @@ pub fn demo_posts_edit_page_component() -> @view.VaporComponentRef {
     name="PostsEditPage",
     source_path=view_pages_posts_edit(),
     props=[],
-  ).with_contract(@view.server_contract([], true))
+  ).with_contract(@view.server_contract(props=[], async_only=true))
 }
 
 ///|
@@ -83,7 +90,12 @@ pub fn demo_post_composer_island(mode : String) -> @view.VaporComponentRef {
   .with_fallback("<div class=\"composer-shell\">Preparing composer...</div>")
   .with_contract(
     @view.client_contract([
-      @view.prop_contract("mode", "String", true, "Composer mode selector"),
+      @view.prop_contract(
+        name="mode",
+        type_name="String",
+        required=true,
+        description="Composer mode selector",
+      ),
     ]),
   )
 }
@@ -100,7 +112,12 @@ pub fn demo_post_composer_idle_island() -> @view.VaporComponentRef {
   .with_fallback("<div class=\"composer-shell\">Preparing composer...</div>")
   .with_contract(
     @view.client_contract([
-      @view.prop_contract("mode", "String", true, "Composer mode selector"),
+      @view.prop_contract(
+        name="mode",
+        type_name="String",
+        required=true,
+        description="Composer mode selector",
+      ),
     ]),
   )
 }
@@ -119,7 +136,12 @@ pub fn demo_like_button_island() -> @view.VaporComponentRef {
   )
   .with_contract(
     @view.client_contract([
-      @view.prop_contract("kind", "String", true, "Visual reaction kind"),
+      @view.prop_contract(
+        name="kind",
+        type_name="String",
+        required=true,
+        description="Visual reaction kind",
+      ),
     ]),
   )
 }

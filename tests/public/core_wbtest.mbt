@@ -23,12 +23,12 @@ test "resources and namespace routes recognize member and collection actions" {
   assert_eq(routes.length(), 9)
 
   let publish_request = request(
-    http_post(),
-    "/admin/posts/42/publish",
-    [],
-    [],
-    None,
-    "",
+    verb=http_post(),
+    path="/admin/posts/42/publish",
+    query=[],
+    form=[],
+    session_id=None,
+    body="",
   )
   match recognize(routes, publish_request) {
     Some(matched) => {
@@ -41,12 +41,12 @@ test "resources and namespace routes recognize member and collection actions" {
   }
 
   let search_request = request(
-    http_get(),
-    "/admin/posts/search",
-    [],
-    [],
-    None,
-    "",
+    verb=http_get(),
+    path="/admin/posts/search",
+    query=[],
+    form=[],
+    session_id=None,
+    body="",
   )
   match recognize(routes, search_request) {
     Some(matched) => {
@@ -225,12 +225,12 @@ test "declarative controller and app builders preserve inferred metadata" {
     .with_controller(controller)
     .with_route(
       route(
-        "sign_in",
-        http_get(),
-        "/sign-in",
-        "SessionsController",
-        "create",
-        None,
+        name="sign_in",
+        verb=http_get(),
+        path="/sign-in",
+        controller="SessionsController",
+        action="create",
+        page_name=None,
       ),
     )
   assert_eq(app.controllers.length(), 1)

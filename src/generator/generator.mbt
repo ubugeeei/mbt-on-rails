@@ -177,12 +177,16 @@ fn scaffold_field_names(fields : Array[ScaffoldField]) -> Array[String] {
 ///|
 fn scaffold_application_layout() -> @view.LayoutModule {
   @view.layout_module(
-    "application",
-    @support.mbtv_path("examples/scaffold/views/layouts/application.mbtv"),
-    @view.server_component(
-      "ApplicationLayout",
-      @support.mbtv_path("examples/scaffold/views/layouts/application.mbtv"),
-      [],
+    name="application",
+    file_path=@support.mbtv_path(
+      "examples/scaffold/views/layouts/application.mbtv",
+    ),
+    component=@view.server_component(
+      name="ApplicationLayout",
+      source_path=@support.mbtv_path(
+        "examples/scaffold/views/layouts/application.mbtv",
+      ),
+      props=[],
     ),
   )
 }
@@ -340,7 +344,10 @@ fn scaffold_counter_island(resource_name : String) -> @view.VaporComponentRef {
     ),
     @view.client_contract([
       @view.prop_contract(
-        "count", "Int", true, "Initial collection count preview",
+        name="count",
+        type_name="Int",
+        required=true,
+        description="Initial collection count preview",
       ),
     ]),
   )

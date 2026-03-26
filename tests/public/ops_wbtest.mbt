@@ -24,15 +24,15 @@ test "strong params filter scoped attributes" {
 ///|
 test "jobs mailers and cache support rails style workflows" {
   let mailer = mailer(
-    "AnnouncementMailer",
-    "noreply@example.com",
-    Some("mailer"),
-    [
+    name="AnnouncementMailer",
+    from="noreply@example.com",
+    layout_name=Some("mailer"),
+    templates=[
       mail_template(
-        "launch",
-        "Launch update",
-        mbtv_path("examples/demo_blog/views/mailer/welcome.html.mbtv"),
-        Some("examples/demo_blog/views/mailer/welcome.text"),
+        action_name="launch",
+        subject="Launch update",
+        html_path=mbtv_path("examples/demo_blog/views/mailer/welcome.html.mbtv"),
+        text_path=Some("examples/demo_blog/views/mailer/welcome.text"),
       ),
     ],
   )
@@ -41,8 +41,9 @@ test "jobs mailers and cache support rails style workflows" {
     compose_mail(mailer, "launch", ["team@example.com"], [
       ("headline", "Ship it"),
     ]) {
-    Some(delivery) => enqueue_delivery(job_queue("mailers"), delivery, None)
-    None => job_queue("mailers")
+    Some(delivery) =>
+      enqueue_delivery(job_queue(name="mailers"), delivery, None)
+    None => job_queue(name="mailers")
   }
 
   assert_true(job_summary(queue).contains("mailers.deliver"))
@@ -75,32 +76,28 @@ test "jobs mailers and cache support rails style workflows" {
 ///|
 test "job failure policies support retry_on discard_on and queue overrides" {
   let definition = job(
-    name="SearchIndexJob",
-    queue="default",
-    argument_types=[("id", "String")],
-    retry_limit=0,
-    unique_key=None,
-  )
-  .retry_on(
-    "TimeoutError",
-    attempts=3,
-    wait=fixed_wait(seconds=5),
-    queue=Some("low"),
-  )
-  .discard_on("DeserializationError", report=true)
+      name="SearchIndexJob",
+      queue="default",
+      argument_types=[("id", "String")],
+      retry_limit=0,
+      unique_key=None,
+    )
+    .retry_on(
+      "TimeoutError",
+      attempts=3,
+      wait=fixed_wait(seconds=5),
+      queue=Some("low"),
+    )
+    .discard_on("DeserializationError", report=true)
 
   let current = enqueued_job(
-    definition=definition,
+    definition~,
     payload=[("id", "42")],
     run_at="",
     attempts=0,
   )
 
-  match handle_job_failure(
-    current,
-    "TimeoutError",
-    "2026-03-26T09:00:00Z",
-  ) {
+  match handle_job_failure(current, "TimeoutError", "2026-03-26T09:00:00Z") {
     Retried(next_job) => {
       assert_eq(next_job.queue, "low")
       assert_eq(next_job.attempts, 1)
@@ -109,50 +106,30 @@ test "job failure policies support retry_on discard_on and queue overrides" {
     _ => assert_true(false)
   }
 
-  match handle_job_failure(
-    current,
-    "DeserializationError",
-    "2026-03-26T09:00:00Z",
-  ) {
+  match
+    handle_job_failure(current, "DeserializationError", "2026-03-26T09:00:00Z") {
     Discarded(discarded) => assert_eq(discarded.name, "SearchIndexJob")
     _ => assert_true(false)
   }
 
   let exhausted = enqueued_job(
-    definition=definition,
+    definition~,
     payload=[("id", "42")],
     run_at="",
     attempts=2,
   )
-  match handle_job_failure(
-    exhausted,
-    "TimeoutError",
-    "2026-03-26T09:00:00Z",
-  ) {
+  match handle_job_failure(exhausted, "TimeoutError", "2026-03-26T09:00:00Z") {
     RetryStopped(stopped) => assert_eq(stopped.attempts, 2)
     _ => assert_true(false)
   }
 
-  let slow = job(
-    name="RemoteCallJob",
-    queue="default",
-    argument_types=[],
-  ).retry_on(
+  let slow = job(name="RemoteCallJob", queue="default", argument_types=[]).retry_on(
     "NetTimeout",
     attempts=4,
     wait=polynomially_longer(),
   )
-  let pending = enqueued_job(
-    definition=slow,
-    payload=[],
-    run_at="",
-    attempts=1,
-  )
-  match handle_job_failure(
-    pending,
-    "NetTimeout",
-    "2026-03-26T09:00:00Z",
-  ) {
+  let pending = enqueued_job(definition=slow, payload=[], run_at="", attempts=1)
+  match handle_job_failure(pending, "NetTimeout", "2026-03-26T09:00:00Z") {
     Retried(next_job) => assert_eq(next_job.run_at, "2026-03-26T09:00:18Z")
     _ => assert_true(false)
   }
@@ -161,37 +138,48 @@ test "job failure policies support retry_on discard_on and queue overrides" {
 ///|
 test "component contracts surface server client boundaries in manifests" {
   let action = server_action(
-    "posts.create",
-    "/_actions/posts.create",
-    [("title", "String"), ("body", "String")],
-    "PostPayload",
-    true,
+    name="posts.create",
+    route="/_actions/posts.create",
+    input_fields=[("title", "String"), ("body", "String")],
+    output_type="PostPayload",
+    csrf_protected=true,
   )
   let island = with_contract(
     with_fallback(
       client_component(
-        "NoteCounter",
-        mbtv_path("examples/resource_app/views/components/note_counter.mbtv"),
-        [("initial", "1")],
-        hydrate_visible(),
+        name="NoteCounter",
+        source_path=mbtv_path(
+          "examples/resource_app/views/components/note_counter.mbtv",
+        ),
+        props=[("initial", "1")],
+        hydration=hydrate_visible(),
       ),
       "<button type=\"button\">1</button>",
     ),
-    client_contract([prop_contract("initial", "Int", true, "Initial count")]),
+    client_contract([
+      prop_contract(
+        name="initial",
+        type_name="Int",
+        required=true,
+        description="Initial count",
+      ),
+    ]),
   )
   let page = with_island(
     page_module(
-      "notes_index",
-      "/notes",
-      mbtv_path("examples/resource_app/views/pages/notes/index.mbtv"),
-      "Notes",
-      with_contract(
+      route_name="notes_index",
+      route_path="/notes",
+      file_path=mbtv_path("examples/resource_app/views/pages/notes/index.mbtv"),
+      title="Notes",
+      component=with_contract(
         server_component(
-          "NotesIndexPage",
-          mbtv_path("examples/resource_app/views/pages/notes/index.mbtv"),
-          [],
+          name="NotesIndexPage",
+          source_path=mbtv_path(
+            "examples/resource_app/views/pages/notes/index.mbtv",
+          ),
+          props=[],
         ),
-        server_contract([], true),
+        server_contract(props=[], async_only=true),
       ),
     ),
     island,

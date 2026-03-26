@@ -26,27 +26,62 @@ test "production api dispatches health metrics resources and not found paths" {
   let health = dispatch(
     routes,
     registry,
-    @mbor.request(@mbor.http_get(), "/health", [], [], None, ""),
+    @mbor.request(
+      verb=@mbor.http_get(),
+      path="/health",
+      query=[],
+      form=[],
+      session_id=None,
+      body="",
+    ),
   )
   let ready = dispatch(
     routes,
     registry,
-    @mbor.request(@mbor.http_get(), "/ready", [], [], None, ""),
+    @mbor.request(
+      verb=@mbor.http_get(),
+      path="/ready",
+      query=[],
+      form=[],
+      session_id=None,
+      body="",
+    ),
   )
   let metrics = dispatch(
     routes,
     registry,
-    @mbor.request(@mbor.http_get(), "/metrics", [], [], None, ""),
+    @mbor.request(
+      verb=@mbor.http_get(),
+      path="/metrics",
+      query=[],
+      form=[],
+      session_id=None,
+      body="",
+    ),
   )
   let post = dispatch(
     routes,
     registry,
-    @mbor.request(@mbor.http_get(), "/api/v1/posts/42", [], [], None, ""),
+    @mbor.request(
+      verb=@mbor.http_get(),
+      path="/api/v1/posts/42",
+      query=[],
+      form=[],
+      session_id=None,
+      body="",
+    ),
   )
   let missing = dispatch(
     routes,
     registry,
-    @mbor.request(@mbor.http_get(), "/missing", [], [], None, ""),
+    @mbor.request(
+      verb=@mbor.http_get(),
+      path="/missing",
+      query=[],
+      form=[],
+      session_id=None,
+      body="",
+    ),
   )
 
   assert_eq(health.status, 200)

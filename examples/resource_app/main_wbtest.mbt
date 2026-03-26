@@ -21,17 +21,24 @@ test "resource app runtime and main smoke stay runnable" {
   let app = note_app()
   let show_response = @mbor.handle_request(
     app,
-    @mbor.request(@mbor.http_get(), "/notes/42", [], [], None, ""),
+    @mbor.request(
+      verb=@mbor.http_get(),
+      path="/notes/42",
+      query=[],
+      form=[],
+      session_id=None,
+      body="",
+    ),
   )
   let create_response = @mbor.handle_request(
     app,
     @mbor.request(
-      @mbor.http_post(),
-      "/_actions/notes.create",
-      [],
-      [],
-      None,
-      "{\"title\":\"hello\"}",
+      verb=@mbor.http_post(),
+      path="/_actions/notes.create",
+      query=[],
+      form=[],
+      session_id=None,
+      body="{\"title\":\"hello\"}",
     ),
   )
 

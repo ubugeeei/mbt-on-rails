@@ -129,7 +129,14 @@ pub fn MbtOnRailsApp::example_html(
 ) -> String? {
   let response = handle_request(
     self,
-    @http.request(@http.http_get(), path, [], [], None, ""),
+    @http.request(
+      verb=@http.http_get(),
+      path~,
+      query=[],
+      form=[],
+      session_id=None,
+      body="",
+    ),
   )
   match response.body {
     @http.Html(body) => Some(body)

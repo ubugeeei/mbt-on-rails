@@ -72,108 +72,108 @@ pub fn resources(
   if include_action(options.only, "index") {
     routes.push(
       route(
-        resource_name + "_index",
-        Get,
-        base_path,
-        controller,
-        "index",
-        Some(page_prefix + "_index"),
+        name=resource_name + "_index",
+        verb=Get,
+        path=base_path,
+        controller~,
+        action="index",
+        page_name=Some(page_prefix + "_index"),
       ),
     )
   }
   if include_action(options.only, "new") {
     routes.push(
       route(
-        resource_name + "_new",
-        Get,
-        base_path + "/new",
-        controller,
-        "new",
-        Some(page_prefix + "_new"),
+        name=resource_name + "_new",
+        verb=Get,
+        path=base_path + "/new",
+        controller~,
+        action="new",
+        page_name=Some(page_prefix + "_new"),
       ),
     )
   }
   for action in options.collection_actions {
     routes.push(
       route(
-        resource_name + "_" + action.0,
-        action.1,
-        base_path + "/" + action.0,
-        controller,
-        action.0,
-        None,
+        name=resource_name + "_" + action.0,
+        verb=action.1,
+        path=base_path + "/" + action.0,
+        controller~,
+        action=action.0,
+        page_name=None,
       ),
     )
   }
   if include_action(options.only, "create") {
     routes.push(
       route(
-        resource_name + "_create",
-        Post,
-        base_path,
-        controller,
-        "create",
-        None,
+        name=resource_name + "_create",
+        verb=Post,
+        path=base_path,
+        controller~,
+        action="create",
+        page_name=None,
       ),
     )
   }
   if include_action(options.only, "show") {
     routes.push(
       route(
-        resource_name + "_show",
-        Get,
-        member_path,
-        controller,
-        "show",
-        Some(page_prefix + "_show"),
+        name=resource_name + "_show",
+        verb=Get,
+        path=member_path,
+        controller~,
+        action="show",
+        page_name=Some(page_prefix + "_show"),
       ),
     )
   }
   if include_action(options.only, "edit") {
     routes.push(
       route(
-        resource_name + "_edit",
-        Get,
-        member_path + "/edit",
-        controller,
-        "edit",
-        Some(page_prefix + "_edit"),
+        name=resource_name + "_edit",
+        verb=Get,
+        path=member_path + "/edit",
+        controller~,
+        action="edit",
+        page_name=Some(page_prefix + "_edit"),
       ),
     )
   }
   if include_action(options.only, "update") {
     routes.push(
       route(
-        resource_name + "_update",
-        Patch,
-        member_path,
-        controller,
-        "update",
-        None,
+        name=resource_name + "_update",
+        verb=Patch,
+        path=member_path,
+        controller~,
+        action="update",
+        page_name=None,
       ),
     )
   }
   if include_action(options.only, "destroy") {
     routes.push(
       route(
-        resource_name + "_destroy",
-        Delete,
-        member_path,
-        controller,
-        "destroy",
-        None,
+        name=resource_name + "_destroy",
+        verb=Delete,
+        path=member_path,
+        controller~,
+        action="destroy",
+        page_name=None,
       ),
     )
   }
   for action in options.member_actions {
     routes.push(
       route(
-        resource_name + "_" + action.0,
-        action.1,
-        member_path + "/" + action.0,
-        controller,
-        action.0,
-        None,
+        name=resource_name + "_" + action.0,
+        verb=action.1,
+        path=member_path + "/" + action.0,
+        controller~,
+        action=action.0,
+        page_name=None,
       ),
     )
   }
@@ -208,12 +208,12 @@ pub fn scope_routes(
     }
     scoped.push(
       route(
-        scoped_name,
-        current.verb,
-        combined_path,
-        current.controller,
-        current.action,
-        scoped_page,
+        name=scoped_name,
+        verb=current.verb,
+        path=combined_path,
+        controller=current.controller,
+        action=current.action,
+        page_name=scoped_page,
       ),
     )
   }

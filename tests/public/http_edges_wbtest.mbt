@@ -34,20 +34,20 @@ test "route parsing and matching cover params catchalls and optional rest segmen
 ///|
 test "build_path and recognize rebuild concrete routes and honor verbs" {
   let post_route = route(
-    "post_show",
-    http_get(),
-    "/posts/[id]/[[...rest]]",
-    "PostsController",
-    "show",
-    None,
+    name="post_show",
+    verb=http_get(),
+    path="/posts/[id]/[[...rest]]",
+    controller="PostsController",
+    action="show",
+    page_name=None,
   )
   let asset_route = route(
-    "asset",
-    http_get(),
-    "/assets/[...path]",
-    "AssetsController",
-    "show",
-    None,
+    name="asset",
+    verb=http_get(),
+    path="/assets/[...path]",
+    controller="AssetsController",
+    action="show",
+    page_name=None,
   )
   assert_eq(build_path(post_route, [("id", "42")]), "/posts/42")
   assert_eq(
@@ -61,23 +61,50 @@ test "build_path and recognize rebuild concrete routes and honor verbs" {
   assert_eq(build_path(asset_route, []), "/assets/*")
 
   let routes = [
-    route("show", http_get(), "/posts/[id]", "PostsController", "show", None),
     route(
-      "update",
-      http_post(),
-      "/posts/[id]",
-      "PostsController",
-      "update",
-      None,
+      name="show",
+      verb=http_get(),
+      path="/posts/[id]",
+      controller="PostsController",
+      action="show",
+      page_name=None,
+    ),
+    route(
+      name="update",
+      verb=http_post(),
+      path="/posts/[id]",
+      controller="PostsController",
+      action="update",
+      page_name=None,
     ),
   ]
   match
-    recognize(routes, request(http_post(), "/posts/42/", [], [], None, "")) {
+    recognize(
+      routes,
+      request(
+        verb=http_post(),
+        path="/posts/42/",
+        query=[],
+        form=[],
+        session_id=None,
+        body="",
+      ),
+    ) {
     Some(matched) => assert_eq(matched.route.name, "update")
     None => assert_true(false)
   }
   match
-    recognize(routes, request(http_delete(), "/posts/42", [], [], None, "")) {
+    recognize(
+      routes,
+      request(
+        verb=http_delete(),
+        path="/posts/42",
+        query=[],
+        form=[],
+        session_id=None,
+        body="",
+      ),
+    ) {
     Some(_) => assert_true(false)
     None => assert_true(true)
   }

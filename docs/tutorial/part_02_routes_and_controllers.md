@@ -26,9 +26,9 @@ Example:
 
 ```moonbit
 let routes = resources(
-  "notes",
-  "NotesController",
-  default_resource_options("notes", Some("notes")),
+  resource_name="notes",
+  controller="NotesController",
+  options=default_resource_options("notes", Some("notes")),
 )
 ```
 
@@ -37,7 +37,7 @@ See [`../../examples/resource_app/generated_types.mbt`](../../examples/resource_
 
 ## Route Recognition
 
-Incoming requests are represented by `request(...)`.
+Incoming requests are represented by `request(verb=..., path=..., ...)`.
 Matching happens through `recognize(...)`.
 
 The public tests in [`../../tests/public/http_edges_wbtest.mbt`](../../tests/public/http_edges_wbtest.mbt) are a good guide for dynamic segments, catch-all segments, and resource routes.

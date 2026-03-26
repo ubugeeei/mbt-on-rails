@@ -77,15 +77,17 @@ fn print_fixture_example() -> Unit {
 /// Prints an Active Job plus Action Mailer example.
 fn print_job_and_mailer_example() -> Unit {
   let announcement_mailer = @mbor.mailer(
-    "AnnouncementMailer",
-    "noreply@example.com",
-    Some("mailer"),
-    [
+    name="AnnouncementMailer",
+    from="noreply@example.com",
+    layout_name=Some("mailer"),
+    templates=[
       @mbor.mail_template(
-        "launch",
-        "Launch update",
-        @mbor.mbtv_path("examples/demo_blog/views/mailer/welcome.html.mbtv"),
-        Some("examples/demo_blog/views/mailer/welcome.text"),
+        action_name="launch",
+        subject="Launch update",
+        html_path=@mbor.mbtv_path(
+          "examples/demo_blog/views/mailer/welcome.html.mbtv",
+        ),
+        text_path=Some("examples/demo_blog/views/mailer/welcome.text"),
       ),
     ],
   )
@@ -95,7 +97,7 @@ fn print_job_and_mailer_example() -> Unit {
     ]) {
     Some(delivery) => {
       let queue = @mbor.enqueue_delivery(
-        @mbor.job_queue("mailers"),
+        @mbor.job_queue(name="mailers"),
         delivery,
         None,
       )

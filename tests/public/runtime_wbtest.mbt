@@ -6,7 +6,14 @@ test "middleware fixtures seeds and turbo streams behave like rails runtime help
     ),
     halt_with_text("maintenance", "/admin", [http_get()], 503, "down"),
   ]
-  let admin_request = request(http_get(), "/admin", [], [], None, "")
+  let admin_request = request(
+    verb=http_get(),
+    path="/admin",
+    query=[],
+    form=[],
+    session_id=None,
+    body="",
+  )
   let request_result = apply_request_middleware(stack, admin_request)
   match request_result.1 {
     Some(response) => assert_eq(response.status, 503)
@@ -14,7 +21,14 @@ test "middleware fixtures seeds and turbo streams behave like rails runtime help
   }
   let passthrough = apply_response_middleware(
     stack,
-    request(http_get(), "/posts", [], [], None, ""),
+    request(
+      verb=http_get(),
+      path="/posts",
+      query=[],
+      form=[],
+      session_id=None,
+      body="",
+    ),
     ok_text("ok"),
   )
   assert_true(passthrough.headers.contains(("x-frame-options", "DENY")))

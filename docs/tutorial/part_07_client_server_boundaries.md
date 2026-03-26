@@ -15,9 +15,9 @@ Learn the explicit boundary model between server components and client component
 
 Components declare a contract:
 
-- `server_contract(...)`
+- `server_contract(props=..., async_only=...)`
 - `client_contract(...)`
-- `prop_contract(...)`
+- `prop_contract(name=..., type_name=..., required=..., description=...)`
 
 Props are described as JSON-serializable contracts.
 That is the current safety boundary of the framework.

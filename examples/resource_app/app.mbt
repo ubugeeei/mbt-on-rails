@@ -9,7 +9,7 @@ fn note_app() -> @mbor.MbtOnRailsApp {
   .with_migration(
     @mbor.migration_from_model("20260323040101", "create_notes", model),
   )
-  .with_job_queue(@mbor.job_queue("default"))
+  .with_job_queue(@mbor.job_queue(name="default"))
   .with_cache(@mbor.cache_store("notes"))
   .with_controller(controller)
   .with_routes(

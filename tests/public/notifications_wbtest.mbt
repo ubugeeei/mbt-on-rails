@@ -33,7 +33,7 @@ test "notifications capture job and mailer instrumentation" {
     unique_key=None,
   )
   let (queue, enqueue_events) = enqueue_now_with_notifications(
-    queue=job_queue("default"),
+    queue=job_queue(name="default"),
     definition=reindex,
     payload=[("id", "42")],
     notifications=notifications(),
@@ -52,13 +52,11 @@ test "notifications capture job and mailer instrumentation" {
   assert_eq(retry_events.named("enqueue_retry.active_job").length(), 1)
 
   let policy_job = enqueued_job(
-    definition=job(
-      name="search.sync",
-      queue="default",
-      argument_types=[("id", "String")],
-    )
-    .retry_on("TimeoutError", attempts=2, wait=fixed_wait(seconds=5))
-    .discard_on("DeserializationError"),
+    definition=job(name="search.sync", queue="default", argument_types=[
+        ("id", "String"),
+      ])
+      .retry_on("TimeoutError", attempts=2, wait=fixed_wait(seconds=5))
+      .discard_on("DeserializationError"),
     payload=[("id", "7")],
     run_at="",
     attempts=0,
@@ -88,13 +86,11 @@ test "notifications capture job and mailer instrumentation" {
   assert_eq(handled_discard_events.named("discard.active_job").length(), 1)
 
   let stopped_job = enqueued_job(
-    definition=job(
-      name="search.sync",
-      queue="default",
-      argument_types=[("id", "String")],
-    )
-    .retry_on("TimeoutError", attempts=2, wait=fixed_wait(seconds=5))
-    .discard_on("DeserializationError"),
+    definition=job(name="search.sync", queue="default", argument_types=[
+        ("id", "String"),
+      ])
+      .retry_on("TimeoutError", attempts=2, wait=fixed_wait(seconds=5))
+      .discard_on("DeserializationError"),
     payload=[("id", "7")],
     run_at="",
     attempts=1,
@@ -109,17 +105,27 @@ test "notifications capture job and mailer instrumentation" {
     RetryStopped(_) => assert_true(true)
     _ => assert_true(false)
   }
-  assert_eq(handled_stopped_events.named("retry_stopped.active_job").length(), 1)
+  assert_eq(
+    handled_stopped_events.named("retry_stopped.active_job").length(),
+    1,
+  )
 
   let (delivery, mail_events) = compose_mail_with_notifications(
-    mailer=mailer("SessionMailer", "noreply@example.com", None, [
-      mail_template(
-        "welcome",
-        "Welcome",
-        mbtv_path("examples/demo_blog/views/mailer/welcome.html.mbtv"),
-        None,
-      ),
-    ]),
+    mailer=mailer(
+      name="SessionMailer",
+      from="noreply@example.com",
+      layout_name=None,
+      templates=[
+        mail_template(
+          action_name="welcome",
+          subject="Welcome",
+          html_path=mbtv_path(
+            "examples/demo_blog/views/mailer/welcome.html.mbtv",
+          ),
+          text_path=None,
+        ),
+      ],
+    ),
     action_name="welcome",
     to=["hello@example.com"],
     assigns=[("name", "MoonBit")],
