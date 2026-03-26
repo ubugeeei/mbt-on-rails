@@ -6,6 +6,26 @@ import {
 }
 
 // Values
+pub fn notes_create_action_entries(NotesCreateActionInput) -> Array[(String, String)]
+
+pub fn notes_create_action_input(title~ : String, body~ : String, slug~ : String) -> NotesCreateActionInput
+
+pub fn notes_create_action_name() -> String
+
+pub fn notes_create_action_output_type() -> String
+
+pub fn notes_create_action_route() -> String
+
+pub fn notes_destroy_action_entries(NotesDestroyActionInput) -> Array[(String, String)]
+
+pub fn notes_destroy_action_input(id~ : String) -> NotesDestroyActionInput
+
+pub fn notes_destroy_action_name() -> String
+
+pub fn notes_destroy_action_output_type() -> String
+
+pub fn notes_destroy_action_route() -> String
+
 pub fn notes_edit_path(NotesEditRouteParams) -> String
 
 pub fn notes_edit_route_params(id~ : String) -> NotesEditRouteParams
@@ -30,6 +50,16 @@ pub fn notes_show_route_params(id~ : String) -> NotesShowRouteParams
 
 pub fn notes_show_route_pattern() -> String
 
+pub fn notes_update_action_entries(NotesUpdateActionInput) -> Array[(String, String)]
+
+pub fn notes_update_action_input(id~ : String, title~ : String, body~ : String, slug~ : String) -> NotesUpdateActionInput
+
+pub fn notes_update_action_name() -> String
+
+pub fn notes_update_action_output_type() -> String
+
+pub fn notes_update_action_route() -> String
+
 pub fn view_components_note_counter() -> @support.MbtvPath
 
 pub fn view_layouts_application() -> @support.MbtvPath
@@ -45,6 +75,18 @@ pub fn view_pages_notes_show() -> @support.MbtvPath
 // Errors
 
 // Types and methods
+pub struct NotesCreateActionInput {
+  title : String
+  body : String
+  slug : String
+}
+pub fn NotesCreateActionInput::entries(Self) -> Array[(String, String)]
+
+pub struct NotesDestroyActionInput {
+  id : String
+}
+pub fn NotesDestroyActionInput::entries(Self) -> Array[(String, String)]
+
 pub struct NotesEditRouteParams {
   id : String
 }
@@ -54,6 +96,14 @@ pub struct NotesShowRouteParams {
   id : String
 }
 pub fn NotesShowRouteParams::entries(Self) -> Array[(String, String)]
+
+pub struct NotesUpdateActionInput {
+  id : String
+  title : String
+  body : String
+  slug : String
+}
+pub fn NotesUpdateActionInput::entries(Self) -> Array[(String, String)]
 
 // Type aliases
 

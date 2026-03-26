@@ -19,11 +19,26 @@ pub fn scaffold_resource(String, Array[ScaffoldField]) -> ScaffoldPlan
 
 pub fn scaffold_summary(ScaffoldPlan) -> String
 
+pub fn server_action_helpers(String) -> Array[ActionHelperSpec]
+
 pub fn template_helpers(views_dir~ : String, template_paths~ : Array[String]) -> Array[TemplateHelperSpec]
 
 // Errors
 
 // Types and methods
+pub struct ActionFieldSpec {
+  raw_name : String
+  field_name : String
+  type_name : String
+}
+
+pub struct ActionHelperSpec {
+  action_name : String
+  route : String
+  input_fields : Array[ActionFieldSpec]
+  output_type : String
+}
+
 pub struct GeneratedArtifact {
   path : String
   description : String

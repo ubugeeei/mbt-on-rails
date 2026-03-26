@@ -45,6 +45,12 @@ The source audit in this batch was anchored to the official Rails repository at:
 - Failure handling now returns `JobFailureOutcome` and can reschedule jobs using fixed or polynomial backoff
 - Active Job notifications now include `discard.active_job` in addition to retry-related events
 
+## Fourth batch added here
+
+- Resource-aware scaffolds now infer `belongs_to` associations, presence/slug validations, strong params, CRUD pages, forms, and a default client island from the declared fields
+- `restful_controller_with_params(...)` lets generic resources opt into Rails-style strong params without hardcoded `title/body/slug`
+- Example type generation now emits typed server action helpers in addition to typed route helpers, so route params and mutation inputs can share one generated surface
+
 ## Biggest gaps still open
 
 - `activesupport`: concern/autoloading/deprecation/timezones/notifications subscribers
@@ -59,6 +65,6 @@ The source audit in this batch was anchored to the official Rails repository at:
 ## Recommended next batches
 
 1. Add `after_action` and `around_action` style controller callbacks.
-2. Expand the validation library with reusable validator objects and richer message customization.
-3. Add Active Job adapters and serialization contracts.
-4. Add partial rendering and a small helper/form-builder layer.
+2. Add partial rendering plus a small helper/form-builder layer so the scaffolded frontend can become less template-string-heavy.
+3. Expand the validation library with reusable validator objects and richer message customization.
+4. Add Active Job adapters and serialization contracts.

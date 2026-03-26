@@ -78,10 +78,21 @@ test "scaffold and demo app expose richer rails style surfaces" {
   ])
 
   assert_eq(scaffold.routes.length(), 8)
-  assert_eq(scaffold.server_actions.length(), 2)
+  assert_eq(scaffold.pages.length(), 4)
+  assert_eq(scaffold.server_actions.length(), 3)
+  assert_eq(scaffold.controller.actions[3].allowed_params, ["body", "post_id"])
+  assert_eq(scaffold.pages[0].forms.length(), 1)
+  assert_eq(scaffold.pages[0].client_islands.length(), 1)
+  assert_eq(scaffold.pages[1].forms.length(), 2)
+  assert_eq(scaffold.server_actions[0].input_fields[0].1, "String")
   assert_true(
     scaffold.artifacts[0].path.contains(
       "examples/scaffold/views/pages/comments/index.mbtv",
+    ),
+  )
+  assert_true(
+    scaffold.artifacts[5].path.contains(
+      "examples/scaffold/views/components/comment_counter.mbtv",
     ),
   )
 

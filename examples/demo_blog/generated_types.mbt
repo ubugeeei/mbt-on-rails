@@ -197,3 +197,252 @@ pub fn posts_edit_path(params : PostsEditRouteParams) -> String {
 pub fn posts_edit_route_pattern() -> String {
   "/posts/[id]/edit"
 }
+
+///|
+pub fn sessions_create_action_name() -> String {
+  "sessions.create"
+}
+
+///|
+pub fn sessions_create_action_route() -> String {
+  "/_actions/sessions.create"
+}
+
+///|
+pub fn sessions_create_action_output_type() -> String {
+  "SessionPayload"
+}
+
+///|
+pub struct SessionsCreateActionInput {
+  email : String
+  password : String
+}
+
+///|
+pub fn sessions_create_action_input(
+  email~ : String,
+  password~ : String,
+) -> SessionsCreateActionInput {
+  { email, password }
+}
+
+///|
+pub fn SessionsCreateActionInput::entries(
+  self : SessionsCreateActionInput,
+) -> Array[(String, String)] {
+  let entries : Array[(String, String)] = []
+  entries.push(("email", self.email))
+  entries.push(("password", self.password))
+  entries
+}
+
+///|
+pub fn sessions_create_action_entries(
+  input : SessionsCreateActionInput,
+) -> Array[(String, String)] {
+  input.entries()
+}
+
+///|
+pub fn sessions_destroy_action_name() -> String {
+  "sessions.destroy"
+}
+
+///|
+pub fn sessions_destroy_action_route() -> String {
+  "/_actions/sessions.destroy"
+}
+
+///|
+pub fn sessions_destroy_action_output_type() -> String {
+  "Unit"
+}
+
+///|
+pub fn sessions_destroy_action_entries() -> Array[(String, String)] {
+  []
+}
+
+///|
+pub fn posts_create_action_name() -> String {
+  "posts.create"
+}
+
+///|
+pub fn posts_create_action_route() -> String {
+  "/_actions/posts.create"
+}
+
+///|
+pub fn posts_create_action_output_type() -> String {
+  "PostPayload"
+}
+
+///|
+pub struct PostsCreateActionInput {
+  title : String
+  slug : String
+  body : String
+}
+
+///|
+pub fn posts_create_action_input(
+  title~ : String,
+  slug~ : String,
+  body~ : String,
+) -> PostsCreateActionInput {
+  { title, slug, body }
+}
+
+///|
+pub fn PostsCreateActionInput::entries(
+  self : PostsCreateActionInput,
+) -> Array[(String, String)] {
+  let entries : Array[(String, String)] = []
+  entries.push(("title", self.title))
+  entries.push(("slug", self.slug))
+  entries.push(("body", self.body))
+  entries
+}
+
+///|
+pub fn posts_create_action_entries(
+  input : PostsCreateActionInput,
+) -> Array[(String, String)] {
+  input.entries()
+}
+
+///|
+pub fn posts_update_action_name() -> String {
+  "posts.update"
+}
+
+///|
+pub fn posts_update_action_route() -> String {
+  "/_actions/posts.update"
+}
+
+///|
+pub fn posts_update_action_output_type() -> String {
+  "PostPayload"
+}
+
+///|
+pub struct PostsUpdateActionInput {
+  id : String
+  title : String
+  slug : String
+  body : String
+}
+
+///|
+pub fn posts_update_action_input(
+  id~ : String,
+  title~ : String,
+  slug~ : String,
+  body~ : String,
+) -> PostsUpdateActionInput {
+  { id, title, slug, body }
+}
+
+///|
+pub fn PostsUpdateActionInput::entries(
+  self : PostsUpdateActionInput,
+) -> Array[(String, String)] {
+  let entries : Array[(String, String)] = []
+  entries.push(("id", self.id))
+  entries.push(("title", self.title))
+  entries.push(("slug", self.slug))
+  entries.push(("body", self.body))
+  entries
+}
+
+///|
+pub fn posts_update_action_entries(
+  input : PostsUpdateActionInput,
+) -> Array[(String, String)] {
+  input.entries()
+}
+
+///|
+pub fn posts_destroy_action_name() -> String {
+  "posts.destroy"
+}
+
+///|
+pub fn posts_destroy_action_route() -> String {
+  "/_actions/posts.destroy"
+}
+
+///|
+pub fn posts_destroy_action_output_type() -> String {
+  "Unit"
+}
+
+///|
+pub struct PostsDestroyActionInput {
+  id : String
+}
+
+///|
+pub fn posts_destroy_action_input(id~ : String) -> PostsDestroyActionInput {
+  { id, }
+}
+
+///|
+pub fn PostsDestroyActionInput::entries(
+  self : PostsDestroyActionInput,
+) -> Array[(String, String)] {
+  let entries : Array[(String, String)] = []
+  entries.push(("id", self.id))
+  entries
+}
+
+///|
+pub fn posts_destroy_action_entries(
+  input : PostsDestroyActionInput,
+) -> Array[(String, String)] {
+  input.entries()
+}
+
+///|
+pub fn posts_publish_action_name() -> String {
+  "posts.publish"
+}
+
+///|
+pub fn posts_publish_action_route() -> String {
+  "/_actions/posts.publish"
+}
+
+///|
+pub fn posts_publish_action_output_type() -> String {
+  "PostPayload"
+}
+
+///|
+pub struct PostsPublishActionInput {
+  id : String
+}
+
+///|
+pub fn posts_publish_action_input(id~ : String) -> PostsPublishActionInput {
+  { id, }
+}
+
+///|
+pub fn PostsPublishActionInput::entries(
+  self : PostsPublishActionInput,
+) -> Array[(String, String)] {
+  let entries : Array[(String, String)] = []
+  entries.push(("id", self.id))
+  entries
+}
+
+///|
+pub fn posts_publish_action_entries(
+  input : PostsPublishActionInput,
+) -> Array[(String, String)] {
+  input.entries()
+}

@@ -13,6 +13,13 @@ test "generate example types source includes typed view helpers and labeled rout
       "    title=\"Edit Post\",\n" +
       "    component=demo_posts_edit_page_component(),\n" +
       "  )\n" +
+      "  @view.server_action(\n" +
+      "    name=\"posts.create\",\n" +
+      "    route=\"/_actions/posts.create\",\n" +
+      "    input_fields=[(\"title\", \"String\"), (\"published\", \"Bool\")],\n" +
+      "    output_type=\"PostPayload\",\n" +
+      "    csrf_protected=true,\n" +
+      "  )\n" +
       "}\n",
   )
 
@@ -34,6 +41,18 @@ test "generate example types source includes typed view helpers and labeled rout
       "pub fn posts_edit_path(params : PostsEditRouteParams) -> String",
     ),
   )
+  assert_true(source.contains("pub struct PostsCreateActionInput"))
+  assert_true(
+    source.contains(
+      "pub fn posts_create_action_input(title~ : String, published~ : Bool) -> PostsCreateActionInput",
+    ),
+  )
+  assert_true(source.contains("pub fn posts_create_action_route() -> String"))
+  assert_true(
+    source.contains(
+      "entries.push((\"published\", if self.published { \"true\" } else { \"false\" }))",
+    ),
+  )
 }
 
 ///|
@@ -49,4 +68,27 @@ test "route helpers support legacy positional page module declarations" {
   assert_eq(helpers[0].route_path, "/posts/[id]")
   assert_eq(helpers[0].params.length(), 1)
   assert_eq(helpers[0].params[0].field_name, "id")
+}
+
+///|
+test "server action helpers support labeled and positional declarations" {
+  let helpers = server_action_helpers(
+    "fn actions() {\n" +
+    "  server_action(\"posts.destroy\", \"/_actions/posts.destroy\", [(\"id\", \"String\")], \"Unit\", true)\n" +
+    "  @view.server_action(\n" +
+    "    name=\"posts.update\",\n" +
+    "    route=\"/_actions/posts.update\",\n" +
+    "    input_fields=[(\"id\", \"String\"), (\"published\", \"Bool\"), (\"position\", \"Int?\")],\n" +
+    "    output_type=\"PostPayload\",\n" +
+    "    csrf_protected=true,\n" +
+    "  )\n" +
+    "}\n",
+  )
+
+  assert_eq(helpers.length(), 2)
+  assert_eq(helpers[0].action_name, "posts.destroy")
+  assert_eq(helpers[0].input_fields.length(), 1)
+  assert_eq(helpers[1].action_name, "posts.update")
+  assert_eq(helpers[1].input_fields[1].field_name, "published")
+  assert_eq(helpers[1].input_fields[2].type_name, "Int?")
 }

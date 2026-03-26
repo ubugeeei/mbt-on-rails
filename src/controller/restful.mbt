@@ -4,6 +4,18 @@ pub fn restful_controller(
   resource_name : String,
   page_prefix : String,
 ) -> ControllerDefinition {
+  restful_controller_with_params(resource_name, page_prefix, [
+    "title", "body", "slug",
+  ])
+}
+
+///|
+/// Builds a Rails-like REST controller with inferred strong params.
+pub fn restful_controller_with_params(
+  resource_name : String,
+  page_prefix : String,
+  permitted_attributes : Array[String],
+) -> ControllerDefinition {
   let singular = @support.singularize(resource_name)
   controller_named(@support.classify(resource_name) + "Controller")
   .for_resource(resource_name)
@@ -11,13 +23,13 @@ pub fn restful_controller(
   .with_before_action(
     before_only("create")
     .requiring(@auth.auth_required())
-    .permitting(["title", "body", "slug"]),
+    .permitting(permitted_attributes),
   )
   .with_before_action(before_only("edit").requiring(@auth.auth_required()))
   .with_before_action(
     before_only("update")
     .requiring(@auth.auth_required())
-    .permitting(["title", "body", "slug"]),
+    .permitting(permitted_attributes),
   )
   .with_before_action(before_only("destroy").requiring(@auth.auth_required()))
   .with_action(
@@ -41,7 +53,7 @@ pub fn restful_controller(
     action_plan("create")
     .require_auth(@auth.auth_required())
     .authorize(resource_name, "create")
-    .permit_params(["title", "body", "slug"])
+    .permit_params(permitted_attributes)
     .persist_model(resource_name)
     .invoke_server_action(resource_name + ".create")
     .enqueue_job(resource_name + ".reindex")
@@ -63,7 +75,7 @@ pub fn restful_controller(
     .require_auth(@auth.auth_required())
     .load_member(resource_name)
     .authorize(resource_name, "update")
-    .permit_params(["title", "body", "slug"])
+    .permit_params(permitted_attributes)
     .persist_model(resource_name)
     .invoke_server_action(resource_name + ".update")
     .enqueue_job(resource_name + ".reindex")

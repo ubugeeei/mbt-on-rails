@@ -16,14 +16,15 @@ Finish the tutorial by understanding generation, tests, and the roadmap.
 
 The scaffold layer can already generate plans for resource-oriented apps:
 
-- model artifact ideas
-- controller/action shapes
-- route sets
-- view file locations
+- model validations and inferred `belongs_to` associations
+- controller/action shapes with strong params derived from declared fields
+- CRUD pages, form bindings, and a default client island
+- route sets and server action contracts
+- view and migration artifact ideas
 
 Read:
 
-- [`../../examples/scaffold`](../../examples/scaffold)
+- [`../../src/generator/generator.mbt`](../../src/generator/generator.mbt)
 - [`../../tests/public/view_wbtest.mbt`](../../tests/public/view_wbtest.mbt)
 
 ## Typed Helper Generation
@@ -34,6 +35,7 @@ It extracts:
 - typed template helper functions
 - typed route param structs
 - typed route path helpers
+- typed server action input helpers
 
 Run it with:
 

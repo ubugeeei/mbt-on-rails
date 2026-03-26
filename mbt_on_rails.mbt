@@ -137,6 +137,7 @@ pub using @controller {
   render_page_step,
   require_auth,
   restful_controller,
+  restful_controller_with_params,
   turbo_stream_format,
 }
 

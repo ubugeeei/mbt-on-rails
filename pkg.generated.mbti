@@ -636,6 +636,8 @@ pub fn resources(String, String, @http.ResourceOptions) -> Array[@http.RouteSpec
 
 pub fn restful_controller(String, String) -> @controller.ControllerDefinition
 
+pub fn restful_controller_with_params(String, String, Array[String]) -> @controller.ControllerDefinition
+
 pub fn retry_job(@job.EnqueuedJob, String) -> @job.EnqueuedJob?
 
 pub fn retry_job_with_notifications(job~ : @job.EnqueuedJob, next_run_at~ : String, notifications~ : @support.Notifications) -> (@job.EnqueuedJob?, @support.Notifications)

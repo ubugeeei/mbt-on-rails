@@ -30,6 +30,23 @@ pub struct TemplateHelperSpec {
 }
 
 ///|
+/// Describes one typed server action input field.
+pub struct ActionFieldSpec {
+  raw_name : String
+  field_name : String
+  type_name : String
+}
+
+///|
+/// Describes one typed server action helper extracted from frontend code.
+pub struct ActionHelperSpec {
+  action_name : String
+  route : String
+  input_fields : Array[ActionFieldSpec]
+  output_type : String
+}
+
+///|
 /// Builds typed template helper metadata from a list of `.mbtv` files.
 pub fn template_helpers(
   views_dir~ : String,
@@ -81,7 +98,23 @@ pub fn route_helpers(frontend_source : String) -> Array[RouteHelperSpec] {
 }
 
 ///|
-/// Generates a typed helper source file for template paths and route builders.
+/// Extracts typed action helpers from `server_action(...)` declarations.
+pub fn server_action_helpers(
+  frontend_source : String,
+) -> Array[ActionHelperSpec] {
+  let helpers : Array[ActionHelperSpec] = []
+  for call_body in server_action_calls(frontend_source) {
+    let arguments = split_top_level_arguments(call_body)
+    match extract_action_helper(arguments) {
+      Some(helper) => helpers.push(helper)
+      None => ()
+    }
+  }
+  helpers
+}
+
+///|
+/// Generates a typed helper source file for template paths, routes, and actions.
 pub fn generate_example_types_source(
   views_dir~ : String,
   template_paths~ : Array[String],
@@ -98,6 +131,10 @@ pub fn generate_example_types_source(
 
   for helper in route_helpers(frontend_source) {
     push_route_helper(lines, helper)
+  }
+
+  for helper in server_action_helpers(frontend_source) {
+    push_action_helper(lines, helper)
   }
 
   lines.join("\n")
@@ -219,6 +256,187 @@ fn push_route_helper(lines : Array[String], helper : RouteHelperSpec) -> Unit {
 }
 
 ///|
+fn push_action_helper(lines : Array[String], helper : ActionHelperSpec) -> Unit {
+  let action_function_name = snake_identifier(helper.action_name)
+  lines.push("///|")
+  lines.push("pub fn " + action_function_name + "_action_name() -> String {")
+  lines.push("  \"" + helper.action_name + "\"")
+  lines.push("}")
+  lines.push("")
+  lines.push("///|")
+  lines.push("pub fn " + action_function_name + "_action_route() -> String {")
+  lines.push("  \"" + helper.route + "\"")
+  lines.push("}")
+  lines.push("")
+  lines.push("///|")
+  lines.push(
+    "pub fn " + action_function_name + "_action_output_type() -> String {",
+  )
+  lines.push("  \"" + helper.output_type + "\"")
+  lines.push("}")
+  lines.push("")
+
+  if helper.input_fields.is_empty() {
+    lines.push("///|")
+    lines.push(
+      "pub fn " +
+      action_function_name +
+      "_action_entries() -> Array[(String, String)] {",
+    )
+    lines.push("  []")
+    lines.push("}")
+    lines.push("")
+    return
+  }
+
+  let struct_name = camel_identifier(helper.action_name) + "ActionInput"
+  lines.push("///|")
+  lines.push("pub struct " + struct_name + " {")
+  for field in helper.input_fields {
+    lines.push(
+      "  " + field.field_name + " : " + normalized_action_type(field.type_name),
+    )
+  }
+  lines.push("}")
+  lines.push("")
+  lines.push("///|")
+  lines.push(
+    "pub fn " +
+    action_function_name +
+    "_action_input(" +
+    helper.input_fields.map(render_action_constructor_arg).join(", ") +
+    ") -> " +
+    struct_name +
+    " {",
+  )
+  lines.push(
+    "  { " +
+    helper.input_fields.map(field => field.field_name).join(", ") +
+    ", }",
+  )
+  lines.push("}")
+  lines.push("")
+  lines.push("///|")
+  lines.push(
+    "pub fn " +
+    struct_name +
+    "::entries(self : " +
+    struct_name +
+    ") -> Array[(String, String)] {",
+  )
+  lines.push("  let entries : Array[(String, String)] = []")
+  for field in helper.input_fields {
+    push_action_entry_lines(lines, field)
+  }
+  lines.push("  entries")
+  lines.push("}")
+  lines.push("")
+  lines.push("///|")
+  lines.push(
+    "pub fn " +
+    action_function_name +
+    "_action_entries(input : " +
+    struct_name +
+    ") -> Array[(String, String)] {",
+  )
+  lines.push("  input.entries()")
+  lines.push("}")
+  lines.push("")
+}
+
+///|
+fn render_action_constructor_arg(field : ActionFieldSpec) -> String {
+  field.field_name + "~ : " + normalized_action_type(field.type_name)
+}
+
+///|
+fn push_action_entry_lines(
+  lines : Array[String],
+  field : ActionFieldSpec,
+) -> Unit {
+  let normalized_type = normalized_action_type(field.type_name)
+  match normalized_type {
+    "String" =>
+      lines.push(
+        "  entries.push((\"" +
+        field.raw_name +
+        "\", self." +
+        field.field_name +
+        "))",
+      )
+    "Int" =>
+      lines.push(
+        "  entries.push((\"" +
+        field.raw_name +
+        "\", self." +
+        field.field_name +
+        ".to_string()))",
+      )
+    "Bool" =>
+      lines.push(
+        "  entries.push((\"" +
+        field.raw_name +
+        "\", if self." +
+        field.field_name +
+        " { \"true\" } else { \"false\" }))",
+      )
+    "String?" => {
+      lines.push("  match self." + field.field_name + " {")
+      lines.push(
+        "    Some(value) => entries.push((\"" + field.raw_name + "\", value))",
+      )
+      lines.push("    None => ()")
+      lines.push("  }")
+    }
+    "Int?" => {
+      lines.push("  match self." + field.field_name + " {")
+      lines.push(
+        "    Some(value) => entries.push((\"" +
+        field.raw_name +
+        "\", value.to_string()))",
+      )
+      lines.push("    None => ()")
+      lines.push("  }")
+    }
+    "Bool?" => {
+      lines.push("  match self." + field.field_name + " {")
+      lines.push(
+        "    Some(value) => entries.push((\"" +
+        field.raw_name +
+        "\", if value { \"true\" } else { \"false\" }))",
+      )
+      lines.push("    None => ()")
+      lines.push("  }")
+    }
+    _ =>
+      lines.push(
+        "  entries.push((\"" +
+        field.raw_name +
+        "\", self." +
+        field.field_name +
+        "))",
+      )
+  }
+}
+
+///|
+fn normalized_action_type(type_name : String) -> String {
+  match type_name.trim().to_string() {
+    "String" => "String"
+    "Int" => "Int"
+    "Integer" => "Int"
+    "Bool" => "Bool"
+    "Boolean" => "Bool"
+    "String?" => "String?"
+    "Int?" => "Int?"
+    "Integer?" => "Int?"
+    "Bool?" => "Bool?"
+    "Boolean?" => "Bool?"
+    other => if other.has_suffix("?") { "String?" } else { "String" }
+  }
+}
+
+///|
 fn render_route_param_constructor_arg(param : RouteParamSpec) -> String {
   let field_type = match param.kind {
     OptionalCatchAll => "String?"
@@ -241,6 +459,37 @@ fn extract_route_helper(arguments : Array[String]) -> RouteHelperSpec? {
   match (route_name, route_path) {
     (Some(name), Some(path)) =>
       Some({ route_name: name, route_path: path, params: route_params(path) })
+    _ => None
+  }
+}
+
+///|
+fn extract_action_helper(arguments : Array[String]) -> ActionHelperSpec? {
+  let action_name = match find_labeled_string_argument(arguments, "name") {
+    Some(value) => Some(value)
+    None => positional_string_argument(arguments, 0)
+  }
+  let route = match find_labeled_string_argument(arguments, "route") {
+    Some(value) => Some(value)
+    None => positional_string_argument(arguments, 1)
+  }
+  let output_type = match
+    find_labeled_string_argument(arguments, "output_type") {
+    Some(value) => Some(value)
+    None => positional_string_argument(arguments, 3)
+  }
+  let input_fields = match find_labeled_argument(arguments, "input_fields") {
+    Some(value) => parse_action_input_fields(value)
+    None =>
+      match positional_argument(arguments, 2) {
+        Some(value) => parse_action_input_fields(value)
+        None => []
+      }
+  }
+
+  match (action_name, route, output_type) {
+    (Some(name), Some(path), Some(output_type)) =>
+      Some({ action_name: name, route: path, input_fields, output_type })
     _ => None
   }
 }
@@ -285,6 +534,51 @@ fn route_params(route_path : String) -> Array[RouteParamSpec] {
     }
   }
   params
+}
+
+///|
+fn parse_action_input_fields(source : String) -> Array[ActionFieldSpec] {
+  let trimmed = source.trim().to_string()
+  if trimmed.length() < 2 ||
+    unsafe_char_at(trimmed, 0) != '[' ||
+    unsafe_char_at(trimmed, trimmed.length() - 1) != ']' {
+    return []
+  }
+
+  let inner = trimmed_slice(trimmed, 1, trimmed.length() - 1)
+  if inner.length() == 0 {
+    return []
+  }
+
+  let fields : Array[ActionFieldSpec] = []
+  for field_source in split_top_level_arguments(inner) {
+    match parse_action_input_field(field_source) {
+      Some(field) => fields.push(field)
+      None => ()
+    }
+  }
+  fields
+}
+
+///|
+fn parse_action_input_field(source : String) -> ActionFieldSpec? {
+  let trimmed = source.trim().to_string()
+  if trimmed.length() < 2 ||
+    unsafe_char_at(trimmed, 0) != '(' ||
+    unsafe_char_at(trimmed, trimmed.length() - 1) != ')' {
+    return None
+  }
+
+  let arguments = split_top_level_arguments(
+    trimmed_slice(trimmed, 1, trimmed.length() - 1),
+  )
+  let raw_name = positional_string_argument(arguments, 0)
+  let type_name = positional_string_argument(arguments, 1)
+  match (raw_name, type_name) {
+    (Some(raw_name), Some(type_name)) =>
+      Some({ raw_name, field_name: snake_identifier(raw_name), type_name })
+    _ => None
+  }
 }
 
 ///|
@@ -334,6 +628,24 @@ fn render_path_expression(route_path : String, params_name : String) -> String {
 fn page_module_calls(source : String) -> Array[String] {
   let calls : Array[String] = []
   let target = "page_module"
+  collect_function_calls(source, target, calls)
+  calls
+}
+
+///|
+fn server_action_calls(source : String) -> Array[String] {
+  let calls : Array[String] = []
+  let target = "server_action"
+  collect_function_calls(source, target, calls)
+  calls
+}
+
+///|
+fn collect_function_calls(
+  source : String,
+  target : String,
+  calls : Array[String],
+) -> Unit {
   let mut index = 0
   while index < source.length() {
     if has_identifier_at(source, index, target) {
@@ -352,7 +664,6 @@ fn page_module_calls(source : String) -> Array[String] {
     }
     index += 1
   }
-  calls
 }
 
 ///|
@@ -413,20 +724,31 @@ fn find_labeled_string_argument(
   arguments : Array[String],
   label : String,
 ) -> String? {
+  match find_labeled_argument(arguments, label) {
+    Some(argument_value) => decode_string_literal(argument_value)
+    None => None
+  }
+}
+
+///|
+fn positional_string_argument(
+  arguments : Array[String],
+  index : Int,
+) -> String? {
+  match positional_argument(arguments, index) {
+    Some(argument) => decode_string_literal(argument)
+    None => None
+  }
+}
+
+///|
+fn find_labeled_argument(arguments : Array[String], label : String) -> String? {
   for argument in arguments {
     match argument.find("=") {
       Some(separator) => {
         let argument_label = trimmed_slice(argument, 0, separator)
         if argument_label == label {
-          let argument_value = trimmed_slice(
-            argument,
-            separator + 1,
-            argument.length(),
-          )
-          match decode_string_literal(argument_value) {
-            Some(value) => return Some(value)
-            None => ()
-          }
+          return Some(trimmed_slice(argument, separator + 1, argument.length()))
         }
       }
       None => ()
@@ -436,14 +758,11 @@ fn find_labeled_string_argument(
 }
 
 ///|
-fn positional_string_argument(
-  arguments : Array[String],
-  index : Int,
-) -> String? {
+fn positional_argument(arguments : Array[String], index : Int) -> String? {
   if index < 0 || index >= arguments.length() {
     return None
   }
-  decode_string_literal(arguments[index])
+  Some(arguments[index])
 }
 
 ///|

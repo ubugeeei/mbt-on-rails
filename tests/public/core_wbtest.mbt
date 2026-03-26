@@ -181,3 +181,18 @@ test "declarative controller and app builders preserve inferred metadata" {
   assert_eq(app.controllers.length(), 1)
   assert_eq(app.routes.length(), 1)
 }
+
+///|
+test "restful controller can derive strong params for arbitrary resources" {
+  let controller = restful_controller_with_params("comments", "comments", [
+    "body", "post_id",
+  ])
+
+  match controller_action(controller, "create") {
+    Some(action) => {
+      assert_eq(action.allowed_params, ["body", "post_id"])
+      assert_eq(action.steps.length(), 8)
+    }
+    None => assert_true(false)
+  }
+}

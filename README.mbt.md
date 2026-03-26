@@ -27,7 +27,7 @@ moon run examples/demo_blog
 - Active Record-style schema, relations, validations, and migrations
 - Auth, sessions, policies, and CSRF helpers
 - `.mbtv` pages, layouts, server components, client islands, and suspense-like boundaries
-- Server actions, form bindings, and generated typed helpers
+- Server actions, form bindings, and generated typed route/action helpers
 - Jobs, mailers, cache, cable, turbo stream, and production helpers
 - Rails-style runtime notifications for controller, view, cache, job, and mailer flows
 

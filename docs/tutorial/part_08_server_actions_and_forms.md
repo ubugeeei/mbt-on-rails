@@ -30,6 +30,7 @@ This gives you:
 - manifestable input/output contracts
 - predictable route names
 - explicit CSRF expectations
+- generated typed mutation helpers from `generated_types.mbt`
 
 ## Form Bindings
 
@@ -51,13 +52,25 @@ let params = posts_show_route_params(id="42")
 let path = posts_show_path(params)
 ```
 
-This is one of the biggest ergonomics wins in the current codebase.
+The generator now also emits typed action helpers:
+
+```moonbit
+let input = posts_create_action_input(
+  title="Hello",
+  slug="hello",
+  body="Typed all the way down",
+)
+let entries = posts_create_action_entries(input)
+```
+
+This is the current end-to-end type-safe path for routes plus mutations in the codebase.
 
 ## Exercise
 
 - Open [`../../examples/resource_app/generated_types.mbt`](../../examples/resource_app/generated_types.mbt)
 - Find `notes_show_route_params`
-- Trace where the generated helper is consumed
+- Find one `*_action_input(...)` helper
+- Trace how both can be used to prepare a request without stringly-typed field names
 
 ## Next
 

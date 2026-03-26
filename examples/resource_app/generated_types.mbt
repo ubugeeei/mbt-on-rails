@@ -117,3 +117,145 @@ pub fn notes_edit_path(params : NotesEditRouteParams) -> String {
 pub fn notes_edit_route_pattern() -> String {
   "/notes/[id]/edit"
 }
+
+///|
+pub fn notes_create_action_name() -> String {
+  "notes.create"
+}
+
+///|
+pub fn notes_create_action_route() -> String {
+  "/_actions/notes.create"
+}
+
+///|
+pub fn notes_create_action_output_type() -> String {
+  "NotePayload"
+}
+
+///|
+pub struct NotesCreateActionInput {
+  title : String
+  body : String
+  slug : String
+}
+
+///|
+pub fn notes_create_action_input(
+  title~ : String,
+  body~ : String,
+  slug~ : String,
+) -> NotesCreateActionInput {
+  { title, body, slug }
+}
+
+///|
+pub fn NotesCreateActionInput::entries(
+  self : NotesCreateActionInput,
+) -> Array[(String, String)] {
+  let entries : Array[(String, String)] = []
+  entries.push(("title", self.title))
+  entries.push(("body", self.body))
+  entries.push(("slug", self.slug))
+  entries
+}
+
+///|
+pub fn notes_create_action_entries(
+  input : NotesCreateActionInput,
+) -> Array[(String, String)] {
+  input.entries()
+}
+
+///|
+pub fn notes_update_action_name() -> String {
+  "notes.update"
+}
+
+///|
+pub fn notes_update_action_route() -> String {
+  "/_actions/notes.update"
+}
+
+///|
+pub fn notes_update_action_output_type() -> String {
+  "NotePayload"
+}
+
+///|
+pub struct NotesUpdateActionInput {
+  id : String
+  title : String
+  body : String
+  slug : String
+}
+
+///|
+pub fn notes_update_action_input(
+  id~ : String,
+  title~ : String,
+  body~ : String,
+  slug~ : String,
+) -> NotesUpdateActionInput {
+  { id, title, body, slug }
+}
+
+///|
+pub fn NotesUpdateActionInput::entries(
+  self : NotesUpdateActionInput,
+) -> Array[(String, String)] {
+  let entries : Array[(String, String)] = []
+  entries.push(("id", self.id))
+  entries.push(("title", self.title))
+  entries.push(("body", self.body))
+  entries.push(("slug", self.slug))
+  entries
+}
+
+///|
+pub fn notes_update_action_entries(
+  input : NotesUpdateActionInput,
+) -> Array[(String, String)] {
+  input.entries()
+}
+
+///|
+pub fn notes_destroy_action_name() -> String {
+  "notes.destroy"
+}
+
+///|
+pub fn notes_destroy_action_route() -> String {
+  "/_actions/notes.destroy"
+}
+
+///|
+pub fn notes_destroy_action_output_type() -> String {
+  "Unit"
+}
+
+///|
+pub struct NotesDestroyActionInput {
+  id : String
+}
+
+///|
+pub fn notes_destroy_action_input(id~ : String) -> NotesDestroyActionInput {
+  { id, }
+}
+
+///|
+pub fn NotesDestroyActionInput::entries(
+  self : NotesDestroyActionInput,
+) -> Array[(String, String)] {
+  let entries : Array[(String, String)] = []
+  entries.push(("id", self.id))
+  entries
+}
+
+///|
+pub fn notes_destroy_action_entries(
+  input : NotesDestroyActionInput,
+) -> Array[(String, String)] {
+  input.entries()
+}

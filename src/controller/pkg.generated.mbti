@@ -56,6 +56,8 @@ pub fn require_auth(@auth.AuthRequirement) -> ActionStep
 
 pub fn restful_controller(String, String) -> ControllerDefinition
 
+pub fn restful_controller_with_params(String, String, Array[String]) -> ControllerDefinition
+
 pub fn touch_cache_step(String) -> ActionStep
 
 pub fn turbo_stream_format() -> ResponseFormat

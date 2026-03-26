@@ -379,6 +379,7 @@ pub using @mbor {
   require_scope,
   resources,
   restful_controller,
+  restful_controller_with_params,
   retry_job,
   retry_on,
   retry_job_with_notifications,

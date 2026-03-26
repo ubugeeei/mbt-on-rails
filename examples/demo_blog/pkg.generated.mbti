@@ -83,6 +83,26 @@ pub fn home_route_params() -> Array[(String, String)]
 
 pub fn home_route_pattern() -> String
 
+pub fn posts_create_action_entries(PostsCreateActionInput) -> Array[(String, String)]
+
+pub fn posts_create_action_input(title~ : String, slug~ : String, body~ : String) -> PostsCreateActionInput
+
+pub fn posts_create_action_name() -> String
+
+pub fn posts_create_action_output_type() -> String
+
+pub fn posts_create_action_route() -> String
+
+pub fn posts_destroy_action_entries(PostsDestroyActionInput) -> Array[(String, String)]
+
+pub fn posts_destroy_action_input(id~ : String) -> PostsDestroyActionInput
+
+pub fn posts_destroy_action_name() -> String
+
+pub fn posts_destroy_action_output_type() -> String
+
+pub fn posts_destroy_action_route() -> String
+
 pub fn posts_edit_path(PostsEditRouteParams) -> String
 
 pub fn posts_edit_route_params(id~ : String) -> PostsEditRouteParams
@@ -101,11 +121,49 @@ pub fn posts_new_route_params() -> Array[(String, String)]
 
 pub fn posts_new_route_pattern() -> String
 
+pub fn posts_publish_action_entries(PostsPublishActionInput) -> Array[(String, String)]
+
+pub fn posts_publish_action_input(id~ : String) -> PostsPublishActionInput
+
+pub fn posts_publish_action_name() -> String
+
+pub fn posts_publish_action_output_type() -> String
+
+pub fn posts_publish_action_route() -> String
+
 pub fn posts_show_path(PostsShowRouteParams) -> String
 
 pub fn posts_show_route_params(id~ : String) -> PostsShowRouteParams
 
 pub fn posts_show_route_pattern() -> String
+
+pub fn posts_update_action_entries(PostsUpdateActionInput) -> Array[(String, String)]
+
+pub fn posts_update_action_input(id~ : String, title~ : String, slug~ : String, body~ : String) -> PostsUpdateActionInput
+
+pub fn posts_update_action_name() -> String
+
+pub fn posts_update_action_output_type() -> String
+
+pub fn posts_update_action_route() -> String
+
+pub fn sessions_create_action_entries(SessionsCreateActionInput) -> Array[(String, String)]
+
+pub fn sessions_create_action_input(email~ : String, password~ : String) -> SessionsCreateActionInput
+
+pub fn sessions_create_action_name() -> String
+
+pub fn sessions_create_action_output_type() -> String
+
+pub fn sessions_create_action_route() -> String
+
+pub fn sessions_destroy_action_entries() -> Array[(String, String)]
+
+pub fn sessions_destroy_action_name() -> String
+
+pub fn sessions_destroy_action_output_type() -> String
+
+pub fn sessions_destroy_action_route() -> String
 
 pub fn sign_in_path() -> String
 
@@ -148,15 +206,46 @@ pub fn view_pages_sign_in() -> @support.MbtvPath
 // Errors
 
 // Types and methods
+pub struct PostsCreateActionInput {
+  title : String
+  slug : String
+  body : String
+}
+pub fn PostsCreateActionInput::entries(Self) -> Array[(String, String)]
+
+pub struct PostsDestroyActionInput {
+  id : String
+}
+pub fn PostsDestroyActionInput::entries(Self) -> Array[(String, String)]
+
 pub struct PostsEditRouteParams {
   id : String
 }
 pub fn PostsEditRouteParams::entries(Self) -> Array[(String, String)]
 
+pub struct PostsPublishActionInput {
+  id : String
+}
+pub fn PostsPublishActionInput::entries(Self) -> Array[(String, String)]
+
 pub struct PostsShowRouteParams {
   id : String
 }
 pub fn PostsShowRouteParams::entries(Self) -> Array[(String, String)]
+
+pub struct PostsUpdateActionInput {
+  id : String
+  title : String
+  slug : String
+  body : String
+}
+pub fn PostsUpdateActionInput::entries(Self) -> Array[(String, String)]
+
+pub struct SessionsCreateActionInput {
+  email : String
+  password : String
+}
+pub fn SessionsCreateActionInput::entries(Self) -> Array[(String, String)]
 
 // Type aliases
 
