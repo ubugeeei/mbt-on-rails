@@ -239,9 +239,7 @@ pub struct AssetManifest {
 pub enum BoundaryKind {
   ServerBoundary
   ClientBoundary
-}
-pub impl Eq for BoundaryKind
-pub impl Show for BoundaryKind
+} derive(Eq, Show)
 
 pub struct ComponentContract {
   boundary : BoundaryKind
@@ -261,9 +259,7 @@ pub enum DynamicMode {
   ForceDynamic
   ForceStatic
   Revalidate(Int)
-}
-pub impl Eq for DynamicMode
-pub impl Show for DynamicMode
+} derive(Eq, Show)
 
 pub struct EmitContract {
   name : String
@@ -305,9 +301,7 @@ pub enum FormFieldKind {
   TextArea
   HiddenInput
   CheckboxInput
-}
-pub impl Eq for FormFieldKind
-pub impl Show for FormFieldKind
+} derive(Eq, Show)
 
 pub enum HydrationMode {
   Manual
@@ -317,9 +311,7 @@ pub enum HydrationMode {
   Media(String)
   Only
   ServerDefer
-}
-pub impl Eq for HydrationMode
-pub impl Show for HydrationMode
+} derive(Eq, Show)
 
 pub struct LayoutModule {
   name : String

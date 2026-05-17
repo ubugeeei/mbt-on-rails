@@ -90,8 +90,7 @@ fn row_matches_predicate(
           in_list_matches(schema, table_name, column, current, values)
         None => false
       }
-    Raw(sql) =>
-      evaluate_raw_predicate(schema, table_name, row, sql)
+    Raw(sql) => evaluate_raw_predicate(schema, table_name, row, sql)
   }
 }
 
@@ -105,12 +104,7 @@ fn evaluate_raw_predicate(
   match parse_simple_raw_predicate(sql) {
     Some((column, operator, value)) =>
       match compare_row_value(schema, table_name, row, column, value) {
-        Some(result) =>
-          if operator == "=" {
-            result == 0
-          } else {
-            result != 0
-          }
+        Some(result) => if operator == "=" { result == 0 } else { result != 0 }
         None => false
       }
     None => false
@@ -155,9 +149,7 @@ fn parse_simple_raw_predicate_with_operator(
 ///|
 fn normalize_raw_literal(value : String) -> String {
   let trimmed = value.trim().to_string()
-  if trimmed.length() >= 2 &&
-    trimmed.has_prefix("'") &&
-    trimmed.has_suffix("'") {
+  if trimmed.length() >= 2 && trimmed.has_prefix("'") && trimmed.has_suffix("'") {
     return String::unsafe_substring(trimmed, start=1, end=trimmed.length() - 1)
   }
   match ascii_lowercase_literal(trimmed) {
@@ -172,7 +164,10 @@ fn ascii_lowercase_literal(source : String) -> String {
   let builder = StringBuilder::new()
   for ch in source {
     if ch >= 'A' && ch <= 'Z' {
-      builder.write_char((ch.to_int() + 32).to_char())
+      match (ch.to_int() + 32).to_char() {
+        Some(lower) => builder.write_char(lower)
+        None => builder.write_char(ch)
+      }
     } else {
       builder.write_char(ch)
     }

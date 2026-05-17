@@ -43,9 +43,7 @@ pub enum TurboStreamAction {
   Remove
   Before
   After
-}
-pub impl Eq for TurboStreamAction
-pub impl Show for TurboStreamAction
+} derive(Eq, Show)
 
 // Type aliases
 

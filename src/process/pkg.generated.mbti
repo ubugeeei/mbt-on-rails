@@ -43,9 +43,7 @@ pub enum ProcessRole {
   CableRole
   SchedulerRole
   ReleaseRole
-}
-pub impl Eq for ProcessRole
-pub impl Show for ProcessRole
+} derive(Eq, Show)
 
 pub struct ReleaseTask {
   name : String

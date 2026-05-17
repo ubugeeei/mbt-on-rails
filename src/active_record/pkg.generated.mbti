@@ -260,19 +260,15 @@ pub enum AssociationKind {
   HasMany
   HasOne
   HasAndBelongsToMany
-}
-pub impl Eq for AssociationKind
-pub impl Show for AssociationKind
+} derive(Eq, Show)
 
 pub struct AttributeCastError {
   attribute : String
   expected_type : String
   value : String?
   detail : String
-}
+} derive(Eq, Show)
 pub fn AttributeCastError::message(Self) -> String
-pub impl Eq for AttributeCastError
-pub impl Show for AttributeCastError
 
 pub enum AttributeValue {
   StringAttribute(String)
@@ -281,11 +277,9 @@ pub enum AttributeValue {
   TimestampAttribute(String)
   JsonAttribute(String)
   NullAttribute
-}
+} derive(Eq, Show)
 pub fn AttributeValue::json_value(Self) -> String
 pub fn AttributeValue::record_value(Self) -> String?
-pub impl Eq for AttributeValue
-pub impl Show for AttributeValue
 
 pub struct Callback {
   hook : LifecycleHook
@@ -295,11 +289,9 @@ pub struct Callback {
 pub enum CastRecordOutcome {
   CastedRecord(TypedRecord)
   CastRecordFailed(Array[AttributeCastError])
-}
+} derive(Eq, Show)
 pub fn CastRecordOutcome::errors(Self) -> Array[AttributeCastError]
 pub fn CastRecordOutcome::typed_record(Self) -> TypedRecord?
-pub impl Eq for CastRecordOutcome
-pub impl Show for CastRecordOutcome
 
 pub struct Column {
   name : String
@@ -323,9 +315,7 @@ pub enum ColumnType {
   Timestamp
   Json
   References(String)
-}
-pub impl Eq for ColumnType
-pub impl Show for ColumnType
+} derive(Eq, Show)
 
 pub enum DestroyOutcome {
   DestroyedRecord(MemoryDatabase, Record)
@@ -361,9 +351,7 @@ pub enum LifecycleHook {
   AfterCreate
   BeforeDestroy
   AfterDestroy
-}
-pub impl Eq for LifecycleHook
-pub impl Show for LifecycleHook
+} derive(Eq, Show)
 
 pub struct MemoryDatabase {
   tables : Array[MemoryTable]
@@ -423,8 +411,7 @@ pub enum Predicate {
   Lt(String, String)
   InList(String, Array[String])
   Raw(String)
-}
-pub impl Show for Predicate
+} derive(Show)
 
 pub struct Record {
   table : String
@@ -473,10 +460,8 @@ pub fn Relation::where_raw(Self, String) -> Self
 pub struct RelationExecutionIssue {
   feature : String
   detail : String
-}
+} derive(Eq, Show)
 pub fn RelationExecutionIssue::message(Self) -> String
-pub impl Eq for RelationExecutionIssue
-pub impl Show for RelationExecutionIssue
 
 pub enum RelationExecutionOutcome {
   ExecutedRecords(Array[Record])
@@ -501,11 +486,9 @@ pub struct ScopeDefinition {
 pub enum SerializeRecordOutcome {
   SerializedRecordJson(String)
   SerializeRecordFailed(Array[AttributeCastError])
-}
+} derive(Eq, Show)
 pub fn SerializeRecordOutcome::errors(Self) -> Array[AttributeCastError]
 pub fn SerializeRecordOutcome::json(Self) -> String?
-pub impl Eq for SerializeRecordOutcome
-pub impl Show for SerializeRecordOutcome
 
 pub enum TransactionSaveOutcome {
   TransactionSaved(MemoryTransaction, Record)
@@ -520,20 +503,16 @@ pub struct TransactionSavepoint {
 pub struct TypedField {
   name : String
   value : AttributeValue
-}
-pub impl Eq for TypedField
-pub impl Show for TypedField
+} derive(Eq, Show)
 
 pub struct TypedRecord {
   table : String
   fields : Array[TypedField]
-}
+} derive(Eq, Show)
 pub fn TypedRecord::field(Self, String) -> TypedField?
 pub fn TypedRecord::to_json(Self) -> String
 pub fn TypedRecord::to_record(Self) -> Record
 pub fn TypedRecord::value_for(Self, String) -> AttributeValue?
-pub impl Eq for TypedRecord
-pub impl Show for TypedRecord
 
 pub struct Validation {
   field : String
@@ -559,9 +538,7 @@ pub enum ValidationErrorKind {
   NotIncluded
   ConfirmationMismatch(String)
   InvalidFormat(String)
-}
-pub impl Eq for ValidationErrorKind
-pub impl Show for ValidationErrorKind
+} derive(Eq, Show)
 
 pub struct ValidationErrors {
   model_name : String
@@ -587,8 +564,7 @@ pub enum ValidationRule {
   Confirmation(String)
   Format(String)
   WrappedRule(@validation.FieldRule)
-}
-pub impl Show for ValidationRule
+} derive(Show)
 
 // Type aliases
 

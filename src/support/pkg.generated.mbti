@@ -47,10 +47,8 @@ pub fn sql_literal(String) -> String
 // Types and methods
 pub struct MbtvPath {
   value : String
-}
+} derive(Eq, Show)
 pub fn MbtvPath::as_string(Self) -> String
-pub impl Eq for MbtvPath
-pub impl Show for MbtvPath
 
 pub struct NotificationEvent {
   name : String

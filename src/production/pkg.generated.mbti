@@ -74,9 +74,7 @@ pub enum Environment {
   Test
   Staging
   Production
-}
-pub impl Eq for Environment
-pub impl Show for Environment
+} derive(Eq, Show)
 
 pub struct HealthCheck {
   name : String

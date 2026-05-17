@@ -26,9 +26,7 @@ pub fn with_metric(MetricsRegistry, MetricSample) -> MetricsRegistry
 pub enum MetricKind {
   CounterMetric
   GaugeMetric
-}
-pub impl Eq for MetricKind
-pub impl Show for MetricKind
+} derive(Eq, Show)
 
 pub struct MetricSample {
   name : String

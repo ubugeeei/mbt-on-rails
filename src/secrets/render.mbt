@@ -3,7 +3,7 @@
 pub fn missing_secrets(config : SecretsConfig) -> Array[String] {
   let missing : Array[String] = []
   for entry in config.entries {
-    if entry.required && entry.value is None {
+    if entry.required && secret_missing(entry.value) {
       missing.push(entry.name)
     }
   }
@@ -41,11 +41,26 @@ pub fn dotenv_preview(config : SecretsConfig) -> String {
   let lines : Array[String] = []
   for entry in config.entries {
     match entry.value {
-      Some(value) => lines.push(entry.name + "=" + value)
+      Some(value) =>
+        if entry.required && secret_missing(entry.value) {
+          ()
+        } else if entry.sensitive {
+          lines.push(entry.name + "=<redacted>")
+        } else {
+          lines.push(entry.name + "=" + value)
+        }
       None => ()
     }
   }
   lines.join("\n")
+}
+
+///|
+fn secret_missing(value : String?) -> Bool {
+  match value {
+    Some(current) => current.trim().to_string().length() == 0
+    None => true
+  }
 }
 
 ///|

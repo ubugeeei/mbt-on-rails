@@ -47,11 +47,10 @@ pub struct FieldRule {
   kind : RuleKind
   message : String?
   validator_name : String?
-}
+} derive(Show)
 pub fn FieldRule::named(Self, String) -> Self
 pub fn FieldRule::with_message(Self, String) -> Self
 pub fn FieldRule::with_message_template(Self, String) -> Self
-pub impl Show for FieldRule
 
 pub struct FieldSchema {
   name : String
@@ -79,8 +78,7 @@ pub enum RuleKind {
   IncludedIn(Array[String])
   SameAs(String)
   Contains(String)
-}
-pub impl Show for RuleKind
+} derive(Show)
 
 pub struct ValidationIssue {
   path : String

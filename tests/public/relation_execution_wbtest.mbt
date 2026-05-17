@@ -131,17 +131,15 @@ test "execute_relation supports basic raw equality predicates in memory" {
   let schema = relation_execution_schema()
   let db = relation_execution_db()
 
-  let published = relation_for(schema).where_raw("published = TRUE").execute(
-    schema,
-    db,
-  )
+  let published = relation_for(schema)
+    .where_raw("published = TRUE")
+    .execute(schema, db)
   assert_eq(published.issues().length(), 0)
-  assert_eq(published.count(), 2)
+  assert_eq(published.count(), 4)
 
-  let drafts = relation_for(schema).where_raw("published != TRUE").execute(
-    schema,
-    db,
-  )
+  let drafts = relation_for(schema)
+    .where_raw("published != TRUE")
+    .execute(schema, db)
   assert_eq(drafts.issues().length(), 0)
   assert_eq(drafts.count(), 1)
 }

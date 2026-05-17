@@ -162,6 +162,32 @@ test "json api and probe helpers preserve statuses and metadata" {
 }
 
 ///|
+test "prometheus rendering sanitizes unsafe metric and label identifiers" {
+  let rendered = render_prometheus(
+    with_metric(
+      metrics_registry(),
+      counter(
+        "9bad.metric\n# HELP injected",
+        [
+          ("bad-label\nname", "value"),
+          ("9tenant", "prod"),
+          ("valid_label", "ok"),
+        ],
+        7,
+      ),
+    ),
+  )
+  assert_true(rendered.contains("# TYPE _9bad_metric___HELP_injected counter"))
+  assert_true(
+    rendered.contains(
+      "_9bad_metric___HELP_injected{bad_label_name=\"value\",_9tenant=\"prod\",valid_label=\"ok\"} 7",
+    ),
+  )
+  assert_false(rendered.contains("\n# HELP injected"))
+  assert_false(rendered.contains("bad-label"))
+}
+
+///|
 test "metrics and secrets helpers expose environment safe summaries" {
   let registry = with_metric(
     set_metric(
@@ -203,6 +229,13 @@ test "metrics and secrets helpers expose environment safe summaries" {
       sensitive=false,
     ),
     secret_var(name="SMTP_PASSWORD", value=None, required=true, sensitive=true),
+    secret_var(name="API_TOKEN", value=Some(""), required=true, sensitive=true),
+    secret_var(
+      name="SECRET_KEY_BASE",
+      value=Some("   "),
+      required=true,
+      sensitive=true,
+    ),
   ])
   assert_false(secrets_valid(secrets))
   assert_true(masked_secret_summary(secrets).contains("SHORT=****"))
@@ -210,9 +243,16 @@ test "metrics and secrets helpers expose environment safe summaries" {
   assert_true(
     masked_secret_summary(secrets).contains("PUBLIC_HOST=example.com"),
   )
-  assert_true(dotenv_preview(secrets).contains("PUBLIC_HOST=example.com"))
-  assert_false(dotenv_preview(secrets).contains("SMTP_PASSWORD"))
+  let preview = dotenv_preview(secrets)
+  assert_true(preview.contains("PUBLIC_HOST=example.com"))
+  assert_true(preview.contains("DATABASE_URL=<redacted>"))
+  assert_false(preview.contains("postgres://app:secret@db/prod"))
+  assert_false(preview.contains("SMTP_PASSWORD"))
+  assert_false(preview.contains("API_TOKEN"))
+  assert_false(preview.contains("SECRET_KEY_BASE"))
   assert_eq(missing_secrets(secrets)[0], "SMTP_PASSWORD")
+  assert_eq(missing_secrets(secrets)[1], "API_TOKEN")
+  assert_eq(missing_secrets(secrets)[2], "SECRET_KEY_BASE")
   match secret_value(secrets, "PUBLIC_HOST") {
     Some(value) => assert_eq(value, "example.com")
     None => assert_true(false)

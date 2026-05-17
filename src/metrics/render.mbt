@@ -61,7 +61,7 @@ pub fn render_prometheus(registry : MetricsRegistry) -> String {
       CounterMetric => "counter"
       GaugeMetric => "gauge"
     }
-    lines.push("# TYPE " + sample.name + " " + kind)
+    lines.push("# TYPE " + prometheus_metric_name(sample.name) + " " + kind)
     lines.push(render_sample(sample))
   }
   lines.join("\n")
@@ -85,9 +85,64 @@ fn render_sample(sample : MetricSample) -> String {
   } else {
     let parts : Array[String] = []
     for label in sample.labels {
-      parts.push(label.0 + "=" + @support.json_string(label.1))
+      parts.push(
+        prometheus_label_name(label.0) + "=" + @support.json_string(label.1),
+      )
     }
     "{" + parts.join(",") + "}"
   }
-  sample.name + labels + " " + sample.value.to_string()
+  prometheus_metric_name(sample.name) + labels + " " + sample.value.to_string()
+}
+
+///|
+fn prometheus_metric_name(source : String) -> String {
+  sanitize_prometheus_identifier(source, allow_colon=true)
+}
+
+///|
+fn prometheus_label_name(source : String) -> String {
+  sanitize_prometheus_identifier(source, allow_colon=false)
+}
+
+///|
+fn sanitize_prometheus_identifier(
+  source : String,
+  allow_colon~ : Bool,
+) -> String {
+  if source.length() == 0 {
+    return "_"
+  }
+  let builder = StringBuilder::new()
+  let mut first = true
+  for ch in source {
+    if first {
+      if is_prometheus_initial_char(ch, allow_colon~) {
+        builder.write_char(ch)
+      } else if is_prometheus_identifier_char(ch, allow_colon~) {
+        builder.write_char('_')
+        builder.write_char(ch)
+      } else {
+        builder.write_char('_')
+      }
+      first = false
+    } else if is_prometheus_identifier_char(ch, allow_colon~) {
+      builder.write_char(ch)
+    } else {
+      builder.write_char('_')
+    }
+  }
+  builder.to_string()
+}
+
+///|
+fn is_prometheus_initial_char(ch : Char, allow_colon~ : Bool) -> Bool {
+  (ch >= 'A' && ch <= 'Z') ||
+  (ch >= 'a' && ch <= 'z') ||
+  ch == '_' ||
+  (allow_colon && ch == ':')
+}
+
+///|
+fn is_prometheus_identifier_char(ch : Char, allow_colon~ : Bool) -> Bool {
+  is_prometheus_initial_char(ch, allow_colon~) || (ch >= '0' && ch <= '9')
 }

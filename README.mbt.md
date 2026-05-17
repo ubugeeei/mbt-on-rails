@@ -8,7 +8,8 @@ It focuses on a declarative API, typed route/model helpers, and an explicit clie
 ```bash
 moon test
 moon run examples/resource_app
-moon run examples/demo_blog
+moon run cmd/main
+moon run examples/production_api
 ```
 
 ## Read This First
