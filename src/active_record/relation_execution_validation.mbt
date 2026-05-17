@@ -36,13 +36,6 @@ fn relation_execution_issues(
       ),
     )
   }
-  if not(relation.preloads.is_empty()) {
-    issues.push(
-      relation_execution_issue(
-        "preload", "association preloading is not implemented for the in-memory adapter",
-      ),
-    )
-  }
   validate_select_columns(schema, relation, issues)
   validate_predicate_columns(schema, relation, issues)
   validate_order_columns(schema, relation, issues)
@@ -91,14 +84,28 @@ fn validate_predicate_columns(
         ensure_known_relation_column(schema, column, "predicate", issues)
       InList(column, _) =>
         ensure_known_relation_column(schema, column, "predicate", issues)
-      Raw(sql) =>
-        issues.push(
-          relation_execution_issue(
-            "raw_predicate",
-            "raw predicates are not executable in memory: " + sql,
-          ),
-        )
+      Raw(sql) => validate_raw_predicate(schema, relation.table, sql, issues)
     }
+  }
+}
+
+///|
+fn validate_raw_predicate(
+  schema : ModelSchema,
+  table_name : String,
+  sql : String,
+  issues : Array[RelationExecutionIssue],
+) -> Unit {
+  match parse_simple_raw_predicate(sql) {
+    Some((column, _, _)) =>
+      ensure_known_relation_column(schema, column, "raw_predicate", issues)
+    None =>
+      issues.push(
+        relation_execution_issue(
+          "raw_predicate",
+          "raw predicates are not executable in memory: " + sql,
+        ),
+      )
   }
 }
 
