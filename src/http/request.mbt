@@ -59,7 +59,7 @@ pub fn request_session_id(
         match store.signing_secret {
           Some(secret) =>
             @auth.verify_signed_cookie_value(store.key, value, secret)
-          None => Some(value)
+          None => None
         }
       } else {
         Some(value)

@@ -7,6 +7,8 @@ pub fn json_string(source : String) -> String {
     match ch {
       '"' => sb.write_string("\\\"")
       '\\' => sb.write_string("\\\\")
+      '\b' => sb.write_string("\\b")
+      '\u{000C}' => sb.write_string("\\f")
       '\n' => sb.write_string("\\n")
       '\r' => sb.write_string("\\r")
       '\t' => sb.write_string("\\t")
@@ -23,10 +25,66 @@ pub fn is_numeric_literal(source : String) -> Bool {
   if source.length() == 0 {
     return false
   }
+  let mut index = 0
+  let mut int_digits = 0
+  let mut frac_digits = 0
+  let mut exp_digits = 0
+  let mut seen_dot = false
+  let mut seen_exp = false
+  let mut allow_exp_sign = false
+  let mut first_int_digit = '\u{0}'
   for ch in source {
-    if not((ch >= '0' && ch <= '9') || ch == '.' || ch == '-') {
-      return false
+    if index == 0 && ch == '-' {
+      index = index + 1
+      continue
     }
+    if allow_exp_sign && (ch == '+' || ch == '-') {
+      allow_exp_sign = false
+      index = index + 1
+      continue
+    }
+    allow_exp_sign = false
+    if ch >= '0' && ch <= '9' {
+      if seen_exp {
+        exp_digits = exp_digits + 1
+      } else if seen_dot {
+        frac_digits = frac_digits + 1
+      } else {
+        if int_digits == 0 {
+          first_int_digit = ch
+        }
+        int_digits = int_digits + 1
+      }
+      index = index + 1
+      continue
+    }
+    if ch == '.' && not(seen_dot) && not(seen_exp) && int_digits > 0 {
+      seen_dot = true
+      index = index + 1
+      continue
+    }
+    if (ch == 'e' || ch == 'E') &&
+      not(seen_exp) &&
+      int_digits > 0 &&
+      (not(seen_dot) || frac_digits > 0) {
+      seen_exp = true
+      allow_exp_sign = true
+      index = index + 1
+      continue
+    }
+    return false
+  }
+  if allow_exp_sign || int_digits == 0 {
+    return false
+  }
+  if int_digits > 1 && first_int_digit == '0' {
+    return false
+  }
+  if seen_dot && frac_digits == 0 {
+    return false
+  }
+  if seen_exp && exp_digits == 0 {
+    return false
   }
   true
 }

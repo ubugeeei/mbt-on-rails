@@ -22,27 +22,31 @@ pub fn handle_request(
 
   match find_server_action(app.server_actions, request.path) {
     Some(action) =>
-      if request.verb == @http.http_post() {
-        return @middleware.apply_response_middleware(
-          app.middlewares,
-          request,
-          @http.ok_json(
-            "{" +
-            "\"action\": " +
-            @support.json_string(action.name) +
-            ", \"status\": " +
-            @support.json_string("accepted") +
-            ", \"body\": " +
-            @support.json_string(request.body) +
-            "}",
-          ),
-        )
-      }
+      return @middleware.apply_response_middleware(
+        app.middlewares,
+        request,
+        server_action_response(app, action, request),
+      )
     None => ()
   }
 
   match @http.recognize(app.routes, request) {
-    Some(matched) =>
+    Some(matched) => {
+      match
+        route_auth_response(
+          app,
+          matched.route.controller,
+          matched.route.action,
+          request,
+        ) {
+        Some(response) =>
+          return @middleware.apply_response_middleware(
+            app.middlewares,
+            request,
+            response,
+          )
+        None => ()
+      }
       match matched.route.page_name {
         Some(page_name) =>
           match find_page(app.pages, page_name) {
@@ -101,12 +105,195 @@ pub fn handle_request(
               )
           }
       }
+    }
     None =>
       @middleware.apply_response_middleware(
         app.middlewares,
         request,
         @http.not_found_response(),
       )
+  }
+}
+
+///|
+fn server_action_response(
+  app : MbtOnRailsApp,
+  action : @view.ServerAction,
+  request : @http.Request,
+) -> @http.Response {
+  match server_action_contract_response(app, action, request) {
+    Some(response) => response
+    None =>
+      @http.ok_json(
+        "{" +
+        "\"action\": " +
+        @support.json_string(action.name) +
+        ", \"status\": " +
+        @support.json_string("accepted") +
+        ", \"body\": " +
+        @support.json_string(request.body) +
+        "}",
+      )
+  }
+}
+
+///|
+fn server_action_contract_response(
+  app : MbtOnRailsApp,
+  action : @view.ServerAction,
+  request : @http.Request,
+) -> @http.Response? {
+  if request.verb != @http.http_post() {
+    return Some(
+      @http.append_response_headers(
+        @http.text_response(405, "Method Not Allowed"),
+        [("allow", "POST")],
+      ),
+    )
+  }
+  if action.csrf_protected {
+    match @http.request_csrf_token(request, app.auth) {
+      Some(token) =>
+        if token.trim().to_string().length() == 0 {
+          return Some(
+            @http.unprocessable_entity_response(message="invalid_csrf_token"),
+          )
+        }
+      None =>
+        return Some(
+          @http.unprocessable_entity_response(message="invalid_csrf_token"),
+        )
+    }
+  }
+  let missing = missing_action_inputs(action, request)
+  if not(missing.is_empty()) {
+    return Some(
+      @http.unprocessable_entity_response(
+        message="missing action input: " + missing.join(", "),
+      ),
+    )
+  }
+  None
+}
+
+///|
+fn missing_action_inputs(
+  action : @view.ServerAction,
+  request : @http.Request,
+) -> Array[String] {
+  let missing : Array[String] = []
+  if action.input_fields.is_empty() || request.form.is_empty() {
+    return missing
+  }
+  for field in action.input_fields {
+    match @support.find_entry(request.form, field.0) {
+      Some(_) => ()
+      None => missing.push(field.0)
+    }
+  }
+  missing
+}
+
+///|
+fn route_auth_response(
+  app : MbtOnRailsApp,
+  controller_name : String,
+  action_name : String,
+  request : @http.Request,
+) -> @http.Response? {
+  match find_controller(app.controllers, controller_name) {
+    Some(controller) => {
+      for before in controller.before_actions {
+        if before_action_applies(before, action_name) {
+          match before.requirement {
+            Some(requirement) =>
+              match auth_requirement_response(requirement, request) {
+                Some(response) => return Some(response)
+                None => ()
+              }
+            None => ()
+          }
+        }
+      }
+      match @controller.controller_action(controller, action_name) {
+        Some(action) =>
+          for step in action.steps {
+            match step {
+              RequireAuth(requirement) =>
+                match auth_requirement_response(requirement, request) {
+                  Some(response) => return Some(response)
+                  None => ()
+                }
+              _ => ()
+            }
+          }
+        None => ()
+      }
+    }
+    None => ()
+  }
+  None
+}
+
+///|
+fn find_controller(
+  controllers : Array[@controller.ControllerDefinition],
+  name : String,
+) -> @controller.ControllerDefinition? {
+  for controller in controllers {
+    if controller.name == name {
+      return Some(controller)
+    }
+  }
+  None
+}
+
+///|
+fn before_action_applies(
+  before : @controller.BeforeAction,
+  action_name : String,
+) -> Bool {
+  match before.action_name {
+    Some(expected) => expected == action_name
+    None => true
+  }
+}
+
+///|
+fn auth_requirement_response(
+  requirement : @auth.AuthRequirement,
+  request : @http.Request,
+) -> @http.Response? {
+  let signed_in = match request.session_id {
+    Some(session_id) => session_id.length() > 0
+    None => false
+  }
+  match requirement {
+    Public => None
+    GuestOnly =>
+      if signed_in {
+        Some(@http.forbidden_response(message="Already authenticated"))
+      } else {
+        None
+      }
+    Authenticated =>
+      if signed_in {
+        None
+      } else {
+        Some(@http.unauthorized_response(message="Authentication required"))
+      }
+    Role(_) =>
+      if signed_in {
+        Some(@http.forbidden_response(message="Authorization required"))
+      } else {
+        Some(@http.unauthorized_response(message="Authentication required"))
+      }
+    Permission(_) =>
+      if signed_in {
+        Some(@http.forbidden_response(message="Authorization required"))
+      } else {
+        Some(@http.unauthorized_response(message="Authentication required"))
+      }
   }
 }
 

@@ -402,7 +402,7 @@ pub fn session_cookie_with_store(
   let value = if store.signed {
     match store.signing_secret {
       Some(secret) => sign_cookie_value(store.key, session.id, secret)
-      None => session.id
+      None => ""
     }
   } else {
     session.id
@@ -424,13 +424,16 @@ pub fn session_cookie_with_store(
 ///|
 /// Renders a cookie definition as a `Set-Cookie` header value.
 pub fn cookie_header(cookie : AuthCookie) -> String {
+  let name = cookie_header_token(cookie.name)
+  let value = cookie_header_value(cookie.value)
+  let path = cookie_header_value(cookie.path)
   let parts : Array[String] = [
-    cookie.name + "=" + cookie.value,
-    "Path=" + cookie.path,
+    name + "=" + value,
+    "Path=" + path,
     "SameSite=" + render_cookie_same_site(cookie.same_site),
   ]
   match cookie.domain {
-    Some(domain) => parts.push("Domain=" + domain)
+    Some(domain) => parts.push("Domain=" + cookie_header_value(domain))
     None => ()
   }
   if cookie.http_only {
@@ -444,7 +447,7 @@ pub fn cookie_header(cookie : AuthCookie) -> String {
     None => ()
   }
   match cookie.expires_at {
-    Some(expires_at) => parts.push("Expires=" + expires_at)
+    Some(expires_at) => parts.push("Expires=" + cookie_header_value(expires_at))
     None => ()
   }
   parts.join("; ")
@@ -484,4 +487,57 @@ fn render_session_store_kind(kind : SessionStoreKind) -> String {
     RedisStore => "redis"
     DisabledStore => "disabled"
   }
+}
+
+///|
+fn cookie_header_token(source : String) -> String {
+  let builder = StringBuilder::new()
+  for ch in source {
+    if is_cookie_token_char(ch) {
+      builder.write_char(ch)
+    } else {
+      builder.write_char('_')
+    }
+  }
+  let rendered = builder.to_string()
+  if rendered.length() == 0 {
+    "_"
+  } else {
+    rendered
+  }
+}
+
+///|
+fn cookie_header_value(source : String) -> String {
+  let builder = StringBuilder::new()
+  for ch in source {
+    match ch {
+      '\n' | '\r' => break
+      ';' => builder.write_char(' ')
+      _ => builder.write_char(ch)
+    }
+  }
+  builder.to_string().trim().to_string()
+}
+
+///|
+fn is_cookie_token_char(ch : Char) -> Bool {
+  (ch >= 'A' && ch <= 'Z') ||
+  (ch >= 'a' && ch <= 'z') ||
+  (ch >= '0' && ch <= '9') ||
+  ch == '!' ||
+  ch == '#' ||
+  ch == '$' ||
+  ch == '%' ||
+  ch == '&' ||
+  ch == '\'' ||
+  ch == '*' ||
+  ch == '+' ||
+  ch == '-' ||
+  ch == '.' ||
+  ch == '^' ||
+  ch == '_' ||
+  ch == '`' ||
+  ch == '|' ||
+  ch == '~'
 }

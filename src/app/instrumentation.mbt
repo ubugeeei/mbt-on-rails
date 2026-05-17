@@ -42,40 +42,58 @@ pub fn handle_request_with_notifications(
   }
 
   match find_server_action(app.server_actions, request.path) {
-    Some(action) =>
-      if request.verb == @http.http_post() {
-        let response = @middleware.apply_response_middleware(
-          app.middlewares,
-          request,
-          @http.ok_json(
-            "{" +
-            "\"action\": " +
-            @support.json_string(action.name) +
-            ", \"status\": " +
-            @support.json_string("accepted") +
-            ", \"body\": " +
-            @support.json_string(request.body) +
-            "}",
+    Some(action) => {
+      let response = @middleware.apply_response_middleware(
+        app.middlewares,
+        request,
+        server_action_response(app, action, request),
+      )
+      return (
+        response,
+        started.instrument(
+          name="process_action.action_controller",
+          payload=controller_payload(
+            controller="ServerActionsController",
+            action=action.name,
+            request~,
+            response~,
           ),
-        )
-        return (
-          response,
-          started.instrument(
-            name="process_action.action_controller",
-            payload=controller_payload(
-              controller="ServerActionsController",
-              action=action.name,
-              request~,
-              response~,
-            ),
-          ),
-        )
-      }
+        ),
+      )
+    }
     None => ()
   }
 
   match @http.recognize(app.routes, request) {
-    Some(matched) =>
+    Some(matched) => {
+      match
+        route_auth_response(
+          app,
+          matched.route.controller,
+          matched.route.action,
+          request,
+        ) {
+        Some(auth_response) => {
+          let response = @middleware.apply_response_middleware(
+            app.middlewares,
+            request,
+            auth_response,
+          )
+          return (
+            response,
+            started.instrument(
+              name="process_action.action_controller",
+              payload=controller_payload(
+                controller=matched.route.controller,
+                action=matched.route.action,
+                request~,
+                response~,
+              ),
+            ),
+          )
+        }
+        None => ()
+      }
       match matched.route.page_name {
         Some(page_name) =>
           match find_page(app.pages, page_name) {
@@ -186,6 +204,7 @@ pub fn handle_request_with_notifications(
             }
           }
       }
+    }
     None => {
       let response = @middleware.apply_response_middleware(
         app.middlewares,

@@ -23,7 +23,8 @@ pub fn increment_metric(
   delta : Int,
 ) -> MetricsRegistry {
   let current = metric_value(registry, name, labels)
-  with_metric(registry, counter(name, labels, current + delta))
+  let kind = metric_kind(registry, name, labels)
+  with_metric(registry, { name, kind, labels, value: current + delta })
 }
 
 ///|
@@ -50,6 +51,21 @@ pub fn metric_value(
     }
   }
   0
+}
+
+///|
+/// Looks up one metric kind by name and labels, defaulting to counters.
+fn metric_kind(
+  registry : MetricsRegistry,
+  name : String,
+  labels : Array[(String, String)],
+) -> MetricKind {
+  for sample in registry.samples {
+    if sample.name == name && sample.labels == labels {
+      return sample.kind
+    }
+  }
+  CounterMetric
 }
 
 ///|

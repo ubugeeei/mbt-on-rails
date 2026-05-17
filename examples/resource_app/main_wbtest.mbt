@@ -32,13 +32,39 @@ test "resource app runtime and main smoke stay runnable" {
   )
   let create_response = @mbor.handle_request(
     app,
+    @mbor.append_request_header(
+      @mbor.request(
+        verb=@mbor.http_post(),
+        path="/_actions/notes.create",
+        query=[],
+        form=[],
+        session_id=None,
+        body="{\"title\":\"hello\"}",
+      ),
+      "x-csrf-token",
+      "token",
+    ),
+  )
+  let new_guest_response = @mbor.handle_request(
+    app,
     @mbor.request(
-      verb=@mbor.http_post(),
-      path="/_actions/notes.create",
+      verb=@mbor.http_get(),
+      path="/notes/new",
       query=[],
       form=[],
       session_id=None,
-      body="{\"title\":\"hello\"}",
+      body="",
+    ),
+  )
+  let new_signed_in_response = @mbor.handle_request(
+    app,
+    @mbor.request(
+      verb=@mbor.http_get(),
+      path="/notes/new",
+      query=[],
+      form=[],
+      session_id=Some("sess_1"),
+      body="",
     ),
   )
 
@@ -50,6 +76,8 @@ test "resource app runtime and main smoke stay runnable" {
   assert_true(
     @mbor.render_response_body(create_response.body).contains("notes.create"),
   )
+  assert_eq(new_guest_response.status, 401)
+  assert_eq(new_signed_in_response.status, 200)
 
   print_example(app)
   run_example()

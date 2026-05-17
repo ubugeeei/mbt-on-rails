@@ -56,6 +56,7 @@ test "cookie stores and forgery strategies stay explicit and type safe" {
     key="_redis_session",
     same_site=cookie_same_site_none(),
   )
+  let unsigned_signed_store = cookie_session_store(key="_unsafe_session")
   let disabled = disabled_session_store()
 
   assert_true(session_store_summary(store).contains("store=cookie"))
@@ -76,6 +77,18 @@ test "cookie stores and forgery strategies stay explicit and type safe" {
   assert_true(
     cookie_header(signed).contains("Expires=Wed, 26 Mar 2026 10:00:00 GMT"),
   )
+  let injected = signed_cookie(
+    name="preview\r\nset-cookie: forged",
+    value="token-1\r\nx: y",
+    secret=config.secret_key_base,
+    domain=Some("example.com\r\nx: y"),
+    expires_at=Some("Wed, 26 Mar 2026 10:00:00 GMT\r\nset-cookie: forged"),
+  )
+  let injected_header = cookie_header(injected)
+  assert_false(injected_header.contains("\r"))
+  assert_false(injected_header.contains("\n"))
+  assert_false(injected_header.contains("set-cookie: forged"))
+  assert_false(injected_header.contains("x: y"))
   match
     verify_signed_cookie_value("preview", signed.value, config.secret_key_base) {
     Some(value) => assert_eq(value, "token-1")
@@ -93,6 +106,27 @@ test "cookie stores and forgery strategies stay explicit and type safe" {
     sign_cookie_value("preview", "token-1", config.secret_key_base).contains(
       "--",
     ),
+  )
+  let unsigned_signed_cookie = session_cookie_with_store(
+    store=unsigned_signed_store,
+    session~,
+  )
+  assert_eq(unsigned_signed_cookie.value, "")
+  let unsigned_signed_request = append_request_header(
+    request(
+      verb=http_get(),
+      path="/",
+      query=[],
+      form=[],
+      session_id=None,
+      body="",
+    ),
+    "cookie",
+    "_unsafe_session=" + session.id,
+  )
+  assert_eq(
+    request_session_id(unsigned_signed_request, unsigned_signed_store),
+    None,
   )
 
   assert_eq(forgery_strategy_summary(request_forgery_exception()), "exception")
@@ -137,6 +171,7 @@ test "cookie stores and forgery strategies stay explicit and type safe" {
 ///|
 test "json api and probe helpers preserve statuses and metadata" {
   let healthy = health_response([health_check(name="app", ok=true, detail="ok")])
+  let empty_probe = readiness_response([])
   let degraded = readiness_response([
     health_check(name="db", ok=false, detail="down"),
   ])
@@ -145,6 +180,8 @@ test "json api and probe helpers preserve statuses and metadata" {
   let error = json_api_error(404, "not_found", "missing")
 
   assert_eq(healthy.status, 200)
+  assert_eq(empty_probe.status, 503)
+  assert_true(render_response_body(empty_probe.body).contains("degraded"))
   assert_eq(degraded.status, 503)
   assert_eq(metrics.headers[0].1, "text/plain; version=0.0.4; charset=utf-8")
   assert_eq(ok.status, 200)
@@ -156,8 +193,23 @@ test "json api and probe helpers preserve statuses and metadata" {
   let with_meta = json_api_document("posts", "42", [("title", "MoonBit")], [
     ("cached", "true"),
   ])
+  let strict_numbers = json_api_document(
+    "posts",
+    "42",
+    [("bad", "1.2.3"), ("dash", "-"), ("leading", "01"), ("ok", "1.5e2")],
+    [],
+  )
+  let strict_log = json_log(
+    log_event("info", "numeric", None, [("bad", "--1"), ("ok", "-2.5")]),
+  )
   let without_meta = json_api_document("posts", "42", [("title", "MoonBit")], [])
   assert_true(with_meta.contains("\"meta\""))
+  assert_true(strict_numbers.contains("\"bad\": \"1.2.3\""))
+  assert_true(strict_numbers.contains("\"dash\": \"-\""))
+  assert_true(strict_numbers.contains("\"leading\": \"01\""))
+  assert_true(strict_numbers.contains("\"ok\": 1.5e2"))
+  assert_true(strict_log.contains("\"bad\": \"--1\""))
+  assert_true(strict_log.contains("\"ok\": -2.5"))
   assert_false(without_meta.contains("\"meta\""))
 }
 
@@ -190,16 +242,21 @@ test "prometheus rendering sanitizes unsafe metric and label identifiers" {
 ///|
 test "metrics and secrets helpers expose environment safe summaries" {
   let registry = with_metric(
-    set_metric(
-      increment_metric(
-        metrics_registry(),
-        "http_requests_total",
-        [("controller", "PostsController")],
-        2,
+    increment_metric(
+      set_metric(
+        increment_metric(
+          metrics_registry(),
+          "http_requests_total",
+          [("controller", "PostsController")],
+          2,
+        ),
+        "db_pool_available",
+        [],
+        4,
       ),
       "db_pool_available",
       [],
-      4,
+      1,
     ),
     counter("job_executions_total", [("queue", "default")], 8),
   )
@@ -212,6 +269,7 @@ test "metrics and secrets helpers expose environment safe summaries" {
   assert_true(
     render_prometheus(registry).contains("# TYPE db_pool_available gauge"),
   )
+  assert_eq(metric_value(registry, "db_pool_available", []), 5)
   assert_true(metrics_summary(registry).contains("job_executions_total"))
 
   let secrets = secrets_config([
@@ -226,6 +284,18 @@ test "metrics and secrets helpers expose environment safe summaries" {
       name="PUBLIC_HOST",
       value=Some("example.com"),
       required=true,
+      sensitive=false,
+    ),
+    secret_var(
+      name="PUBLIC_BANNER",
+      value=Some("example.com\nDATABASE_URL=oops"),
+      required=false,
+      sensitive=false,
+    ),
+    secret_var(
+      name="BAD-NAME",
+      value=Some("bad"),
+      required=false,
       sensitive=false,
     ),
     secret_var(name="SMTP_PASSWORD", value=None, required=true, sensitive=true),
@@ -245,7 +315,12 @@ test "metrics and secrets helpers expose environment safe summaries" {
   )
   let preview = dotenv_preview(secrets)
   assert_true(preview.contains("PUBLIC_HOST=example.com"))
+  assert_true(
+    preview.contains("PUBLIC_BANNER=\"example.com\\nDATABASE_URL=oops\""),
+  )
   assert_true(preview.contains("DATABASE_URL=<redacted>"))
+  assert_false(preview.contains("\nDATABASE_URL=oops"))
+  assert_false(preview.contains("BAD-NAME"))
   assert_false(preview.contains("postgres://app:secret@db/prod"))
   assert_false(preview.contains("SMTP_PASSWORD"))
   assert_false(preview.contains("API_TOKEN"))

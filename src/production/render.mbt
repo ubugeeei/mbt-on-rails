@@ -22,7 +22,7 @@ pub fn config_summary(config : DeploymentConfig) -> String {
 /// Renders health and readiness checks into JSON.
 pub fn render_health_json(checks : Array[HealthCheck]) -> String {
   let entries : Array[String] = []
-  let mut healthy = true
+  let mut healthy = not(checks.is_empty())
   for check in checks {
     if not(check.ok) {
       healthy = false

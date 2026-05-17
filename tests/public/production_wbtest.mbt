@@ -38,11 +38,16 @@ test "metrics secrets and production http helpers are production friendly" {
   assert_eq(missing_secrets(secrets)[0], "SMTP_PASSWORD")
 
   let healthy = health_response([health_check(name="app", ok=true, detail="ok")])
+  let empty = health_response([])
   let metrics = metrics_response(render_prometheus(registry))
   let api_ok = json_api_ok("posts", "42", [("title", "MoonBit")])
   let api_error = json_api_error(404, "not_found", "missing")
 
   assert_eq(healthy.status, 200)
+  assert_eq(empty.status, 503)
+  assert_true(
+    render_response_body(empty.body).contains("\"status\": \"degraded\""),
+  )
   assert_eq(metrics.headers[0].1, "text/plain; version=0.0.4; charset=utf-8")
   assert_true(render_response_body(api_ok.body).contains("\"type\": \"posts\""))
   assert_true(
@@ -85,4 +90,31 @@ test "deployment helpers describe production process topology" {
   assert_true(process_summary(processes).contains("worker role=worker"))
   assert_true(env_keys_summary(processes[0]).contains("DATABASE_URL"))
   assert_true(release_summary(tasks).contains("db:migrate"))
+
+  let injected_process = worker_process(
+    "worker\nrelease",
+    "moon run examples/rails_ops\nrelease: forged",
+    0,
+    ["default\nmailers"],
+    ["DATABASE_URL\nOTHER"],
+  )
+  let injected_summary = process_summary([injected_process])
+  let injected_env = env_keys_summary(injected_process)
+  let injected_release = release_summary([
+    release_task(
+      name="db\nmigrate",
+      command="moon run examples/orm_migration\nset -x",
+      required=true,
+    ),
+  ])
+
+  assert_eq(injected_process.concurrency, 1)
+  assert_false(injected_summary.contains("\nrelease"))
+  assert_false(injected_env.contains("\nOTHER"))
+  assert_false(injected_release.contains("\nset -x"))
+  assert_true(
+    injected_summary.contains(
+      "worker release role=worker x1 queues=default mailers cmd=moon run examples/rails_ops release: forged",
+    ),
+  )
 }

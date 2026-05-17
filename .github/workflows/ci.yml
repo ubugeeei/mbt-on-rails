@@ -59,6 +59,14 @@ jobs:
       - name: Run checks
         run: moon check
 
+      - name: Run IDE semantic smoke checks
+        run: |
+          moon ide outline src/metrics/render.mbt
+          moon ide doc render_prometheus
+          moon ide peek-def render_prometheus
+          moon ide analyze > /tmp/moon-ide-analyze.txt
+          test -s /tmp/moon-ide-analyze.txt
+
       - name: Run tests
         run: moon test
 
