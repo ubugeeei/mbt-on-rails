@@ -60,17 +60,17 @@ pub fn process_summary(processes : Array[ProcessDefinition]) -> String {
     let queues = if process.queues.is_empty() {
       ""
     } else {
-      " queues=" + process.queues.join(",")
+      " queues=" + safe_summary_list(process.queues, ",")
     }
     lines.push(
-      process.name +
+      safe_summary_text(process.name) +
       " role=" +
       render_role(process.role) +
       " x" +
       process.concurrency.to_string() +
       queues +
       " cmd=" +
-      process.command,
+      safe_summary_text(process.command),
     )
   }
   lines.join("\n")
@@ -82,11 +82,11 @@ pub fn release_summary(tasks : Array[ReleaseTask]) -> String {
   let lines : Array[String] = []
   for task in tasks {
     lines.push(
-      task.name +
+      safe_summary_text(task.name) +
       " required=" +
       task.required.to_string() +
       " cmd=" +
-      task.command,
+      safe_summary_text(task.command),
     )
   }
   lines.join("\n")
@@ -95,7 +95,10 @@ pub fn release_summary(tasks : Array[ReleaseTask]) -> String {
 ///|
 /// Renders one environment key list for diagnostics.
 pub fn env_keys_summary(process : ProcessDefinition) -> String {
-  process.name + " env=[" + process.env_keys.join(", ") + "]"
+  safe_summary_text(process.name) +
+  " env=[" +
+  safe_summary_list(process.env_keys, ", ") +
+  "]"
 }
 
 ///|
@@ -107,5 +110,31 @@ fn render_role(role : ProcessRole) -> String {
     CableRole => "cable"
     SchedulerRole => "scheduler"
     ReleaseRole => "release"
+  }
+}
+
+///|
+fn safe_summary_list(values : Array[String], separator : String) -> String {
+  let sanitized : Array[String] = []
+  for value in values {
+    sanitized.push(safe_summary_text(value))
+  }
+  sanitized.join(separator)
+}
+
+///|
+fn safe_summary_text(source : String) -> String {
+  let builder = StringBuilder::new()
+  for ch in source {
+    match ch {
+      '\n' | '\r' | '\t' => builder.write_char(' ')
+      _ => builder.write_char(ch)
+    }
+  }
+  let sanitized = builder.to_string().trim().to_string()
+  if sanitized.length() == 0 {
+    "-"
+  } else {
+    sanitized
   }
 }

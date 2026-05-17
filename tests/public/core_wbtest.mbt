@@ -5,6 +5,17 @@ test "support helpers keep json and paths stable" {
     entries_to_json([("id", "42"), ("published", "true")]),
     "{\"id\": 42, \"published\": true}",
   )
+  assert_eq(
+    entries_to_json([
+      ("valid", "42"),
+      ("float", "-1.25e+3"),
+      ("bad", "1.2.3"),
+      ("dash", "-"),
+      ("leading", "01"),
+    ]),
+    "{\"valid\": 42, \"float\": -1.25e+3, \"bad\": \"1.2.3\", \"dash\": \"-\", \"leading\": \"01\"}",
+  )
+  assert_eq(json_string("a\u{0008}b\u{000C}c"), "\"a\\bb\\fc\"")
 }
 
 ///|

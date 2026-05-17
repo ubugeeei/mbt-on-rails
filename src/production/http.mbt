@@ -89,6 +89,9 @@ fn build_probe_response(checks : Array[HealthCheck]) -> @http.Response {
 ///|
 /// Returns whether every probe is currently healthy.
 fn all_checks_ok(checks : Array[HealthCheck]) -> Bool {
+  if checks.is_empty() {
+    return false
+  }
   for check in checks {
     if not(check.ok) {
       return false

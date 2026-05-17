@@ -209,8 +209,48 @@ test "action view style helpers render concise typed html fragments" {
     tag(name="br", attrs=[("class", "spacer")]),
     "<br class=\"spacer\">",
   )
+  assert_eq(
+    tag(name="img src=x", attrs=[
+      ("data-id", "42"),
+      ("aria-label", "Logo"),
+      ("bad name", "forged"),
+    ]),
+    "<span data-id=\"42\" aria-label=\"Logo\">",
+  )
+  assert_eq(
+    content_tag(name="script>alert", content="safe", attrs=[
+      ("class", "ok"),
+      ("on click", "forged"),
+    ]),
+    "<span class=\"ok\">safe</span>",
+  )
   assert_eq(pluralize(1, "comment"), "1 comment")
   assert_eq(pluralize(2, "category"), "2 categories")
+}
+
+///|
+test "template validation ignores commented and string component imports" {
+  let errors = validate_template_component_imports(
+    "app/views/posts/show.mbtv",
+    "<script setup>\n" +
+    "// component LikeButton,\n" +
+    "let docs = \"component Card\"\n" +
+    "component SaveButton,\n" +
+    "</script>\n" +
+    "<template><LikeButton /><SaveButton /></template>\n",
+  )
+
+  assert_true(
+    errors.contains(
+      "app/views/posts/show.mbtv: missing component import for <LikeButton>",
+    ),
+  )
+  assert_false(
+    errors.contains(
+      "app/views/posts/show.mbtv: missing component import for <SaveButton>",
+    ),
+  )
+  assert_false(errors.contains("unused component import Card"))
 }
 
 ///|
@@ -357,7 +397,20 @@ test "scaffold and demo app expose richer rails style surfaces" {
   assert_eq(page_response.status, 200)
   assert_true(render_response_body(page_response.body).contains("posts_show"))
 
-  let action_response = handle_request(
+  let action_request = append_request_header(
+    request(
+      verb=http_post(),
+      path="/_actions/posts.create",
+      query=[],
+      form=[],
+      session_id=None,
+      body="{\"title\":\"hello\"}",
+    ),
+    "x-csrf-token",
+    "token",
+  )
+  let action_response = handle_request(demo, action_request)
+  let missing_csrf_response = handle_request(
     demo,
     request(
       verb=http_post(),
@@ -368,10 +421,74 @@ test "scaffold and demo app expose richer rails style surfaces" {
       body="{\"title\":\"hello\"}",
     ),
   )
+  let wrong_method_response = handle_request(
+    demo,
+    request(
+      verb=http_get(),
+      path="/_actions/posts.create",
+      query=[],
+      form=[],
+      session_id=None,
+      body="",
+    ),
+  )
+  let missing_form_response = handle_request(
+    demo,
+    append_request_header(
+      request(
+        verb=http_post(),
+        path="/_actions/posts.create",
+        query=[],
+        form=[("title", "hello")],
+        session_id=None,
+        body="",
+      ),
+      "x-csrf-token",
+      "token",
+    ),
+  )
+  let signed_in_sign_in_response = handle_request(
+    demo,
+    request(
+      verb=http_get(),
+      path="/sign-in",
+      query=[],
+      form=[],
+      session_id=Some("sess_1"),
+      body="",
+    ),
+  )
+  let sign_out_guest_response = handle_request(
+    demo,
+    request(
+      verb=http_delete(),
+      path="/sign-out",
+      query=[],
+      form=[],
+      session_id=None,
+      body="",
+    ),
+  )
   assert_eq(action_response.status, 200)
   assert_true(
     render_response_body(action_response.body).contains("posts.create"),
   )
+  assert_eq(missing_csrf_response.status, 422)
+  assert_true(
+    render_response_body(missing_csrf_response.body).contains(
+      "invalid_csrf_token",
+    ),
+  )
+  assert_eq(wrong_method_response.status, 405)
+  assert_eq(find_entry(wrong_method_response.headers, "allow"), Some("POST"))
+  assert_eq(missing_form_response.status, 422)
+  assert_true(
+    render_response_body(missing_form_response.body).contains(
+      "missing action input",
+    ),
+  )
+  assert_eq(signed_in_sign_in_response.status, 403)
+  assert_eq(sign_out_guest_response.status, 401)
   assert_true(demo.router_manifest().contains("\"route_name\": \"posts_show\""))
   assert_true(demo.schema_statements().length() >= 3)
   assert_true(

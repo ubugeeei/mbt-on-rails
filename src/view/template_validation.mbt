@@ -4,7 +4,9 @@ pub fn template_component_imports(source : String) -> Array[String] {
   let script = extract_between(source, "<script setup>", "</script>")
   let imports : Array[String] = []
   for line_view in script.split("\n") {
-    let line = line_view.trim().to_string()
+    let line = code_line_without_comments_or_strings(line_view.to_string())
+      .trim()
+      .to_string()
     if line.contains("component ") {
       let name = parse_component_name_after(line, "component ")
       if name.length() > 0 && not(imports.contains(name)) {
@@ -52,6 +54,46 @@ pub fn validate_template_component_imports(
     }
   }
   errors
+}
+
+///|
+fn code_line_without_comments_or_strings(source : String) -> String {
+  let builder = StringBuilder::new()
+  let mut index = 0
+  let mut in_string = false
+  let mut quote = '\u0000'
+  let mut escaped = false
+  while index < source.length() {
+    let ch = source.unsafe_get(index).unsafe_to_char()
+    if in_string {
+      if escaped {
+        escaped = false
+      } else if ch == '\\' {
+        escaped = true
+      } else if ch == quote {
+        in_string = false
+      }
+      builder.write_char(' ')
+      index += 1
+      continue
+    }
+    if ch == '"' || ch == '\'' {
+      in_string = true
+      quote = ch
+      builder.write_char(' ')
+      index += 1
+      continue
+    }
+    if ch == '/' && index + 1 < source.length() {
+      let next = source.unsafe_get(index + 1).unsafe_to_char()
+      if next == '/' {
+        break
+      }
+    }
+    builder.write_char(ch)
+    index += 1
+  }
+  builder.to_string()
 }
 
 ///|

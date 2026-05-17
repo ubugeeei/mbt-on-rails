@@ -113,9 +113,7 @@ pub struct EnqueuedJob {
 pub enum FailureDisposition {
   RetryJob
   DiscardJob
-}
-pub impl Eq for FailureDisposition
-pub impl Show for FailureDisposition
+} derive(Eq, Show)
 
 pub struct JobAdapter {
   kind : JobAdapterKind
@@ -133,9 +131,7 @@ pub enum JobAdapterKind {
   AsyncAdapter
   TestAdapter
   SolidQueueAdapter
-}
-pub impl Eq for JobAdapterKind
-pub impl Show for JobAdapterKind
+} derive(Eq, Show)
 
 pub struct JobDefinition {
   name : String
@@ -174,9 +170,7 @@ pub struct JobQueue {
 pub enum RetryWait {
   FixedSeconds(Int)
   PolynomiallyLonger
-}
-pub impl Eq for RetryWait
-pub impl Show for RetryWait
+} derive(Eq, Show)
 
 pub struct SerializedJob {
   adapter : JobAdapter

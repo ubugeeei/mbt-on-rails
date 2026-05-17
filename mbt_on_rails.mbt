@@ -748,6 +748,3 @@ pub using @app {
   handle_request,
   handle_request_with_notifications,
 }
-
-///|
-pub using @demo_blog {demo_blog_app}

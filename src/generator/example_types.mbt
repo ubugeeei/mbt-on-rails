@@ -146,8 +146,13 @@ fn push_template_helper(
   helper : TemplateHelperSpec,
 ) -> Unit {
   lines.push("///|")
+  lines.push(
+    "/// Returns the typed template path used by this generated view helper.",
+  )
   lines.push("pub fn " + helper.function_name + "() -> @support.MbtvPath {")
-  lines.push("  @support.mbtv_path(\"" + helper.source_path + "\")")
+  lines.push(
+    "  @support.mbtv_path(" + moonbit_string_literal(helper.source_path) + ")",
+  )
   lines.push("}")
   lines.push("")
 }
@@ -157,16 +162,21 @@ fn push_route_helper(lines : Array[String], helper : RouteHelperSpec) -> Unit {
   let route_function_name = snake_identifier(helper.route_name)
   if helper.params.is_empty() {
     lines.push("///|")
+    lines.push("/// Returns the concrete path for this static route.")
     lines.push("pub fn " + route_function_name + "_path() -> String {")
-    lines.push("  \"" + helper.route_path + "\"")
+    lines.push("  " + moonbit_string_literal(helper.route_path))
     lines.push("}")
     lines.push("")
     lines.push("///|")
+    lines.push("/// Returns the route pattern declared by the page module.")
     lines.push("pub fn " + route_function_name + "_route_pattern() -> String {")
-    lines.push("  \"" + helper.route_path + "\"")
+    lines.push("  " + moonbit_string_literal(helper.route_path))
     lines.push("}")
     lines.push("")
     lines.push("///|")
+    lines.push(
+      "/// Returns the empty route parameter list for this static route.",
+    )
     lines.push(
       "pub fn " +
       route_function_name +
@@ -180,6 +190,9 @@ fn push_route_helper(lines : Array[String], helper : RouteHelperSpec) -> Unit {
 
   let struct_name = camel_identifier(helper.route_name) + "RouteParams"
   lines.push("///|")
+  lines.push(
+    "/// Stores the typed parameters required to build this route path.",
+  )
   lines.push("pub struct " + struct_name + " {")
   for param in helper.params {
     let field_type = match param.kind {
@@ -191,6 +204,7 @@ fn push_route_helper(lines : Array[String], helper : RouteHelperSpec) -> Unit {
   lines.push("}")
   lines.push("")
   lines.push("///|")
+  lines.push("/// Builds the typed route parameters for this route.")
   lines.push(
     "pub fn " +
     route_function_name +
@@ -206,6 +220,7 @@ fn push_route_helper(lines : Array[String], helper : RouteHelperSpec) -> Unit {
   lines.push("}")
   lines.push("")
   lines.push("///|")
+  lines.push("/// Converts the typed route parameters into raw route entries.")
   lines.push(
     "pub fn " +
     struct_name +
@@ -219,16 +234,18 @@ fn push_route_helper(lines : Array[String], helper : RouteHelperSpec) -> Unit {
       OptionalCatchAll => {
         lines.push("  match self." + param.field_name + " {")
         lines.push(
-          "    Some(value) => entries.push((\"" + param.raw_name + "\", value))",
+          "    Some(value) => entries.push((" +
+          moonbit_string_literal(param.raw_name) +
+          ", value))",
         )
         lines.push("    None => ()")
         lines.push("  }")
       }
       _ =>
         lines.push(
-          "  entries.push((\"" +
-          param.raw_name +
-          "\", self." +
+          "  entries.push((" +
+          moonbit_string_literal(param.raw_name) +
+          ", self." +
           param.field_name +
           "))",
         )
@@ -238,6 +255,7 @@ fn push_route_helper(lines : Array[String], helper : RouteHelperSpec) -> Unit {
   lines.push("}")
   lines.push("")
   lines.push("///|")
+  lines.push("/// Builds the concrete path for this route.")
   lines.push(
     "pub fn " +
     route_function_name +
@@ -249,8 +267,9 @@ fn push_route_helper(lines : Array[String], helper : RouteHelperSpec) -> Unit {
   lines.push("}")
   lines.push("")
   lines.push("///|")
+  lines.push("/// Returns the route pattern declared by the page module.")
   lines.push("pub fn " + route_function_name + "_route_pattern() -> String {")
-  lines.push("  \"" + helper.route_path + "\"")
+  lines.push("  " + moonbit_string_literal(helper.route_path))
   lines.push("}")
   lines.push("")
 }
@@ -259,25 +278,29 @@ fn push_route_helper(lines : Array[String], helper : RouteHelperSpec) -> Unit {
 fn push_action_helper(lines : Array[String], helper : ActionHelperSpec) -> Unit {
   let action_function_name = snake_identifier(helper.action_name)
   lines.push("///|")
+  lines.push("/// Returns the canonical server action name.")
   lines.push("pub fn " + action_function_name + "_action_name() -> String {")
-  lines.push("  \"" + helper.action_name + "\"")
+  lines.push("  " + moonbit_string_literal(helper.action_name))
   lines.push("}")
   lines.push("")
   lines.push("///|")
+  lines.push("/// Returns the server action route used by form submissions.")
   lines.push("pub fn " + action_function_name + "_action_route() -> String {")
-  lines.push("  \"" + helper.route + "\"")
+  lines.push("  " + moonbit_string_literal(helper.route))
   lines.push("}")
   lines.push("")
   lines.push("///|")
+  lines.push("/// Returns the declared server action output type.")
   lines.push(
     "pub fn " + action_function_name + "_action_output_type() -> String {",
   )
-  lines.push("  \"" + helper.output_type + "\"")
+  lines.push("  " + moonbit_string_literal(helper.output_type))
   lines.push("}")
   lines.push("")
 
   if helper.input_fields.is_empty() {
     lines.push("///|")
+    lines.push("/// Returns the empty input entry list for this server action.")
     lines.push(
       "pub fn " +
       action_function_name +
@@ -291,6 +314,7 @@ fn push_action_helper(lines : Array[String], helper : ActionHelperSpec) -> Unit 
 
   let struct_name = camel_identifier(helper.action_name) + "ActionInput"
   lines.push("///|")
+  lines.push("/// Stores the typed input accepted by this server action.")
   lines.push("pub struct " + struct_name + " {")
   for field in helper.input_fields {
     lines.push(
@@ -300,6 +324,7 @@ fn push_action_helper(lines : Array[String], helper : ActionHelperSpec) -> Unit 
   lines.push("}")
   lines.push("")
   lines.push("///|")
+  lines.push("/// Builds the typed input for this server action.")
   lines.push(
     "pub fn " +
     action_function_name +
@@ -317,6 +342,7 @@ fn push_action_helper(lines : Array[String], helper : ActionHelperSpec) -> Unit 
   lines.push("}")
   lines.push("")
   lines.push("///|")
+  lines.push("/// Converts typed server action input into form entries.")
   lines.push(
     "pub fn " +
     struct_name +
@@ -332,6 +358,7 @@ fn push_action_helper(lines : Array[String], helper : ActionHelperSpec) -> Unit 
   lines.push("}")
   lines.push("")
   lines.push("///|")
+  lines.push("/// Returns form entries ready to submit to this server action.")
   lines.push(
     "pub fn " +
     action_function_name +
@@ -358,32 +385,34 @@ fn push_action_entry_lines(
   match normalized_type {
     "String" =>
       lines.push(
-        "  entries.push((\"" +
-        field.raw_name +
-        "\", self." +
+        "  entries.push((" +
+        moonbit_string_literal(field.raw_name) +
+        ", self." +
         field.field_name +
         "))",
       )
     "Int" =>
       lines.push(
-        "  entries.push((\"" +
-        field.raw_name +
-        "\", self." +
+        "  entries.push((" +
+        moonbit_string_literal(field.raw_name) +
+        ", self." +
         field.field_name +
         ".to_string()))",
       )
     "Bool" =>
       lines.push(
-        "  entries.push((\"" +
-        field.raw_name +
-        "\", if self." +
+        "  entries.push((" +
+        moonbit_string_literal(field.raw_name) +
+        ", if self." +
         field.field_name +
         " { \"true\" } else { \"false\" }))",
       )
     "String?" => {
       lines.push("  match self." + field.field_name + " {")
       lines.push(
-        "    Some(value) => entries.push((\"" + field.raw_name + "\", value))",
+        "    Some(value) => entries.push((" +
+        moonbit_string_literal(field.raw_name) +
+        ", value))",
       )
       lines.push("    None => ()")
       lines.push("  }")
@@ -391,9 +420,9 @@ fn push_action_entry_lines(
     "Int?" => {
       lines.push("  match self." + field.field_name + " {")
       lines.push(
-        "    Some(value) => entries.push((\"" +
-        field.raw_name +
-        "\", value.to_string()))",
+        "    Some(value) => entries.push((" +
+        moonbit_string_literal(field.raw_name) +
+        ", value.to_string()))",
       )
       lines.push("    None => ()")
       lines.push("  }")
@@ -401,18 +430,18 @@ fn push_action_entry_lines(
     "Bool?" => {
       lines.push("  match self." + field.field_name + " {")
       lines.push(
-        "    Some(value) => entries.push((\"" +
-        field.raw_name +
-        "\", if value { \"true\" } else { \"false\" }))",
+        "    Some(value) => entries.push((" +
+        moonbit_string_literal(field.raw_name) +
+        ", if value { \"true\" } else { \"false\" }))",
       )
       lines.push("    None => ()")
       lines.push("  }")
     }
     _ =>
       lines.push(
-        "  entries.push((\"" +
-        field.raw_name +
-        "\", self." +
+        "  entries.push((" +
+        moonbit_string_literal(field.raw_name) +
+        ", self." +
         field.field_name +
         "))",
       )
@@ -614,7 +643,7 @@ fn render_path_expression(route_path : String, params_name : String) -> String {
       )
       pieces.push("\"/\" + " + params_name + "." + snake_identifier(raw_name))
     } else {
-      pieces.push("\"/" + segment + "\"")
+      pieces.push(moonbit_string_literal("/" + segment))
     }
   }
   if pieces.is_empty() {
@@ -622,6 +651,26 @@ fn render_path_expression(route_path : String, params_name : String) -> String {
   } else {
     pieces.join(" + ")
   }
+}
+
+///|
+fn moonbit_string_literal(source : String) -> String {
+  let builder = StringBuilder::new()
+  builder.write_char('"')
+  for ch in source {
+    match ch {
+      '"' => builder.write_string("\\\"")
+      '\\' => builder.write_string("\\\\")
+      '\b' => builder.write_string("\\u{0008}")
+      '\u{000C}' => builder.write_string("\\u{000C}")
+      '\n' => builder.write_string("\\n")
+      '\r' => builder.write_string("\\r")
+      '\t' => builder.write_string("\\t")
+      _ => builder.write_char(ch)
+    }
+  }
+  builder.write_char('"')
+  builder.to_string()
 }
 
 ///|
@@ -648,6 +697,19 @@ fn collect_function_calls(
 ) -> Unit {
   let mut index = 0
   while index < source.length() {
+    let ch = unsafe_char_at(source, index)
+    if ch == '"' || ch == '\'' {
+      index = skip_source_string(source, index)
+      continue
+    }
+    if starts_line_comment(source, index) {
+      index = skip_line_comment(source, index)
+      continue
+    }
+    if starts_block_comment(source, index) {
+      index = skip_block_comment(source, index)
+      continue
+    }
     if has_identifier_at(source, index, target) {
       let open_paren_index = skip_whitespace(source, index + target.length())
       if open_paren_index < source.length() &&
@@ -688,6 +750,15 @@ fn split_top_level_arguments(source : String) -> Array[String] {
         in_string = false
       }
       index += 1
+      continue
+    }
+
+    if starts_line_comment(source, index) {
+      index = skip_line_comment(source, index)
+      continue
+    }
+    if starts_block_comment(source, index) {
+      index = skip_block_comment(source, index)
       continue
     }
 
@@ -847,6 +918,61 @@ fn balanced_parenthesized_content(
     index += 1
   }
   None
+}
+
+///|
+fn skip_source_string(source : String, start : Int) -> Int {
+  let quote = unsafe_char_at(source, start)
+  let mut index = start + 1
+  let mut escaped = false
+  while index < source.length() {
+    let ch = unsafe_char_at(source, index)
+    if escaped {
+      escaped = false
+    } else if ch == '\\' {
+      escaped = true
+    } else if ch == quote {
+      return index + 1
+    }
+    index += 1
+  }
+  source.length()
+}
+
+///|
+fn starts_line_comment(source : String, index : Int) -> Bool {
+  index + 1 < source.length() &&
+  unsafe_char_at(source, index) == '/' &&
+  unsafe_char_at(source, index + 1) == '/'
+}
+
+///|
+fn skip_line_comment(source : String, start : Int) -> Int {
+  let mut index = start + 2
+  while index < source.length() && unsafe_char_at(source, index) != '\n' {
+    index += 1
+  }
+  index
+}
+
+///|
+fn starts_block_comment(source : String, index : Int) -> Bool {
+  index + 1 < source.length() &&
+  unsafe_char_at(source, index) == '/' &&
+  unsafe_char_at(source, index + 1) == '*'
+}
+
+///|
+fn skip_block_comment(source : String, start : Int) -> Int {
+  let mut index = start + 2
+  while index + 1 < source.length() {
+    if unsafe_char_at(source, index) == '*' &&
+      unsafe_char_at(source, index + 1) == '/' {
+      return index + 2
+    }
+    index += 1
+  }
+  source.length()
 }
 
 ///|

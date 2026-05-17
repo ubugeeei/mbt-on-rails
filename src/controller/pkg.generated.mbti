@@ -124,8 +124,7 @@ pub enum ActionStep {
   DeliverMail(String)
   TouchCache(String)
   SetFlash(String, String)
-}
-pub impl Show for ActionStep
+} derive(Show)
 
 pub struct AfterAction {
   action_name : String?
@@ -168,9 +167,7 @@ pub enum ResponseFormat {
   JsonFormat
   TurboStreamFormat
   RedirectFormat
-}
-pub impl Eq for ResponseFormat
-pub impl Show for ResponseFormat
+} derive(Eq, Show)
 
 // Type aliases
 

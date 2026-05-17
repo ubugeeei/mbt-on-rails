@@ -37,7 +37,14 @@ pub fn process_definition(
   queues : Array[String],
   env_keys : Array[String],
 ) -> ProcessDefinition {
-  { name, role, command, concurrency, queues, env_keys }
+  {
+    name,
+    role,
+    command,
+    concurrency: positive_concurrency(concurrency),
+    queues,
+    env_keys,
+  }
 }
 
 ///|
@@ -51,4 +58,13 @@ pub fn release_task(
   required~ : Bool,
 ) -> ReleaseTask {
   { name, command, required }
+}
+
+///|
+fn positive_concurrency(value : Int) -> Int {
+  if value < 1 {
+    1
+  } else {
+    value
+  }
 }

@@ -121,9 +121,7 @@ pub enum MigrationSafetyLevel {
   Safe
   Review
   Dangerous
-}
-pub impl Eq for MigrationSafetyLevel
-pub impl Show for MigrationSafetyLevel
+} derive(Eq, Show)
 
 pub enum MigrationStep {
   CreateTable(@active_record.ModelSchema)

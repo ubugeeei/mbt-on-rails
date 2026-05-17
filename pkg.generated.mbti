@@ -283,8 +283,6 @@ pub fn deliver_mail_step(String) -> @controller.ActionStep
 
 pub fn delivery_job(@mailer.MailDelivery, String, String?) -> @job.EnqueuedJob
 
-pub fn demo_blog_app() -> @app.MbtOnRailsApp
-
 #label_migration(asset_host, allow_positional=true)
 #label_migration(environment, allow_positional=true)
 #label_migration(force_ssl, allow_positional=true)

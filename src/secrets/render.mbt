@@ -3,7 +3,7 @@
 pub fn missing_secrets(config : SecretsConfig) -> Array[String] {
   let missing : Array[String] = []
   for entry in config.entries {
-    if entry.required && entry.value is None {
+    if entry.required && secret_missing(entry.value) {
       missing.push(entry.name)
     }
   }
@@ -41,11 +41,27 @@ pub fn dotenv_preview(config : SecretsConfig) -> String {
   let lines : Array[String] = []
   for entry in config.entries {
     match entry.value {
-      Some(value) => lines.push(entry.name + "=" + value)
+      Some(value) =>
+        if not(valid_env_name(entry.name)) ||
+          (entry.required && secret_missing(entry.value)) {
+          ()
+        } else if entry.sensitive {
+          lines.push(entry.name + "=<redacted>")
+        } else {
+          lines.push(entry.name + "=" + dotenv_value(value))
+        }
       None => ()
     }
   }
   lines.join("\n")
+}
+
+///|
+fn secret_missing(value : String?) -> Bool {
+  match value {
+    Some(current) => current.trim().to_string().length() == 0
+    None => true
+  }
 }
 
 ///|
@@ -61,4 +77,62 @@ fn mask_secret(value : String) -> String {
     end=value.length(),
   )
   prefix + "****" + suffix
+}
+
+///|
+fn valid_env_name(name : String) -> Bool {
+  if name.length() == 0 {
+    return false
+  }
+  let mut index = 0
+  for ch in name {
+    let valid = if index == 0 {
+      (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || ch == '_'
+    } else {
+      (ch >= 'A' && ch <= 'Z') ||
+      (ch >= 'a' && ch <= 'z') ||
+      (ch >= '0' && ch <= '9') ||
+      ch == '_'
+    }
+    if not(valid) {
+      return false
+    }
+    index += 1
+  }
+  true
+}
+
+///|
+fn dotenv_value(value : String) -> String {
+  if not(requires_dotenv_quotes(value)) {
+    return value
+  }
+  let builder = StringBuilder::new()
+  builder.write_char('"')
+  for ch in value {
+    match ch {
+      '"' => builder.write_string("\\\"")
+      '\\' => builder.write_string("\\\\")
+      '\n' => builder.write_string("\\n")
+      '\r' => builder.write_string("\\r")
+      '\t' => builder.write_string("\\t")
+      _ => builder.write_char(ch)
+    }
+  }
+  builder.write_char('"')
+  builder.to_string()
+}
+
+///|
+fn requires_dotenv_quotes(value : String) -> Bool {
+  if value.length() == 0 {
+    return true
+  }
+  for ch in value {
+    match ch {
+      ' ' | '\n' | '\r' | '\t' | '"' | '\'' | '#' | '=' | '\\' => return true
+      _ => ()
+    }
+  }
+  false
 }

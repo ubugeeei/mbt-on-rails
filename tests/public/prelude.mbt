@@ -253,7 +253,6 @@ pub using @mbor {
   deliver_mail_step,
   deserialize_payload,
   dom_id,
-  demo_blog_app,
   deployment_config,
   digest_password,
   disabled_session_store,
@@ -634,3 +633,6 @@ pub using @mbor {
   with_validation,
   worker_process,
 }
+
+///|
+pub using @demo_blog {demo_blog_app}

@@ -128,9 +128,7 @@ pub enum HttpMethod {
   Delete
   Head
   Options
-}
-pub impl Eq for HttpMethod
-pub impl Show for HttpMethod
+} derive(Eq, Show)
 
 pub struct MatchedRoute {
   route : RouteSpec
@@ -184,9 +182,7 @@ pub enum RouteSegment {
   Param(String)
   CatchAll(String)
   OptionalCatchAll(String)
-}
-pub impl Eq for RouteSegment
-pub impl Show for RouteSegment
+} derive(Eq, Show)
 
 pub struct RouteSpec {
   name : String

@@ -1,7 +1,7 @@
 ///|
 /// Renders one void HTML tag with escaped attributes.
 pub fn tag(name~ : String, attrs? : Array[(String, String)] = []) -> String {
-  "<" + @support.escape_html(name) + render_html_attrs(attrs) + ">"
+  "<" + safe_html_tag_name(name) + render_html_attrs(attrs) + ">"
 }
 
 ///|
@@ -13,14 +13,8 @@ pub fn content_tag(
   escape? : Bool = true,
 ) -> String {
   let body = if escape { @support.escape_html(content) } else { content }
-  "<" +
-  @support.escape_html(name) +
-  render_html_attrs(attrs) +
-  ">" +
-  body +
-  "</" +
-  @support.escape_html(name) +
-  ">"
+  let tag_name = safe_html_tag_name(name)
+  "<" + tag_name + render_html_attrs(attrs) + ">" + body + "</" + tag_name + ">"
 }
 
 ///|
@@ -169,11 +163,57 @@ fn render_html_attrs(attrs : Array[(String, String)]) -> String {
   }
   let parts : Array[String] = []
   for attr in attrs {
-    parts.push(
-      @support.escape_html(attr.0) + "=\"" + @support.escape_html(attr.1) + "\"",
-    )
+    if is_valid_html_name(attr.0) {
+      parts.push(
+        @support.escape_html(attr.0) +
+        "=\"" +
+        @support.escape_html(attr.1) +
+        "\"",
+      )
+    }
+  }
+  if parts.is_empty() {
+    return ""
   }
   " " + parts.join(" ")
+}
+
+///|
+fn safe_html_tag_name(name : String) -> String {
+  if is_valid_html_name(name) {
+    name
+  } else {
+    "span"
+  }
+}
+
+///|
+fn is_valid_html_name(name : String) -> Bool {
+  if name.length() == 0 {
+    return false
+  }
+  let mut index = 0
+  for ch in name {
+    let valid = if index == 0 {
+      (ch >= 'A' && ch <= 'Z') ||
+      (ch >= 'a' && ch <= 'z') ||
+      ch == '_' ||
+      ch == ':'
+    } else {
+      (ch >= 'A' && ch <= 'Z') ||
+      (ch >= 'a' && ch <= 'z') ||
+      (ch >= '0' && ch <= '9') ||
+      ch == '_' ||
+      ch == '-' ||
+      ch == ':' ||
+      ch == '.'
+    }
+    if not(valid) {
+      return false
+    }
+    index += 1
+  }
+  true
 }
 
 ///|

@@ -12,5 +12,13 @@
     "ssr",
     "vapor-moon"
   ],
-  "description": "Rails-inspired MoonBit framework skeleton with Vapor Moon compatible SSR and island manifests."
+  "description": "Rails-inspired MoonBit framework skeleton with Vapor Moon compatible SSR and island manifests.",
+  "exclude": [
+    ".github/**",
+    "app/**",
+    "cmd/**",
+    "examples/**",
+    "scripts/**",
+    "tests/**"
+  ]
 }

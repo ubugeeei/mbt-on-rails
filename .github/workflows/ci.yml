@@ -6,6 +6,13 @@ on:
       - main
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   moonbit:
     runs-on: ubuntu-latest
@@ -43,8 +50,46 @@ jobs:
       - name: Build JavaScript target
         run: moon build --target js
 
+      - name: Build WebAssembly GC target
+        run: moon build --target wasm-gc
+
+      - name: Build native target
+        run: moon build --target native
+
       - name: Run checks
         run: moon check
 
+      - name: Run IDE semantic smoke checks
+        run: |
+          moon ide outline src/metrics/render.mbt
+          moon ide doc render_prometheus
+          moon ide peek-def render_prometheus
+          moon ide analyze > /tmp/moon-ide-analyze.txt
+          test -s /tmp/moon-ide-analyze.txt
+
       - name: Run tests
         run: moon test
+
+      - name: Run JavaScript target tests
+        run: moon test --target js
+
+      - name: Run WebAssembly GC target tests
+        run: moon test --target wasm-gc
+
+      - name: Run production examples
+        run: |
+          moon run examples/production_api
+          moon run examples/production_stack
+
+      - name: Validate example template assets
+        run: scripts/validate_template_assets.py
+
+      - name: Validate package artifact
+        run: scripts/validate_package_boundary.sh
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: moon-package
+          path: _build/publish/*.zip
+          if-no-files-found: error
