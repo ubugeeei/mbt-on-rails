@@ -1,7 +1,7 @@
 ///|
 /// Runs the demo CLI output used by `moon run cmd/main`.
 fn run_cli() -> Unit {
-  let app = @mbor.demo_blog_app()
+  let app = @demo_blog.demo_blog_app()
 
   println("mbt on rails")
   println("============")

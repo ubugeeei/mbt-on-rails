@@ -81,8 +81,11 @@ jobs:
           moon run examples/production_api
           moon run examples/production_stack
 
+      - name: Validate example template assets
+        run: scripts/validate_template_assets.py
+
       - name: Validate package artifact
-        run: moon package --list
+        run: scripts/validate_package_boundary.sh
 
       - name: Upload package artifact
         uses: actions/upload-artifact@v4

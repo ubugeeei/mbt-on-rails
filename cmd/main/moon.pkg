@@ -1,4 +1,5 @@
 import {
+  "ubugeeei/mbt_on_rails/examples/demo_blog" @demo_blog,
   "ubugeeei/mbt_on_rails" @mbor,
 }
 
