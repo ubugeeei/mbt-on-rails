@@ -90,8 +90,94 @@ fn row_matches_predicate(
           in_list_matches(schema, table_name, column, current, values)
         None => false
       }
-    Raw(_) => false
+    Raw(sql) =>
+      evaluate_raw_predicate(schema, table_name, row, sql)
   }
+}
+
+///|
+fn evaluate_raw_predicate(
+  schema : ModelSchema,
+  table_name : String,
+  row : Record,
+  sql : String,
+) -> Bool {
+  match parse_simple_raw_predicate(sql) {
+    Some((column, operator, value)) =>
+      match compare_row_value(schema, table_name, row, column, value) {
+        Some(result) =>
+          if operator == "=" {
+            result == 0
+          } else {
+            result != 0
+          }
+        None => false
+      }
+    None => false
+  }
+}
+
+///|
+fn parse_simple_raw_predicate(sql : String) -> (String, String, String)? {
+  if sql.contains("!=") {
+    return parse_simple_raw_predicate_with_operator(sql, "!=")
+  }
+  if sql.contains("<>") {
+    return parse_simple_raw_predicate_with_operator(sql, "<>")
+  }
+  if sql.contains("=") {
+    return parse_simple_raw_predicate_with_operator(sql, "=")
+  }
+  None
+}
+
+///|
+fn parse_simple_raw_predicate_with_operator(
+  sql : String,
+  operator : String,
+) -> (String, String, String)? {
+  let parts = sql.split(operator).map(fn(part) { part.to_string() }).collect()
+  if parts.length() != 2 {
+    return None
+  }
+  let column = parts[0].trim().to_string()
+  if column.length() == 0 {
+    return None
+  }
+  let raw_value = parts[1].trim().to_string()
+  if raw_value.length() == 0 {
+    return None
+  }
+  let normalized = normalize_raw_literal(raw_value)
+  Some((column, if operator == "=" { "=" } else { "!=" }, normalized))
+}
+
+///|
+fn normalize_raw_literal(value : String) -> String {
+  let trimmed = value.trim().to_string()
+  if trimmed.length() >= 2 &&
+    trimmed.has_prefix("'") &&
+    trimmed.has_suffix("'") {
+    return String::unsafe_substring(trimmed, start=1, end=trimmed.length() - 1)
+  }
+  match ascii_lowercase_literal(trimmed) {
+    "true" => "true"
+    "false" => "false"
+    _ => trimmed
+  }
+}
+
+///|
+fn ascii_lowercase_literal(source : String) -> String {
+  let builder = StringBuilder::new()
+  for ch in source {
+    if ch >= 'A' && ch <= 'Z' {
+      builder.write_char((ch.to_int() + 32).to_char())
+    } else {
+      builder.write_char(ch)
+    }
+  }
+  builder.to_string()
 }
 
 ///|

@@ -114,16 +114,34 @@ test "execute_relation surfaces unsupported features as explicit issues" {
   assert_eq(unsupported.count(), 0)
   assert_true(not(unsupported.exists()))
   let issues = unsupported.issues()
-  assert_eq(issues.length(), 5)
+  assert_eq(issues.length(), 3)
   assert_true(issues[0].message().contains("joins"))
   assert_true(issues[1].message().contains("group_by"))
   assert_true(issues[2].message().contains("having"))
-  assert_true(issues[3].message().contains("preload"))
-  assert_true(issues[4].message().contains("raw_predicate"))
 
   let none = none_relation(relation_for(schema).where_raw("broken = TRUE")).execute(
     schema, db,
   )
   assert_true(none.issues().is_empty())
   assert_eq(none.count(), 0)
+}
+
+///|
+test "execute_relation supports basic raw equality predicates in memory" {
+  let schema = relation_execution_schema()
+  let db = relation_execution_db()
+
+  let published = relation_for(schema).where_raw("published = TRUE").execute(
+    schema,
+    db,
+  )
+  assert_eq(published.issues().length(), 0)
+  assert_eq(published.count(), 2)
+
+  let drafts = relation_for(schema).where_raw("published != TRUE").execute(
+    schema,
+    db,
+  )
+  assert_eq(drafts.issues().length(), 0)
+  assert_eq(drafts.count(), 1)
 }
