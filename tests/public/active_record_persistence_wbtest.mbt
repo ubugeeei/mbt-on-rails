@@ -33,6 +33,22 @@ fn post_schema() -> ModelSchema {
 }
 
 ///|
+fn metric_schema() -> ModelSchema {
+  model(
+    name="Metric",
+    table="metrics",
+    columns=[
+      string_column("name"),
+      integer_column("views"),
+      boolean_column("published"),
+      references_column("account_id", "accounts"),
+      nullable(text_column("notes")),
+    ],
+    timestamps=false,
+  )
+}
+
+///|
 test "save_record updates matching primary keys and preserves existing fields" {
   let schema = article_schema()
   let db = insert_record(
@@ -137,6 +153,137 @@ test "save_record applies defaults and timestamp fields" {
       )
     }
     ValidationFailed(_) => assert_true(false)
+  }
+}
+
+///|
+test "save_record enforces schema-required fields and typed values" {
+  let schema = metric_schema()
+
+  match
+    save_record(
+      schema,
+      empty_memory_database(),
+      record("metrics", [
+        ("id", "1"),
+        ("published", "true"),
+        ("account_id", "7"),
+      ]),
+    ) {
+    Saved(_, _) => assert_true(false)
+    ValidationFailed(errors) => {
+      assert_true(errors.full_messages().contains("name must be present"))
+      assert_true(errors.full_messages().contains("views must be present"))
+    }
+  }
+
+  match
+    save_record(
+      schema,
+      empty_memory_database(),
+      record("metrics", [
+        ("id", "2"),
+        ("name", "Launch"),
+        ("views", "many"),
+        ("published", "sometimes"),
+        ("account_id", "team"),
+      ]),
+    ) {
+    Saved(_, _) => assert_true(false)
+    ValidationFailed(errors) => {
+      assert_true(errors.full_messages().contains("views must match Int"))
+      assert_true(errors.full_messages().contains("published must match Bool"))
+      assert_true(errors.full_messages().contains("account_id must match Int"))
+      assert_eq(errors.for_attribute("views")[0].detail("value"), Some("many"))
+    }
+  }
+}
+
+///|
+test "save_record validates schema constraints after merging update payloads" {
+  let schema = metric_schema()
+  let db = empty_memory_database().insert_record(
+    record("metrics", [
+      ("id", "1"),
+      ("name", "Launch"),
+      ("views", "10"),
+      ("published", "true"),
+      ("account_id", "7"),
+    ]),
+  )
+
+  match
+    save_record(schema, db, record("metrics", [("id", "1"), ("views", "11")])) {
+    Saved(_, saved) => {
+      assert_eq(find_entry(saved.fields, "name"), Some("Launch"))
+      assert_eq(find_entry(saved.fields, "views"), Some("11"))
+    }
+    ValidationFailed(_) => assert_true(false)
+  }
+
+  match
+    save_record(
+      schema,
+      db,
+      record("metrics", [("id", "1"), ("published", "not-a-bool")]),
+    ) {
+    Saved(_, _) => assert_true(false)
+    ValidationFailed(errors) =>
+      assert_true(errors.full_messages().contains("published must match Bool"))
+  }
+}
+
+///|
+test "save_record rejects rows whose table does not match the schema" {
+  let schema = article_schema()
+  let db = empty_memory_database().insert_record(
+    record("articles", [
+      ("id", "1"),
+      ("title", "Launch"),
+      ("slug", "launch"),
+      ("state", "draft"),
+    ]),
+  )
+
+  match
+    save_record(
+      schema,
+      empty_memory_database(),
+      record("users", [
+        ("title", "Wrong"),
+        ("slug", "wrong"),
+        ("state", "draft"),
+      ]),
+    ) {
+    Saved(_, _) => assert_true(false)
+    ValidationFailed(errors) => {
+      assert_true(
+        errors.full_messages().contains("record table must match schema table"),
+      )
+      assert_eq(
+        errors.for_attribute("base")[0].detail("expected"),
+        Some("articles"),
+      )
+      assert_eq(errors.for_attribute("base")[0].detail("actual"), Some("users"))
+    }
+  }
+
+  match
+    save_record(
+      schema,
+      db,
+      record("users", [("id", "1"), ("state", "published")]),
+    ) {
+    Saved(_, _) => assert_true(false)
+    ValidationFailed(errors) =>
+      assert_true(
+        errors.full_messages().contains("record table must match schema table"),
+      )
+  }
+  match find_record_by_primary_key(schema, db, "1") {
+    Some(current) =>
+      assert_eq(find_entry(current.fields, "state"), Some("draft"))
+    None => assert_true(false)
   }
 }
 

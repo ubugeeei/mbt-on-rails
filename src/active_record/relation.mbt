@@ -126,6 +126,9 @@ pub fn where_in(
   column : String,
   values : Array[String],
 ) -> Relation {
+  if values.is_empty() {
+    return none_relation(relation)
+  }
   let predicates = @support.clone_array(relation.predicates)
   predicates.push(InList(column, values))
   { ..relation, predicates, }
@@ -281,9 +284,9 @@ pub fn relation_to_sql(relation : Relation) -> String {
   if relation.distinct {
     sb.write_string("DISTINCT ")
   }
-  sb.write_string(relation.selects.join(", "))
+  sb.write_string(selects_to_sql(relation.selects))
   sb.write_string(" FROM ")
-  sb.write_string(relation.table)
+  sb.write_string(quote_sql_identifier_path(relation.table))
   if not(relation.joins.is_empty()) {
     sb.write_char(' ')
     sb.write_string(relation.joins.join(" "))
@@ -301,7 +304,7 @@ pub fn relation_to_sql(relation : Relation) -> String {
   }
   if not(relation.groupings.is_empty()) {
     sb.write_string(" GROUP BY ")
-    sb.write_string(relation.groupings.join(", "))
+    sb.write_string(identifier_list_to_sql(relation.groupings))
   }
   if not(relation.having_clauses.is_empty()) {
     sb.write_string(" HAVING ")
@@ -311,7 +314,7 @@ pub fn relation_to_sql(relation : Relation) -> String {
     let parts : Array[String] = []
     for order in relation.orderings {
       let suffix = if order.descending { "DESC" } else { "ASC" }
-      parts.push(order.column + " " + suffix)
+      parts.push(quote_sql_identifier_path(order.column) + " " + suffix)
     }
     sb.write_string(" ORDER BY ")
     sb.write_string(parts.join(", "))
@@ -369,20 +372,105 @@ fn merge_optional_int(left : Int?, right : Int?) -> Int? {
 }
 
 ///|
+fn selects_to_sql(selects : Array[String]) -> String {
+  let rendered : Array[String] = []
+  for select in selects {
+    rendered.push(select_to_sql(select))
+  }
+  rendered.join(", ")
+}
+
+///|
+fn select_to_sql(select : String) -> String {
+  let trimmed = select.trim().to_string()
+  match select_alias_parts(trimmed) {
+    Some((expression, alias_name)) =>
+      select_expression_to_sql(expression) +
+      " AS " +
+      quote_sql_identifier(alias_name)
+    None => select_expression_to_sql(trimmed)
+  }
+}
+
+///|
+fn select_expression_to_sql(select : String) -> String {
+  if select == "*" {
+    return "*"
+  }
+  if @support.is_numeric_literal(select) {
+    return select
+  }
+  if select_uses_raw_sql_expression(select) {
+    return select
+  }
+  quote_sql_identifier_path(select)
+}
+
+///|
+fn select_alias_parts(select : String) -> (String, String)? {
+  match select_alias_parts_with_separator(select, " AS ") {
+    Some(parts) => Some(parts)
+    None => select_alias_parts_with_separator(select, " as ")
+  }
+}
+
+///|
+fn select_alias_parts_with_separator(
+  select : String,
+  separator : String,
+) -> (String, String)? {
+  let parts = select
+    .split(separator)
+    .map(fn(part) { part.to_string() })
+    .collect()
+  if parts.length() != 2 {
+    return None
+  }
+  let expression = parts[0].trim().to_string()
+  let alias_name = parts[1].trim().to_string()
+  if expression.length() == 0 || alias_name.length() == 0 {
+    return None
+  }
+  Some((expression, alias_name))
+}
+
+///|
+fn select_uses_raw_sql_expression(select : String) -> Bool {
+  select.contains("(") || select.contains(")")
+}
+
+///|
+fn identifier_list_to_sql(identifiers : Array[String]) -> String {
+  let rendered : Array[String] = []
+  for identifier in identifiers {
+    rendered.push(quote_sql_identifier_path(identifier))
+  }
+  rendered.join(", ")
+}
+
+///|
 /// Renders one predicate as a SQL clause fragment.
 fn predicate_to_sql(predicate : Predicate) -> String {
   match predicate {
-    Eq(column, value) => column + " = " + @support.sql_literal(value)
-    NotEq(column, value) => column + " <> " + @support.sql_literal(value)
-    Like(column, value) => column + " LIKE " + @support.sql_literal(value)
-    Gt(column, value) => column + " > " + @support.sql_literal(value)
-    Lt(column, value) => column + " < " + @support.sql_literal(value)
+    Eq(column, value) =>
+      quote_sql_identifier_path(column) + " = " + @support.sql_literal(value)
+    NotEq(column, value) =>
+      quote_sql_identifier_path(column) + " <> " + @support.sql_literal(value)
+    Like(column, value) =>
+      quote_sql_identifier_path(column) + " LIKE " + @support.sql_literal(value)
+    Gt(column, value) =>
+      quote_sql_identifier_path(column) + " > " + @support.sql_literal(value)
+    Lt(column, value) =>
+      quote_sql_identifier_path(column) + " < " + @support.sql_literal(value)
     InList(column, values) => {
+      if values.is_empty() {
+        return "1=0"
+      }
       let literals : Array[String] = []
       for value in values {
         literals.push(@support.sql_literal(value))
       }
-      column + " IN (" + literals.join(", ") + ")"
+      quote_sql_identifier_path(column) + " IN (" + literals.join(", ") + ")"
     }
     Raw(sql) => sql
   }

@@ -7,10 +7,87 @@ pub fn validate_record_errors(
 ) -> ValidationErrors {
   let errors = validation_errors(model_name=schema.name)
   let mut current = errors
+    .merge(validate_record_table(schema, row))
+    .merge(validate_schema_constraints(schema, row))
   for validation in effective_validations(schema) {
     current = current.merge(validate_rule(schema, validation, row, db))
   }
   current
+}
+
+///|
+fn validate_record_table(
+  schema : ModelSchema,
+  row : Record,
+) -> ValidationErrors {
+  if row.table == schema.table {
+    return validation_errors(model_name=schema.name)
+  }
+  validation_errors(model_name=schema.name).add(
+    validation_error(
+      attribute="base",
+      kind=InvalidFormat("table"),
+      message="record table must match schema table",
+      details=[("expected", schema.table), ("actual", row.table)],
+    ),
+  )
+}
+
+///|
+fn validate_schema_constraints(
+  schema : ModelSchema,
+  row : Record,
+) -> ValidationErrors {
+  let mut errors = validation_errors(model_name=schema.name)
+  for column in schema.columns {
+    if not(column.nullable) &&
+      @support.find_entry(row.fields, column.name) is None {
+      errors = errors.add(
+        validation_error(
+          attribute=column.name,
+          kind=Blank,
+          message="must be present",
+          details=[("required", "true")],
+        ),
+      )
+    }
+  }
+  for field in row.fields {
+    match find_column(schema, field.0) {
+      Some(column) =>
+        match cast_record(schema, record(row.table, [field])) {
+          CastedRecord(_) => ()
+          CastRecordFailed(cast_errors) =>
+            for cast_error in cast_errors {
+              errors = errors.add(schema_cast_error_to_validation(cast_error))
+            }
+        }
+      None => ()
+    }
+  }
+  errors
+}
+
+///|
+fn schema_cast_error_to_validation(
+  error : AttributeCastError,
+) -> ValidationError {
+  validation_error(
+    attribute=error.attribute,
+    kind=InvalidFormat(error.expected_type),
+    message="must match " + error.expected_type,
+    details=[
+      ("expected_type", error.expected_type),
+      (
+        "value",
+        match error.value {
+          Some(value) => value
+          None => "<missing>"
+        },
+      ),
+      ("detail", error.detail),
+    ],
+  )
 }
 
 ///|
@@ -99,7 +176,7 @@ fn matching_unique_conflicts(
   value : String,
 ) -> Array[Record] {
   let conflicts : Array[Record] = []
-  for current in find_records(db, row.table, attribute, value) {
+  for current in find_records(db, schema.table, attribute, value) {
     if not(same_primary_key(schema, current, row)) {
       conflicts.push(current)
     }
