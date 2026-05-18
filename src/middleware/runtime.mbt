@@ -4,20 +4,32 @@ pub fn apply_request_middleware(
   middlewares : Array[Middleware],
   request : @http.Request,
 ) -> (@http.Request, @http.Response?) {
+  let applied = apply_request_middleware_with_reached(middlewares, request)
+  (applied.0, applied.1)
+}
+
+///|
+/// Applies request middleware and returns the layers reached before a halt.
+pub fn apply_request_middleware_with_reached(
+  middlewares : Array[Middleware],
+  request : @http.Request,
+) -> (@http.Request, @http.Response?, Array[Middleware]) {
   let mut current = request
+  let reached : Array[Middleware] = []
   for layer in middlewares {
     if !middleware_matches(layer, current) {
       continue
     }
+    reached.push(layer)
     for header in layer.request_headers {
       current = @http.append_request_header(current, header.0, header.1)
     }
     match layer.halt_response {
-      Some(response) => return (current, Some(response))
+      Some(response) => return (current, Some(response), reached)
       None => ()
     }
   }
-  (current, None)
+  (current, None, reached)
 }
 
 ///|
@@ -32,6 +44,21 @@ pub fn apply_response_middleware(
     if !middleware_matches(layer, request) {
       continue
     }
+    for header in layer.response_headers {
+      headers.push(header)
+    }
+  }
+  @http.append_response_headers(response, headers)
+}
+
+///|
+/// Applies response middleware from layers already reached by request handling.
+pub fn apply_reached_response_middleware(
+  reached_middlewares : Array[Middleware],
+  response : @http.Response,
+) -> @http.Response {
+  let headers : Array[(String, String)] = []
+  for layer in reached_middlewares {
     for header in layer.response_headers {
       headers.push(header)
     }
@@ -70,8 +97,17 @@ fn middleware_matches(layer : Middleware, request : @http.Request) -> Bool {
   let method_match = layer.methods.is_empty() ||
     layer.methods.contains(request.verb)
   let path_match = match layer.path_prefix {
-    Some(prefix) => request.path.has_prefix(@support.normalize_path(prefix))
+    Some(prefix) => path_prefix_matches(request.path, prefix)
     None => true
   }
   method_match && path_match
+}
+
+///|
+fn path_prefix_matches(path : String, prefix : String) -> Bool {
+  let normalized_path = @support.normalize_path(path)
+  let normalized_prefix = @support.normalize_path(prefix)
+  normalized_prefix == "/" ||
+  normalized_path == normalized_prefix ||
+  normalized_path.has_prefix(normalized_prefix + "/")
 }

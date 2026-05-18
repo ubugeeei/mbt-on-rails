@@ -146,6 +146,36 @@ test "response builders preserve status content types and body rendering" {
 }
 
 ///|
+test "response headers and redirect locations reject response splitting" {
+  let injected = append_response_headers(ok_text("ok"), [
+    ("x-safe\r\nset-cookie: forged", "one\r\nlocation: //evil.test"),
+    ("x-space key", "two\nx-forged: yes"),
+  ])
+  assert_eq(injected.headers[1].0, "x-safe")
+  assert_eq(injected.headers[1].1, "one")
+  assert_eq(injected.headers[2].0, "x-space_key")
+  assert_eq(injected.headers[2].1, "two")
+  for header in injected.headers {
+    assert_false(header.0.contains("\r"))
+    assert_false(header.0.contains("\n"))
+    assert_false(header.0.contains("set-cookie: forged"))
+    assert_false(header.1.contains("\r"))
+    assert_false(header.1.contains("\n"))
+    assert_false(header.1.contains("location: //evil.test"))
+  }
+
+  let redirected = redirect_response("/posts\r\nset-cookie: forged=1")
+  assert_true(redirected.headers.contains(("location", "/posts")))
+  assert_eq(render_response_body(redirected.body), "Redirecting to /posts")
+
+  let created = created_json(
+    "{\"id\":42}",
+    location=Some("/posts/42\r\nx-forged: yes"),
+  )
+  assert_true(created.headers.contains(("location", "/posts/42")))
+}
+
+///|
 test "request helpers decode cookies csrf tokens and session stores" {
   let config = default_auth_config()
   let session = issue_session("42", "browser")

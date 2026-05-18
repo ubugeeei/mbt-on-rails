@@ -6,7 +6,11 @@ import {
 }
 
 // Values
+pub fn apply_reached_response_middleware(Array[Middleware], @http.Response) -> @http.Response
+
 pub fn apply_request_middleware(Array[Middleware], @http.Request) -> (@http.Request, @http.Response?)
+
+pub fn apply_request_middleware_with_reached(Array[Middleware], @http.Request) -> (@http.Request, @http.Response?, Array[Middleware])
 
 pub fn apply_response_middleware(Array[Middleware], @http.Request, @http.Response) -> @http.Response
 
