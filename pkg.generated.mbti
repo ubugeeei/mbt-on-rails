@@ -630,6 +630,28 @@ pub fn middleware(String, String?, Array[@http.HttpMethod], Array[(String, Strin
 
 pub fn middleware_summary(Array[@middleware.Middleware]) -> String
 
+pub fn nosniff_middleware() -> @middleware.Middleware
+
+pub fn frame_options_deny() -> @middleware.FrameOptionsMode
+
+pub fn frame_options_middleware(@middleware.FrameOptionsMode) -> @middleware.Middleware
+
+pub fn frame_options_same_origin() -> @middleware.FrameOptionsMode
+
+pub fn hsts_middleware(Int, Bool, Bool) -> @middleware.Middleware
+
+pub fn referrer_policy_middleware(String) -> @middleware.Middleware
+
+pub fn content_security_policy_middleware(@middleware.ContentSecurityPolicy) -> @middleware.Middleware
+
+pub fn content_security_policy_value(@middleware.ContentSecurityPolicy) -> String
+
+pub fn strict_content_security_policy() -> @middleware.ContentSecurityPolicy
+
+pub fn cors_middleware(@middleware.CorsConfig) -> Array[@middleware.Middleware]
+
+pub fn default_security_headers_bundle() -> Array[@middleware.Middleware]
+
 pub fn migration(String, String, Array[@migration.MigrationStep]) -> @migration.Migration
 
 pub fn migration_down_sql(@migration.Migration) -> Array[String]

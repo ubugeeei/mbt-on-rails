@@ -398,12 +398,26 @@ pub using @cable {
 
 ///|
 pub using @middleware {
+  type ContentSecurityPolicy,
+  type CorsConfig,
+  type FrameOptionsMode,
   type Middleware,
   apply_request_middleware,
   apply_response_middleware,
+  content_security_policy_middleware,
+  content_security_policy_value,
+  cors_middleware,
+  default_security_headers_bundle,
+  frame_options_deny,
+  frame_options_middleware,
+  frame_options_same_origin,
   halt_with_text,
+  hsts_middleware,
   middleware,
   middleware_summary,
+  nosniff_middleware,
+  referrer_policy_middleware,
+  strict_content_security_policy,
   with_request_header,
   with_response_header,
 }
