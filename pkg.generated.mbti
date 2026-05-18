@@ -210,6 +210,26 @@ pub fn cache_write(@cache.CacheStore, String, String, String?, String?, Array[St
 
 pub fn cache_write_with_notifications(store~ : @cache.CacheStore, key~ : String, value~ : String, version~ : String?, expires_at~ : String?, tags~ : Array[String], notifications~ : @support.Notifications) -> (@cache.CacheStore, @support.Notifications)
 
+pub fn cache_adapter(String, (String) -> @cache.CacheReadOutcome, (String, String, String?) -> @cache.CacheWriteOutcome, (String) -> @cache.CacheWriteOutcome, (String) -> @cache.CacheWriteOutcome, () -> @cache.CacheWriteOutcome) -> @cache.CacheAdapter
+
+pub fn cache_adapter_close(@cache.CacheAdapter) -> @cache.CacheWriteOutcome
+
+pub fn cache_adapter_delete(@cache.CacheAdapter, String) -> @cache.CacheWriteOutcome
+
+pub fn cache_adapter_delete_tag(@cache.CacheAdapter, String) -> @cache.CacheWriteOutcome
+
+pub fn cache_adapter_error_message(@cache.CacheAdapterError) -> String
+
+pub fn cache_adapter_read(@cache.CacheAdapter, String) -> @cache.CacheReadOutcome
+
+pub fn cache_adapter_summary(@cache.CacheAdapter) -> String
+
+pub fn cache_adapter_write(@cache.CacheAdapter, String, String, String?) -> @cache.CacheWriteOutcome
+
+pub fn memory_cache_adapter(Array[@cache.CacheStore]) -> @cache.CacheAdapter
+
+pub fn null_cache_adapter() -> @cache.CacheAdapter
+
 pub fn cast_record(@active_record.ModelSchema, @active_record.Record) -> @active_record.CastRecordOutcome
 
 pub fn change_default_step(String, String, String?, String?) -> @migration.MigrationStep

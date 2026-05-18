@@ -588,9 +588,21 @@ pub using @mailer {
 
 ///|
 pub using @cache {
+  type CacheAdapter,
+  type CacheAdapterError,
   type CacheEntry,
   type CacheFetchResult,
+  type CacheReadOutcome,
   type CacheStore,
+  type CacheWriteOutcome,
+  cache_adapter,
+  cache_adapter_close,
+  cache_adapter_delete,
+  cache_adapter_delete_tag,
+  cache_adapter_error_message,
+  cache_adapter_read,
+  cache_adapter_summary,
+  cache_adapter_write,
   cache_delete,
   cache_delete_tag_with_notifications,
   cache_delete_with_notifications,
@@ -604,6 +616,8 @@ pub using @cache {
   cache_summary,
   cache_write,
   cache_write_with_notifications,
+  memory_cache_adapter,
+  null_cache_adapter,
 }
 
 ///|
