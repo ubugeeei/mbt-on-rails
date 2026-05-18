@@ -16,9 +16,19 @@ pub fn constant_time_eq(String, String) -> Bool
 
 pub fn entries_to_json(Array[(String, String)]) -> String
 
+pub fn escape_css_value(String) -> String
+
 pub fn escape_html(String) -> String
 
+pub fn escape_html_attribute(String) -> String
+
+pub fn escape_html_text(String) -> String
+
+pub fn escape_js_string(String) -> String
+
 pub fn escape_sql_string(String) -> String
+
+pub fn escape_url_component(String) -> String
 
 pub fn find_entry(Array[(String, String)], String) -> String?
 
