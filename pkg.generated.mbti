@@ -33,6 +33,20 @@ pub fn action(String, Array[@controller.ActionStep], String?, Bool, Array[String
 
 pub fn action_plan(String) -> @controller.ActionDefinition
 
+pub fn adapter_begin(@active_record.DatabaseAdapter) -> @active_record.TransactionBeginOutcome
+
+pub fn adapter_close(@active_record.DatabaseAdapter) -> @active_record.TransactionCloseOutcome
+
+pub fn adapter_commit(@active_record.DatabaseAdapter, @active_record.TxHandle) -> @active_record.TransactionCloseOutcome
+
+pub fn adapter_error_message(@active_record.AdapterError) -> String
+
+pub fn adapter_execute(@active_record.DatabaseAdapter, String, Array[@active_record.RelationBind]) -> @active_record.QueryOutcome
+
+pub fn adapter_rollback(@active_record.DatabaseAdapter, @active_record.TxHandle) -> @active_record.TransactionCloseOutcome
+
+pub fn adapter_summary(@active_record.DatabaseAdapter) -> String
+
 pub fn add_check_constraint_step(String, String, String, validate? : Bool) -> @migration.MigrationStep
 
 pub fn add_column_step(String, @active_record.Column) -> @migration.MigrationStep
@@ -50,26 +64,6 @@ pub fn add_reference_step(table_name~ : String, column_name~ : String, target_ta
 
 pub fn add_timestamps_step(String, nullable? : Bool) -> @migration.MigrationStep
 
-pub fn adapter_begin(@active_record.DatabaseAdapter) -> @active_record.TransactionBeginOutcome
-
-pub fn adapter_close(@active_record.DatabaseAdapter) -> @active_record.TransactionCloseOutcome
-
-pub fn adapter_commit(@active_record.DatabaseAdapter, @active_record.TxHandle) -> @active_record.TransactionCloseOutcome
-
-pub fn adapter_error_message(@active_record.AdapterError) -> String
-
-pub fn adapter_execute(@active_record.DatabaseAdapter, String, Array[@active_record.RelationBind]) -> @active_record.QueryOutcome
-
-pub fn adapter_rollback(@active_record.DatabaseAdapter, @active_record.TxHandle) -> @active_record.TransactionCloseOutcome
-
-pub fn adapter_summary(@active_record.DatabaseAdapter) -> String
-
-pub fn database_adapter(String, (String, Array[@active_record.RelationBind]) -> @active_record.QueryOutcome, () -> @active_record.TransactionBeginOutcome, (@active_record.TxHandle) -> @active_record.TransactionCloseOutcome, (@active_record.TxHandle) -> @active_record.TransactionCloseOutcome, () -> @active_record.TransactionCloseOutcome) -> @active_record.DatabaseAdapter
-
-pub fn null_database_adapter() -> @active_record.DatabaseAdapter
-
-pub fn query_result(Array[String], Array[@active_record.Record], Int, last_insert_id? : String?) -> @active_record.QueryResult
-
 pub fn after_action(String?, String) -> @controller.AfterAction
 
 pub fn after_create(String) -> @active_record.Callback
@@ -81,14 +75,6 @@ pub fn after_each() -> @controller.AfterAction
 pub fn after_only(String) -> @controller.AfterAction
 
 pub fn after_save(String) -> @active_record.Callback
-
-pub fn bind_bool(Bool) -> @active_record.RelationBind
-
-pub fn bind_int(Int64) -> @active_record.RelationBind
-
-pub fn bind_null() -> @active_record.RelationBind
-
-pub fn bind_text(String) -> @active_record.RelationBind
 
 pub fn all_http_methods() -> Array[@http.HttpMethod]
 
@@ -168,6 +154,14 @@ pub fn begin_transaction(@active_record.MemoryDatabase) -> @active_record.Memory
 #label_migration(name, allow_positional=true)
 #label_migration(target, allow_positional=true)
 pub fn belongs_to(name~ : String, target~ : String, foreign_key~ : String) -> @active_record.Association
+
+pub fn bind_bool(Bool) -> @active_record.RelationBind
+
+pub fn bind_int(Int64) -> @active_record.RelationBind
+
+pub fn bind_null() -> @active_record.RelationBind
+
+pub fn bind_text(String) -> @active_record.RelationBind
 
 pub fn boolean_column(String) -> @active_record.Column
 
@@ -256,6 +250,10 @@ pub fn constant_time_eq(String, String) -> Bool
 #label_migration(pattern, allow_positional=true)
 pub fn contains(pattern~ : String) -> @validation.FieldRule
 
+pub fn content_security_policy_middleware(@middleware.ContentSecurityPolicy) -> @middleware.Middleware
+
+pub fn content_security_policy_value(@middleware.ContentSecurityPolicy) -> String
+
 pub fn content_tag(name~ : String, content~ : String, attrs? : Array[(String, String)], escape? : Bool) -> String
 
 pub fn controller(String, String?, String, Array[@controller.BeforeAction], Array[@controller.AfterAction], Array[@controller.AroundAction], Array[@controller.ActionDefinition]) -> @controller.ControllerDefinition
@@ -277,6 +275,10 @@ pub fn cookie_same_site_strict() -> @auth.CookieSameSite
 #label_migration(key, allow_positional=true)
 pub fn cookie_session_store(key~ : String, expire_after_seconds? : Int?, secure? : Bool, http_only? : Bool, same_site? : @auth.CookieSameSite, signed? : Bool, path? : String, domain? : String?, renew? : Bool, signing_secret? : String?) -> @auth.SessionStore
 
+pub fn cors_config(String, Array[@http.HttpMethod], Array[String], Bool, Int) -> @middleware.CorsConfig
+
+pub fn cors_middleware(@middleware.CorsConfig) -> Array[@middleware.Middleware]
+
 pub fn count_sql(@active_record.Relation) -> String
 
 pub fn counter(String, Array[(String, String)], Int) -> @metrics.MetricSample
@@ -291,6 +293,8 @@ pub fn created_json(String, location? : String?) -> @http.Response
 
 pub fn csrf_valid(@auth.Session?, String?) -> Bool
 
+pub fn database_adapter(String, (String, Array[@active_record.RelationBind]) -> @active_record.QueryOutcome, () -> @active_record.TransactionBeginOutcome, (@active_record.TxHandle) -> @active_record.TransactionCloseOutcome, (@active_record.TxHandle) -> @active_record.TransactionCloseOutcome, () -> @active_record.TransactionCloseOutcome) -> @active_record.DatabaseAdapter
+
 pub fn default_assets() -> @view.AssetManifest
 
 pub fn default_auth_config() -> @auth.AuthConfig
@@ -300,6 +304,8 @@ pub fn default_development_config() -> @production.DeploymentConfig
 pub fn default_production_config() -> @production.DeploymentConfig
 
 pub fn default_resource_options(String, String?) -> @http.ResourceOptions
+
+pub fn default_security_headers_bundle() -> Array[@middleware.Middleware]
 
 pub fn default_staging_config() -> @production.DeploymentConfig
 
@@ -451,6 +457,12 @@ pub fn form_builder(name~ : String, binding~ : @view.FormBinding, fields~ : Arra
 #label_migration(name, allow_positional=true)
 pub fn form_field(name~ : String, field_kind~ : @view.FormFieldKind, label~ : String, required? : Bool, placeholder? : String?, value? : String?, autocomplete? : String?, help_text? : String?) -> @view.FormField
 
+pub fn frame_options_deny() -> @middleware.FrameOptionsMode
+
+pub fn frame_options_middleware(@middleware.FrameOptionsMode) -> @middleware.Middleware
+
+pub fn frame_options_same_origin() -> @middleware.FrameOptionsMode
+
 pub fn gauge(String, Array[(String, String)], Int) -> @metrics.MetricSample
 
 pub fn group_by(@active_record.Relation, Array[String]) -> @active_record.Relation
@@ -482,12 +494,6 @@ pub fn has_one(name~ : String, target~ : String, foreign_key~ : String) -> @acti
 
 pub fn hash_string(String) -> String
 
-pub fn hex_encode_bytes(Array[UInt]) -> String
-
-pub fn hmac_sha256_bytes(Array[UInt], Array[UInt]) -> Array[UInt]
-
-pub fn hmac_sha256_hex(String, String) -> String
-
 pub fn having_raw(@active_record.Relation, String) -> @active_record.Relation
 
 pub fn having_with_binds(@active_record.Relation, String, Array[@active_record.RelationBind]) -> @active_record.Relation
@@ -499,7 +505,15 @@ pub fn health_check(name~ : String, ok~ : Bool, detail~ : String) -> @production
 
 pub fn health_response(Array[@production.HealthCheck]) -> @http.Response
 
+pub fn hex_encode_bytes(Array[UInt]) -> String
+
 pub fn hidden_field(name~ : String, label~ : String, value? : String?) -> @view.FormField
+
+pub fn hmac_sha256_bytes(Array[UInt], Array[UInt]) -> Array[UInt]
+
+pub fn hmac_sha256_hex(String, String) -> String
+
+pub fn hsts_middleware(Int, Bool, Bool) -> @middleware.Middleware
 
 pub fn html_format() -> @controller.ResponseFormat
 
@@ -666,30 +680,6 @@ pub fn middleware(String, String?, Array[@http.HttpMethod], Array[(String, Strin
 
 pub fn middleware_summary(Array[@middleware.Middleware]) -> String
 
-pub fn nosniff_middleware() -> @middleware.Middleware
-
-pub fn frame_options_deny() -> @middleware.FrameOptionsMode
-
-pub fn frame_options_middleware(@middleware.FrameOptionsMode) -> @middleware.Middleware
-
-pub fn frame_options_same_origin() -> @middleware.FrameOptionsMode
-
-pub fn hsts_middleware(Int, Bool, Bool) -> @middleware.Middleware
-
-pub fn referrer_policy_middleware(String) -> @middleware.Middleware
-
-pub fn content_security_policy_middleware(@middleware.ContentSecurityPolicy) -> @middleware.Middleware
-
-pub fn content_security_policy_value(@middleware.ContentSecurityPolicy) -> String
-
-pub fn cors_config(String, Array[@http.HttpMethod], Array[String], Bool, Int) -> @middleware.CorsConfig
-
-pub fn strict_content_security_policy() -> @middleware.ContentSecurityPolicy
-
-pub fn cors_middleware(@middleware.CorsConfig) -> Array[@middleware.Middleware]
-
-pub fn default_security_headers_bundle() -> Array[@middleware.Middleware]
-
 pub fn migration(String, String, Array[@migration.MigrationStep]) -> @migration.Migration
 
 pub fn migration_down_sql(@migration.Migration) -> Array[String]
@@ -730,11 +720,15 @@ pub fn none_relation(@active_record.Relation) -> @active_record.Relation
 
 pub fn normalize_path(String) -> String
 
+pub fn nosniff_middleware() -> @middleware.Middleware
+
 pub fn not_found_response() -> @http.Response
 
 pub fn notification_event(name~ : String, payload~ : Array[(String, String)]) -> @support.NotificationEvent
 
 pub fn notifications() -> @support.Notifications
+
+pub fn null_database_adapter() -> @active_record.DatabaseAdapter
 
 pub fn nullable(@active_record.Column) -> @active_record.Column
 
@@ -825,6 +819,8 @@ pub fn props_to_json(Array[(String, String)]) -> String
 
 pub fn protect_from_forgery(@auth.Session?, String?, @auth.RequestForgeryStrategy) -> @auth.RequestForgeryOutcome
 
+pub fn query_result(Array[String], Array[@active_record.Record], Int, last_insert_id? : String?) -> @active_record.QueryResult
+
 pub fn rate_limit_rule(String, String, Int, Int) -> @production.RateLimitRule
 
 pub fn rate_limit_rule_valid(@production.RateLimitRule) -> Bool
@@ -851,6 +847,8 @@ pub fn redirect_to_step(String) -> @controller.ActionStep
 pub fn redis_session_store(key~ : String, expire_after_seconds? : Int?, secure? : Bool, http_only? : Bool, same_site? : @auth.CookieSameSite, path? : String, domain? : String?, renew? : Bool) -> @auth.SessionStore
 
 pub fn references_column(String, String) -> @active_record.Column
+
+pub fn referrer_policy_middleware(String) -> @middleware.Middleware
 
 pub fn relation_execution_issue(String, String) -> @active_record.RelationExecutionIssue
 
@@ -949,13 +947,13 @@ pub fn request_header(@http.Request, String) -> String?
 
 pub fn request_session_id(@http.Request, @auth.SessionStore) -> String?
 
-pub fn resolve_request_id(@http.Request, String, String) -> String
-
 pub fn require_auth(@auth.AuthRequirement) -> @controller.ActionStep
 
 pub fn require_scope(@params.Parameters, String) -> @params.Parameters?
 
 pub fn required() -> @validation.FieldRule
+
+pub fn resolve_request_id(@http.Request, String, String) -> String
 
 pub fn resources(String, String, @http.ResourceOptions) -> Array[@http.RouteSpec]
 
@@ -990,6 +988,8 @@ pub fn rollback_transaction(@active_record.MemoryTransaction) -> @active_record.
 #label_migration(verb, allow_positional=true)
 pub fn route(name~ : String, verb~ : @http.HttpMethod, path~ : String, controller~ : String, action~ : String, page_name~ : String?) -> @http.RouteSpec
 
+pub fn run_record_callbacks(Array[(@active_record.Record) -> @active_record.CallbackOutcome], @active_record.Record) -> @active_record.CallbackOutcome
+
 pub fn safe_join(Array[String], separator? : String) -> String
 
 #label_migration(other_field, allow_positional=true)
@@ -998,8 +998,6 @@ pub fn same_as(other_field~ : String) -> @validation.FieldRule
 pub fn save_record(@active_record.ModelSchema, @active_record.MemoryDatabase, @active_record.Record) -> @active_record.SaveOutcome
 
 pub fn save_record_with_callbacks(@active_record.ModelSchema, @active_record.MemoryDatabase, @active_record.Record, Array[(@active_record.Record) -> @active_record.CallbackOutcome], Array[(@active_record.Record) -> @active_record.CallbackOutcome]) -> @active_record.SaveWithCallbacksOutcome
-
-pub fn run_record_callbacks(Array[(@active_record.Record) -> @active_record.CallbackOutcome], @active_record.Record) -> @active_record.CallbackOutcome
 
 pub fn scaffold_field(String, @active_record.Column) -> @generator.ScaffoldField
 
@@ -1012,10 +1010,6 @@ pub fn scheduler_process(String, String, Array[String]) -> @process.ProcessDefin
 pub fn schema_dump(Array[@active_record.ModelSchema]) -> String
 
 pub fn schema_sql(Array[@migration.Migration]) -> Array[String]
-
-pub fn sha256_bytes(Array[UInt]) -> Array[UInt]
-
-pub fn sha256_hex(String) -> String
 
 #label_migration(name, allow_positional=true)
 #label_migration(relation, allow_positional=true)
@@ -1093,6 +1087,10 @@ pub fn session_store_summary(@auth.SessionStore) -> String
 
 pub fn set_metric(@metrics.MetricsRegistry, String, Array[(String, String)], Int) -> @metrics.MetricsRegistry
 
+pub fn sha256_bytes(Array[UInt]) -> Array[UInt]
+
+pub fn sha256_hex(String) -> String
+
 pub fn show_style(Bool, String) -> String
 
 pub fn sign_cookie_value(String, String, String) -> String
@@ -1114,14 +1112,14 @@ pub fn solid_queue_adapter(queue_prefix? : String?) -> @job.JobAdapter
 
 pub fn split_path(String) -> Array[String]
 
+pub fn strict_content_security_policy() -> @middleware.ContentSecurityPolicy
+
 pub fn string_column(String) -> @active_record.Column
 
 #label_migration(name, allow_positional=true)
 pub fn string_field(name~ : String) -> @validation.FieldSchema
 
 pub fn substitute_relation_binds(String, Array[@active_record.RelationBind]) -> String
-
-pub fn tx_handle(String, String) -> @active_record.TxHandle
 
 pub fn suspense_boundary(name~ : String, fallback_html~ : String, children~ : Array[@view.VaporNode]) -> @view.VaporNode
 
@@ -1158,6 +1156,8 @@ pub fn turbo_stream(@turbo.TurboStreamAction, String, String) -> @turbo.TurboStr
 
 pub fn turbo_stream_format() -> @controller.ResponseFormat
 
+pub fn tx_handle(String, String) -> @active_record.TxHandle
+
 pub fn typed_field(String, @active_record.AttributeValue) -> @active_record.TypedField
 
 pub fn typed_record(String, Array[@active_record.TypedField]) -> @active_record.TypedRecord
@@ -1168,13 +1168,13 @@ pub fn unauthorized_response(message? : String) -> @http.Response
 
 pub fn unique(@active_record.Column) -> @active_record.Column
 
+pub fn unprocessable_entity_response(message? : String) -> @http.Response
+
 pub fn unsafe_having_raw(@active_record.Relation, String) -> @active_record.Relation
 
 pub fn unsafe_join_relation(@active_record.Relation, String) -> @active_record.Relation
 
 pub fn unsafe_where_raw(@active_record.Relation, String) -> @active_record.Relation
-
-pub fn unprocessable_entity_response(message? : String) -> @http.Response
 
 pub fn update_sql(@active_record.ModelSchema, @active_record.Record, String) -> String
 
@@ -1356,6 +1356,8 @@ pub using @controller {type ActionDefinition}
 
 pub using @controller {type ActionStep}
 
+pub using @active_record {type AdapterError}
+
 pub using @controller {type AfterAction}
 
 pub using @controller {type AroundAction}
@@ -1392,6 +1394,8 @@ pub using @cache {type CacheStore}
 
 pub using @active_record {type Callback}
 
+pub using @active_record {type CallbackOutcome}
+
 pub using @active_record {type CastRecordOutcome}
 
 pub using @active_record {type Column}
@@ -1400,13 +1404,21 @@ pub using @active_record {type ColumnType}
 
 pub using @view {type ComponentContract}
 
+pub using @middleware {type ContentSecurityPolicy}
+
 pub using @controller {type ControllerDefinition}
 
 pub using @auth {type CookieSameSite}
 
+pub using @middleware {type CorsConfig}
+
+pub using @active_record {type DatabaseAdapter}
+
 pub using @production {type DeploymentConfig}
 
 pub using @active_record {type DestroyOutcome}
+
+pub using @active_record {type DestroyWithCallbacksOutcome}
 
 pub using @active_record {type DirtyFieldChange}
 
@@ -1441,6 +1453,8 @@ pub using @view {type FormBuilder}
 pub using @view {type FormField}
 
 pub using @view {type FormFieldKind}
+
+pub using @middleware {type FrameOptionsMode}
 
 pub using @generator {type GeneratedArtifact}
 
@@ -1536,11 +1550,17 @@ pub using @process {type ProcessRole}
 
 pub using @view {type PropContract}
 
+pub using @active_record {type QueryOutcome}
+
+pub using @active_record {type QueryResult}
+
 pub using @production {type RateLimitRule}
 
 pub using @active_record {type Record}
 
 pub using @active_record {type Relation}
+
+pub using @active_record {type RelationBind}
 
 pub using @active_record {type RelationExecutionIssue}
 
@@ -1576,6 +1596,8 @@ pub using @validation {type RuleKind}
 
 pub using @active_record {type SaveOutcome}
 
+pub using @active_record {type SaveWithCallbacksOutcome}
+
 pub using @generator {type ScaffoldField}
 
 pub using @generator {type ScaffoldPlan}
@@ -1610,6 +1632,10 @@ pub using @view {type TemplateRef}
 
 pub using @view {type TemplateRefContract}
 
+pub using @active_record {type TransactionBeginOutcome}
+
+pub using @active_record {type TransactionCloseOutcome}
+
 pub using @active_record {type TransactionSaveOutcome}
 
 pub using @active_record {type TransactionSavepoint}
@@ -1617,6 +1643,8 @@ pub using @active_record {type TransactionSavepoint}
 pub using @turbo {type TurboStream}
 
 pub using @turbo {type TurboStreamAction}
+
+pub using @active_record {type TxHandle}
 
 pub using @active_record {type TypedField}
 

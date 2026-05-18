@@ -13,9 +13,7 @@ test "sha256_hex matches FIPS 180-4 known-answer test vectors" {
   // SHA-256("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq") =
   //   248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1
   assert_eq(
-    sha256_hex(
-      "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
-    ),
+    sha256_hex("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"),
     "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1",
   )
 }
@@ -89,7 +87,7 @@ test "sign_cookie_value now produces an HMAC-SHA-256 tag" {
   }
   // The tag portion is 64 lowercase hex characters.
   let parts_index = signed.length() - 64
-  let tag = signed.substring(start=parts_index, end=signed.length())
+  let tag = signed[parts_index:].to_string()
   assert_eq(tag.length(), 64)
   for ch in tag {
     let allowed = (ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f')

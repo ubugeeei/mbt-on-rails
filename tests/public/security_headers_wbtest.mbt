@@ -53,10 +53,11 @@ test "hsts_middleware composes a Strict-Transport-Security value" {
     ok_text("ok"),
   )
   assert_true(
-    response.headers.contains((
-      "strict-transport-security",
-      "max-age=63072000; includeSubDomains; preload",
-    )),
+    response.headers.contains(
+      (
+        "strict-transport-security", "max-age=63072000; includeSubDomains; preload",
+      ),
+    ),
   )
   let minimal = apply_response_middleware(
     [hsts_middleware(3600, false, false)],
@@ -84,9 +85,9 @@ test "referrer_policy_middleware emits the configured policy" {
     ok_text("ok"),
   )
   assert_true(
-    response.headers.contains((
-      "referrer-policy", "strict-origin-when-cross-origin",
-    )),
+    response.headers.contains(
+      ("referrer-policy", "strict-origin-when-cross-origin"),
+    ),
   )
 }
 
@@ -97,17 +98,18 @@ test "content_security_policy_value renders only configured directives" {
   assert_true(value.contains("default-src 'self'"))
   assert_true(value.contains("frame-ancestors 'none'"))
   assert_true(value.contains("object-src 'none'"))
+  let empty : Array[String] = []
   let minimal : ContentSecurityPolicy = {
     default_src: ["'self'"],
-    script_src: [],
-    style_src: [],
-    img_src: [],
-    connect_src: [],
-    font_src: [],
-    frame_ancestors: [],
-    object_src: [],
-    base_uri: [],
-    form_action: [],
+    script_src: empty,
+    style_src: empty,
+    img_src: empty,
+    connect_src: empty,
+    font_src: empty,
+    frame_ancestors: empty,
+    object_src: empty,
+    base_uri: empty,
+    form_action: empty,
   }
   assert_eq(content_security_policy_value(minimal), "default-src 'self'")
 }
@@ -135,17 +137,17 @@ test "cors_middleware halts preflight requests and tags every other response" {
     Some(response) => {
       assert_eq(response.status, 204)
       assert_true(
-        response.headers.contains((
-          "access-control-allow-origin", "https://app.example.com",
-        )),
+        response.headers.contains(
+          ("access-control-allow-origin", "https://app.example.com"),
+        ),
       )
       assert_true(
         response.headers.contains(("access-control-allow-methods", "GET, POST")),
       )
       assert_true(
-        response.headers.contains((
-          "access-control-allow-headers", "content-type, x-csrf-token",
-        )),
+        response.headers.contains(
+          ("access-control-allow-headers", "content-type, x-csrf-token"),
+        ),
       )
       assert_true(
         response.headers.contains(("access-control-allow-credentials", "true")),
@@ -164,9 +166,9 @@ test "cors_middleware halts preflight requests and tags every other response" {
   )
   let response = apply_response_middleware(layers, normal, ok_text("ok"))
   assert_true(
-    response.headers.contains((
-      "access-control-allow-origin", "https://app.example.com",
-    )),
+    response.headers.contains(
+      ("access-control-allow-origin", "https://app.example.com"),
+    ),
   )
   assert_true(
     response.headers.contains(("access-control-allow-credentials", "true")),

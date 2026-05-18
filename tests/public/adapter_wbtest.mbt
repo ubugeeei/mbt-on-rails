@@ -5,7 +5,10 @@ test "null_database_adapter reports connection_failed for every call" {
   match adapter_execute(adapter, "SELECT 1", []) {
     QuerySucceeded(_) => assert_true(false)
     QueryFailed(error) =>
-      assert_eq(adapter_error_message(error), "connection_failed: null adapter is offline")
+      assert_eq(
+        adapter_error_message(error),
+        "connection_failed: null adapter is offline",
+      )
   }
   match adapter_begin(adapter) {
     TransactionStarted(_) => assert_true(false)
@@ -25,16 +28,18 @@ test "adapter_commit and adapter_rollback reject handles from another adapter" {
     TransactionClosed => assert_true(false)
     TransactionCloseFailed(error) =>
       assert_true(
-        adapter_error_message(error)
-          .has_prefix("other: transaction handle from elsewhere"),
+        adapter_error_message(error).has_prefix(
+          "other: transaction handle from elsewhere",
+        ),
       )
   }
   match adapter_rollback(adapter, foreign) {
     TransactionClosed => assert_true(false)
     TransactionCloseFailed(error) =>
       assert_true(
-        adapter_error_message(error)
-          .has_prefix("other: transaction handle from elsewhere"),
+        adapter_error_message(error).has_prefix(
+          "other: transaction handle from elsewhere",
+        ),
       )
   }
 }
@@ -50,14 +55,8 @@ test "adapter_error_message renders every variant for diagnostics" {
     adapter_error_message(IntegrityViolation("dup pk")),
     "integrity_violation: dup pk",
   )
-  assert_eq(
-    adapter_error_message(AdapterTimeout("5s")),
-    "timeout: 5s",
-  )
-  assert_eq(
-    adapter_error_message(OtherAdapterError("misc")),
-    "other: misc",
-  )
+  assert_eq(adapter_error_message(AdapterTimeout("5s")), "timeout: 5s")
+  assert_eq(adapter_error_message(OtherAdapterError("misc")), "other: misc")
 }
 
 ///|
@@ -76,17 +75,13 @@ test "database_adapter composes a fake driver for round-trip tests" {
   }
   let close_self = fn() -> TransactionCloseOutcome { TransactionClosed }
   let adapter = database_adapter(
-    "fake",
-    fake_execute,
-    fake_begin,
-    close_ok,
-    close_ok,
-    close_self,
+    "fake", fake_execute, fake_begin, close_ok, close_ok, close_self,
   )
   assert_eq(adapter_summary(adapter), "adapter name=fake")
   match adapter_execute(adapter, "SELECT 1", []) {
     QuerySucceeded(result) => {
-      assert_eq(result.columns, ["id"])
+      assert_eq(result.columns.length(), 1)
+      assert_eq(result.columns[0], "id")
       assert_eq(result.rows.length(), 1)
       assert_eq(result.affected_rows, 1)
     }

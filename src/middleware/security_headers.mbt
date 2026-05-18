@@ -1,6 +1,6 @@
 ///|
 /// Selects which `X-Frame-Options` policy to emit.
-pub enum FrameOptionsMode {
+pub(all) enum FrameOptionsMode {
   FrameDeny
   FrameSameOrigin
 } derive(Eq)
@@ -20,7 +20,7 @@ pub fn frame_options_same_origin() -> FrameOptionsMode {
 ///|
 /// A structured Content-Security-Policy. Directives left empty are
 /// omitted entirely from the rendered header.
-pub struct ContentSecurityPolicy {
+pub(all) struct ContentSecurityPolicy {
   default_src : Array[String]
   script_src : Array[String]
   style_src : Array[String]
@@ -104,14 +104,7 @@ pub fn frame_options_middleware(mode : FrameOptionsMode) -> Middleware {
     FrameDeny => "DENY"
     FrameSameOrigin => "SAMEORIGIN"
   }
-  middleware(
-    "frame-options",
-    None,
-    [],
-    [],
-    [("x-frame-options", value)],
-    None,
-  )
+  middleware("frame-options", None, [], [], [("x-frame-options", value)], None)
 }
 
 ///|
@@ -177,7 +170,7 @@ pub fn content_security_policy_middleware(
 /// origins should mount one CORS middleware bundle per origin under
 /// distinct `path_prefix` scopes, or echo the request `Origin` themselves
 /// in their own application layer.
-pub struct CorsConfig {
+pub(all) struct CorsConfig {
   allowed_origin : String
   allowed_methods : Array[@http.HttpMethod]
   allowed_headers : Array[String]

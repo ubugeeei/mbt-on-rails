@@ -47,12 +47,14 @@ test "see_other_response inherits internal-only validation" {
 
 ///|
 test "redirect_response_to_external sends absolute URLs when caller opts in" {
-  let response = redirect_response_to_external("https://example.com/oauth/callback")
+  let response = redirect_response_to_external(
+    "https://example.com/oauth/callback",
+  )
   assert_eq(response.status, 302)
   assert_true(
-    response.headers.contains((
-      "location", "https://example.com/oauth/callback",
-    )),
+    response.headers.contains(
+      ("location", "https://example.com/oauth/callback"),
+    ),
   )
   let strips_crlf = redirect_response_to_external(
     "https://example.com/x\r\nset-cookie: forged=1",
