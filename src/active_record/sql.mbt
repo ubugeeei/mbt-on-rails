@@ -17,11 +17,11 @@ pub fn insert_sql(model : ModelSchema, row : Record) -> String {
   let columns : Array[String] = []
   let values : Array[String] = []
   for field in row.fields {
-    columns.push(field.0)
+    columns.push(quote_sql_identifier(field.0))
     values.push(@support.sql_literal(field.1))
   }
   "INSERT INTO " +
-  model.table +
+  quote_sql_identifier_path(model.table) +
   " (" +
   columns.join(", ") +
   ") VALUES (" +
@@ -34,14 +34,16 @@ pub fn insert_sql(model : ModelSchema, row : Record) -> String {
 pub fn update_sql(model : ModelSchema, row : Record, id : String) -> String {
   let assignments : Array[String] = []
   for field in row.fields {
-    assignments.push(field.0 + " = " + @support.sql_literal(field.1))
+    assignments.push(
+      quote_sql_identifier(field.0) + " = " + @support.sql_literal(field.1),
+    )
   }
   "UPDATE " +
-  model.table +
+  quote_sql_identifier_path(model.table) +
   " SET " +
   assignments.join(", ") +
   " WHERE " +
-  model.primary_key +
+  quote_sql_identifier(model.primary_key) +
   " = " +
   @support.sql_literal(id)
 }
@@ -51,16 +53,18 @@ pub fn update_sql(model : ModelSchema, row : Record, id : String) -> String {
 pub fn delete_sql(model : ModelSchema, id : String) -> String {
   if model.soft_delete {
     "UPDATE " +
-    model.table +
-    " SET deleted_at = CURRENT_TIMESTAMP WHERE " +
-    model.primary_key +
+    quote_sql_identifier_path(model.table) +
+    " SET " +
+    quote_sql_identifier("deleted_at") +
+    " = CURRENT_TIMESTAMP WHERE " +
+    quote_sql_identifier(model.primary_key) +
     " = " +
     @support.sql_literal(id)
   } else {
     "DELETE FROM " +
-    model.table +
+    quote_sql_identifier_path(model.table) +
     " WHERE " +
-    model.primary_key +
+    quote_sql_identifier(model.primary_key) +
     " = " +
     @support.sql_literal(id)
   }
@@ -77,18 +81,22 @@ pub fn upsert_sql(
   let values : Array[String] = []
   let updates : Array[String] = []
   for field in row.fields {
-    columns.push(field.0)
+    columns.push(quote_sql_identifier(field.0))
     values.push(@support.sql_literal(field.1))
-    updates.push(field.0 + " = EXCLUDED." + field.0)
+    updates.push(
+      quote_sql_identifier(field.0) +
+      " = EXCLUDED." +
+      quote_sql_identifier(field.0),
+    )
   }
   "INSERT INTO " +
-  model.table +
+  quote_sql_identifier_path(model.table) +
   " (" +
   columns.join(", ") +
   ") VALUES (" +
   values.join(", ") +
   ") ON CONFLICT (" +
-  conflict_column +
+  quote_sql_identifier(conflict_column) +
   ") DO UPDATE SET " +
   updates.join(", ")
 }
@@ -107,7 +115,11 @@ pub fn create_table_sql(model : ModelSchema) -> String {
   if model.soft_delete {
     definitions.push("deleted_at TIMESTAMP NULL")
   }
-  "CREATE TABLE " + model.table + " (\n  " + definitions.join(",\n  ") + "\n)"
+  "CREATE TABLE " +
+  quote_sql_identifier_path(model.table) +
+  " (\n  " +
+  definitions.join(",\n  ") +
+  "\n)"
 }
 
 ///|
@@ -115,14 +127,21 @@ pub fn create_table_sql(model : ModelSchema) -> String {
 pub fn column_definition_sql(column : Column) -> String {
   let null_sql = if column.nullable { "NULL" } else { "NOT NULL" }
   let base = match column.column_type {
-    Varchar => column.name + " VARCHAR(255) " + null_sql
-    Text => column.name + " TEXT " + null_sql
-    Integer => column.name + " INTEGER " + null_sql
-    Boolean => column.name + " BOOLEAN " + null_sql
-    Timestamp => column.name + " TIMESTAMP " + null_sql
-    Json => column.name + " JSON " + null_sql
+    Varchar => quote_sql_identifier(column.name) + " VARCHAR(255) " + null_sql
+    Text => quote_sql_identifier(column.name) + " TEXT " + null_sql
+    Integer => quote_sql_identifier(column.name) + " INTEGER " + null_sql
+    Boolean => quote_sql_identifier(column.name) + " BOOLEAN " + null_sql
+    Timestamp => quote_sql_identifier(column.name) + " TIMESTAMP " + null_sql
+    Json => quote_sql_identifier(column.name) + " JSON " + null_sql
     References(table) =>
-      column.name + " BIGINT " + null_sql + " REFERENCES " + table + "(id)"
+      quote_sql_identifier(column.name) +
+      " BIGINT " +
+      null_sql +
+      " REFERENCES " +
+      quote_sql_identifier_path(table) +
+      "(" +
+      quote_sql_identifier("id") +
+      ")"
   }
   let with_default = match column.default_value {
     Some(default_value) =>
@@ -148,11 +167,11 @@ pub fn index_statements(model : ModelSchema) -> Array[String] {
         "CREATE " +
         unique_prefix +
         "INDEX " +
-        index_name +
+        quote_sql_identifier(index_name) +
         " ON " +
-        model.table +
+        quote_sql_identifier_path(model.table) +
         " (" +
-        column.name +
+        quote_sql_identifier(column.name) +
         ")",
       )
     }
@@ -171,4 +190,64 @@ pub fn schema_dump(models : Array[ModelSchema]) -> String {
     }
   }
   lines.join("\n")
+}
+
+///|
+fn quote_sql_identifier(source : String) -> String {
+  let trimmed = source.trim().to_string()
+  if is_safe_sql_identifier(trimmed) {
+    return trimmed
+  }
+  "\"" + trimmed.replace(old="\"", new="\"\"") + "\""
+}
+
+///|
+fn quote_sql_identifier_path(source : String) -> String {
+  let trimmed = source.trim().to_string()
+  if trimmed == "*" {
+    return "*"
+  }
+  let parts = trimmed.split(".").map(fn(part) { part.to_string() }).collect()
+  if parts.length() <= 1 {
+    return quote_sql_identifier(trimmed)
+  }
+  let quoted : Array[String] = []
+  for part in parts {
+    let segment = part.trim().to_string()
+    if segment == "*" {
+      quoted.push("*")
+    } else {
+      quoted.push(quote_sql_identifier(segment))
+    }
+  }
+  quoted.join(".")
+}
+
+///|
+fn is_safe_sql_identifier(source : String) -> Bool {
+  if source.length() == 0 {
+    return false
+  }
+  let chars = source.to_array()
+  if not(is_sql_identifier_start(chars[0])) {
+    return false
+  }
+  let mut index = 1
+  while index < chars.length() {
+    if not(is_sql_identifier_continue(chars[index])) {
+      return false
+    }
+    index += 1
+  }
+  true
+}
+
+///|
+fn is_sql_identifier_start(ch : Char) -> Bool {
+  (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || ch == '_'
+}
+
+///|
+fn is_sql_identifier_continue(ch : Char) -> Bool {
+  is_sql_identifier_start(ch) || (ch >= '0' && ch <= '9')
 }

@@ -123,6 +123,57 @@ test "relation sql covers distinct grouping merge pluck exists and none" {
 }
 
 ///|
+test "empty where_in renders as a safe no-match relation" {
+  let schema = model(name="Post", table="posts", columns=[
+    string_column("title"),
+  ])
+  let empty = relation_for(schema).where_in("id", [])
+  assert_eq(relation_to_sql(empty), "SELECT * FROM posts WHERE 1=0")
+  assert_eq(
+    relation_to_sql(relation_for(schema).where_in("id", ["1", "2"])),
+    "SELECT * FROM posts WHERE id IN (1, 2)",
+  )
+}
+
+///|
+test "safe SQL builders quote injection-shaped identifiers" {
+  let unsafe_schema = model(
+    name="Unsafe",
+    table="posts; DROP TABLE users",
+    columns=[string_column("title; DROP TABLE posts")],
+    timestamps=false,
+  )
+  let relation = relation_for(unsafe_schema)
+    .select_columns(["id; DROP TABLE users AS total; DROP"])
+    .where_eq("title; DROP TABLE posts", "hello")
+    .order_by("created_at DESC; DROP TABLE audit")
+  assert_eq(
+    relation_to_sql(relation),
+    "SELECT \"id; DROP TABLE users\" AS \"total; DROP\" FROM \"posts; DROP TABLE users\" WHERE \"title; DROP TABLE posts\" = 'hello' ORDER BY \"created_at DESC; DROP TABLE audit\" ASC",
+  )
+  assert_eq(
+    insert_sql(
+      unsafe_schema,
+      record("posts; DROP TABLE users", [
+        ("title; DROP TABLE posts", "hello"),
+        ("name\"quoted", "world"),
+      ]),
+    ),
+    "INSERT INTO \"posts; DROP TABLE users\" (\"title; DROP TABLE posts\", \"name\"\"quoted\") VALUES ('hello', 'world')",
+  )
+  assert_true(
+    create_table_sql(unsafe_schema).contains(
+      "CREATE TABLE \"posts; DROP TABLE users\"",
+    ),
+  )
+  assert_true(
+    create_table_sql(unsafe_schema).contains(
+      "\"title; DROP TABLE posts\" VARCHAR(255) NOT NULL",
+    ),
+  )
+}
+
+///|
 test "render_page covers hydration variants assets metadata and dynamic modes" {
   let layout = render_test_layout()
   let base = with_assets(

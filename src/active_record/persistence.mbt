@@ -39,6 +39,10 @@ pub fn save_record(
   db : MemoryDatabase,
   row : Record,
 ) -> SaveOutcome {
+  let table_errors = validate_record_table(schema, row)
+  if not(table_errors.is_empty()) {
+    return ValidationFailed(table_errors)
+  }
   let current = resolve_current_record(schema, db, row)
   let candidate = normalize_persisted_record(schema, current, row)
   let errors = validate_record_errors(schema, candidate, db)

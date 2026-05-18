@@ -162,3 +162,14 @@ test "execute_relation where_not_eq ignores missing values like sql nulls" {
     None => assert_true(false)
   }
 }
+
+///|
+test "execute_relation treats empty where_in as no matching rows" {
+  let schema = relation_execution_schema()
+  let db = relation_execution_db()
+  let outcome = relation_for(schema).where_in("id", []).execute(schema, db)
+
+  assert_true(outcome.issues().is_empty())
+  assert_eq(outcome.count(), 0)
+  assert_true(not(outcome.exists()))
+}
