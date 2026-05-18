@@ -51,8 +51,15 @@ test "build_path and recognize rebuild concrete routes and honor verbs" {
   )
   assert_eq(build_path(post_route, [("id", "42")]), "/posts/42")
   assert_eq(
-    build_path(post_route, [("id", "42"), ("rest", "comments/1")]),
-    "/posts/42/comments/1",
+    build_path(post_route, [("id", "hello world/42?")]),
+    "/posts/hello%20world%2F42%3F",
+  )
+  assert_eq(
+    build_path(post_route, [
+      ("id", "42"),
+      ("rest", "comments with spaces/1?draft=true"),
+    ]),
+    "/posts/42/comments%20with%20spaces/1%3Fdraft%3Dtrue",
   )
   assert_eq(
     build_path(asset_route, [("path", "images/logo.svg")]),
@@ -97,6 +104,21 @@ test "build_path and recognize rebuild concrete routes and honor verbs" {
     recognize(
       routes,
       request(
+        verb=http_head(),
+        path="/posts/42",
+        query=[],
+        form=[],
+        session_id=None,
+        body="",
+      ),
+    ) {
+    Some(matched) => assert_eq(matched.route.name, "show")
+    None => assert_true(false)
+  }
+  match
+    recognize(
+      routes,
+      request(
         verb=http_delete(),
         path="/posts/42",
         query=[],
@@ -108,6 +130,26 @@ test "build_path and recognize rebuild concrete routes and honor verbs" {
     Some(_) => assert_true(false)
     None => assert_true(true)
   }
+}
+
+///|
+test "permitted params collapse duplicate keys deterministically" {
+  let permitted = permit(
+    params([
+      ("title", "first"),
+      ("title", "second"),
+      ("body", "kept"),
+      ("admin", "true"),
+    ]),
+    ["title", "title", "body"],
+  )
+
+  assert_true(
+    permitted_attributes(permitted) == [("title", "first"), ("body", "kept")],
+  )
+  assert_true(permitted_value(permitted, "title") == Some("first"))
+  assert_eq(permitted.missing.length(), 0)
+  assert_true(permitted.rejected == ["admin"])
 }
 
 ///|

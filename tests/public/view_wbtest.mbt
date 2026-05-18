@@ -521,6 +521,19 @@ test "scaffold and demo app expose richer rails style surfaces" {
   )
   assert_eq(page_response.status, 200)
   assert_true(render_response_body(page_response.body).contains("posts_show"))
+  let head_response = handle_request(
+    demo,
+    request(
+      verb=http_head(),
+      path="/posts/42",
+      query=[],
+      form=[],
+      session_id=None,
+      body="",
+    ),
+  )
+  assert_eq(head_response.status, 200)
+  assert_eq(render_response_body(head_response.body), "")
 
   let valid_action_token = sign_cookie_value(
     "server_action:posts.create",
