@@ -94,6 +94,21 @@ test "cookie stores and forgery strategies stay explicit and type safe" {
     Some(value) => assert_eq(value, "token-1")
     None => assert_true(false)
   }
+  let delimited_value = "token--with--delimiter"
+  let delimited_signed = sign_cookie_value(
+    "preview",
+    delimited_value,
+    config.secret_key_base,
+  )
+  match
+    verify_signed_cookie_value(
+      "preview",
+      delimited_signed,
+      config.secret_key_base,
+    ) {
+    Some(value) => assert_eq(value, delimited_value)
+    None => assert_true(false)
+  }
   assert_eq(
     verify_signed_cookie_value("preview", signed.value, "wrong-secret"),
     None,
