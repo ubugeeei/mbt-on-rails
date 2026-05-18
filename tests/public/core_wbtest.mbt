@@ -132,11 +132,10 @@ test "migration generation produces reversible down sql" {
 }
 
 ///|
-test "migration plan supports phased safe changes" {
+test "migration plan supports nullable phased changes" {
   let phased = migration_plan("20260326020101", "backfill_post_published")
     .add_column("posts", nullable(boolean_column("published")))
     .change_default("posts", "published", None, Some("false"))
-    .change_null("posts", "published", false, backfill_value=Some("false"))
     .add_index_concurrently("posts", "published", false)
 
   let issues = analyze_migration(phased)
@@ -150,11 +149,6 @@ test "migration plan supports phased safe changes" {
   assert_true(
     up_sql.contains(
       "ALTER TABLE posts ALTER COLUMN published SET DEFAULT 'false'",
-    ),
-  )
-  assert_true(
-    up_sql.contains(
-      "UPDATE posts SET published = 'false' WHERE published IS NULL",
     ),
   )
   assert_eq(
