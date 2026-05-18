@@ -50,6 +50,8 @@ pub fn delete_sql(ModelSchema, String) -> String
 
 pub fn destroy_record(ModelSchema, MemoryDatabase, String, deleted_at? : String?) -> DestroyOutcome
 
+pub fn destroy_record_with_callbacks(ModelSchema, MemoryDatabase, String, Array[(Record) -> CallbackOutcome], Array[(Record) -> CallbackOutcome], deleted_at? : String?) -> DestroyWithCallbacksOutcome
+
 pub fn dirty_new_record(Record) -> DirtyRecord
 
 pub fn dirty_record(Record, Record) -> DirtyRecord
@@ -146,7 +148,11 @@ pub fn rollback_to_savepoint(MemoryTransaction, String) -> MemoryTransaction
 
 pub fn rollback_transaction(MemoryTransaction) -> MemoryDatabase
 
+pub fn run_record_callbacks(Array[(Record) -> CallbackOutcome], Record) -> CallbackOutcome
+
 pub fn save_record(ModelSchema, MemoryDatabase, Record) -> SaveOutcome
+
+pub fn save_record_with_callbacks(ModelSchema, MemoryDatabase, Record, Array[(Record) -> CallbackOutcome], Array[(Record) -> CallbackOutcome]) -> SaveWithCallbacksOutcome
 
 pub fn schema_dump(Array[ModelSchema]) -> String
 
@@ -333,10 +339,21 @@ pub enum ColumnType {
   References(String)
 } derive(Eq, @debug.Debug)
 
+pub enum CallbackOutcome {
+  Continue(Record)
+  Halt(String)
+} derive(@debug.Debug)
+
 pub enum DestroyOutcome {
   DestroyedRecord(MemoryDatabase, Record)
   DestroyNotFound(MemoryDatabase)
 }
+
+pub enum DestroyWithCallbacksOutcome {
+  DestroyedAfterCallbacks(MemoryDatabase, Record)
+  DestroyTargetMissing(MemoryDatabase)
+  DestroyCallbackHalted(String)
+} derive(@debug.Debug)
 
 pub struct DirtyFieldChange {
   attribute : String
@@ -506,6 +523,12 @@ pub enum SaveOutcome {
   Saved(MemoryDatabase, Record)
   ValidationFailed(ValidationErrors)
 }
+
+pub enum SaveWithCallbacksOutcome {
+  SavedAfterCallbacks(MemoryDatabase, Record)
+  SaveValidationFailed(ValidationErrors)
+  SaveCallbackHalted(String)
+} derive(@debug.Debug)
 
 pub struct ScopeDefinition {
   name : String

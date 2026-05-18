@@ -301,6 +301,8 @@ pub fn deserialize_payload(String) -> Array[(String, String)]?
 
 pub fn destroy_record(@active_record.ModelSchema, @active_record.MemoryDatabase, String, deleted_at? : String?) -> @active_record.DestroyOutcome
 
+pub fn destroy_record_with_callbacks(@active_record.ModelSchema, @active_record.MemoryDatabase, String, Array[(@active_record.Record) -> @active_record.CallbackOutcome], Array[(@active_record.Record) -> @active_record.CallbackOutcome], deleted_at? : String?) -> @active_record.DestroyWithCallbacksOutcome
+
 pub fn digest_password(String, String) -> String
 
 pub fn dirty_new_record(@active_record.Record) -> @active_record.DirtyRecord
@@ -958,6 +960,10 @@ pub fn safe_join(Array[String], separator? : String) -> String
 pub fn same_as(other_field~ : String) -> @validation.FieldRule
 
 pub fn save_record(@active_record.ModelSchema, @active_record.MemoryDatabase, @active_record.Record) -> @active_record.SaveOutcome
+
+pub fn save_record_with_callbacks(@active_record.ModelSchema, @active_record.MemoryDatabase, @active_record.Record, Array[(@active_record.Record) -> @active_record.CallbackOutcome], Array[(@active_record.Record) -> @active_record.CallbackOutcome]) -> @active_record.SaveWithCallbacksOutcome
+
+pub fn run_record_callbacks(Array[(@active_record.Record) -> @active_record.CallbackOutcome], @active_record.Record) -> @active_record.CallbackOutcome
 
 pub fn scaffold_field(String, @active_record.Column) -> @generator.ScaffoldField
 
