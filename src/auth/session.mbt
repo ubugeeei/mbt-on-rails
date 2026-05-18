@@ -1,5 +1,10 @@
 ///|
 /// Produces a stable demo password digest from a password and salt.
+///
+/// **Demo only.** This wraps a non-cryptographic hash and is here for
+/// backwards compatibility with the original tutorial. Reach for
+/// `digest_password_secure` / `verify_password_secure` in any code
+/// that stores real user credentials.
 pub fn digest_password(password : String, salt : String) -> String {
   "mbor$demo$" + @support.hash_string(salt + "::" + password)
 }
@@ -9,13 +14,118 @@ pub fn digest_password(password : String, salt : String) -> String {
 ///
 /// Uses a constant-time comparison so an attacker cannot probe the digest
 /// one byte at a time. The digest itself is still a demo construction —
-/// see issue #88 for replacing it with a real password hash.
+/// use `verify_password_secure` against `digest_password_secure` for any
+/// real credential.
 pub fn verify_password(
   password : String,
   salt : String,
   digest : String,
 ) -> Bool {
   @support.constant_time_eq(digest_password(password, salt), digest)
+}
+
+///|
+/// Builds a PBKDF2-HMAC-SHA-256 password digest in a self-describing
+/// `pbkdf2$sha256$<iterations>$<salt-hex>$<hash-hex>` format.
+///
+/// `iterations` defaults to 600,000 — the OWASP 2025 baseline for new
+/// systems. Increase it as hardware speeds up. The salt is hex-encoded
+/// so any `$` characters in the caller's salt do not break parsing.
+pub fn digest_password_secure(
+  password : String,
+  salt : String,
+  iterations? : Int = 600_000,
+) -> String {
+  let salt_bytes = @support.utf8_bytes(salt)
+  let digest_bytes = @support.pbkdf2_hmac_sha256(
+    @support.utf8_bytes(password),
+    salt_bytes,
+    iterations,
+    32,
+  )
+  "pbkdf2$sha256$" +
+  iterations.to_string() +
+  "$" +
+  @support.hex_encode_bytes(salt_bytes) +
+  "$" +
+  @support.hex_encode_bytes(digest_bytes)
+}
+
+///|
+/// Verifies a password against a digest produced by
+/// `digest_password_secure`.
+///
+/// Parses the iteration count and salt out of the stored string, re-runs
+/// PBKDF2 with the same parameters, and compares the result in constant
+/// time. Returns `false` for any malformed digest rather than raising.
+pub fn verify_password_secure(password : String, digest : String) -> Bool {
+  match parse_pbkdf2_digest(digest) {
+    Some(parsed) => {
+      let candidate = @support.pbkdf2_hmac_sha256(
+        @support.utf8_bytes(password),
+        parsed.salt_bytes,
+        parsed.iterations,
+        parsed.expected_hash.length(),
+      )
+      let candidate_hex = @support.hex_encode_bytes(candidate)
+      let expected_hex = @support.hex_encode_bytes(parsed.expected_hash)
+      @support.constant_time_eq(candidate_hex, expected_hex)
+    }
+    None => false
+  }
+}
+
+///|
+struct Pbkdf2DigestParts {
+  iterations : Int
+  salt_bytes : Array[UInt]
+  expected_hash : Array[UInt]
+}
+
+///|
+fn parse_pbkdf2_digest(digest : String) -> Pbkdf2DigestParts? {
+  let parts : Array[String] = []
+  for chunk in digest.split("$") {
+    parts.push(chunk.to_string())
+  }
+  if parts.length() != 5 {
+    return None
+  }
+  if parts[0] != "pbkdf2" {
+    return None
+  }
+  if parts[1] != "sha256" {
+    return None
+  }
+  let iterations = match parse_positive_int(parts[2]) {
+    Some(value) => value
+    None => return None
+  }
+  let salt_bytes = match @support.hex_decode_bytes(parts[3]) {
+    Some(value) => value
+    None => return None
+  }
+  let expected_hash = match @support.hex_decode_bytes(parts[4]) {
+    Some(value) => value
+    None => return None
+  }
+  Some({ iterations, salt_bytes, expected_hash })
+}
+
+///|
+fn parse_positive_int(source : String) -> Int? {
+  if source.length() == 0 {
+    return None
+  }
+  let mut result = 0
+  for ch in source {
+    if ch < '0' || ch > '9' {
+      return None
+    }
+    let digit = (ch.to_uint() - '0'.to_uint()).reinterpret_as_int()
+    result = result * 10 + digit
+  }
+  Some(result)
 }
 
 ///|
