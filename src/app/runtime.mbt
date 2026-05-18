@@ -19,7 +19,7 @@ pub fn handle_request(
     None => ()
   }
 
-  match find_server_action(app.server_actions, request.path) {
+  match find_server_action(app.server_actions, request) {
     Some(action) =>
       return @middleware.apply_response_middleware(
         app.middlewares,
@@ -151,9 +151,10 @@ fn server_action_contract_response(
     )
   }
   if action.csrf_protected {
-    match @http.request_csrf_token(request, app.auth) {
-      Some(token) =>
-        if token.trim().to_owned().length() == 0 {
+    match request.session_id {
+      Some(session_id) =>
+        if session_id.trim().to_owned().length() == 0 ||
+          !valid_server_action_csrf_token(app, action, request, session_id) {
           return Some(
             @http.unprocessable_entity_response(message="invalid_csrf_token"),
           )
@@ -181,7 +182,7 @@ fn missing_action_inputs(
   request : @http.Request,
 ) -> Array[String] {
   let missing : Array[String] = []
-  if action.input_fields.is_empty() || request.form.is_empty() {
+  if action.input_fields.is_empty() {
     return missing
   }
   for field in action.input_fields {
@@ -314,14 +315,48 @@ fn find_page(
 /// Looks up a server action by route path.
 fn find_server_action(
   actions : Array[@view.ServerAction],
-  route : String,
+  request : @http.Request,
 ) -> @view.ServerAction? {
+  if request.verb != @http.http_post() {
+    return None
+  }
   for action in actions {
-    if action.route == route {
+    if action.route == request.path {
       return Some(action)
     }
   }
   None
+}
+
+///|
+fn valid_server_action_csrf_token(
+  app : MbtOnRailsApp,
+  action : @view.ServerAction,
+  request : @http.Request,
+  session_id : String,
+) -> Bool {
+  match @http.request_csrf_token(request, app.auth) {
+    Some(token) => {
+      if token.trim().to_owned().length() == 0 {
+        return false
+      }
+      match
+        @auth.verify_signed_cookie_value(
+          server_action_csrf_token_name(action),
+          token,
+          app.auth.secret_key_base,
+        ) {
+        Some(value) => value == session_id
+        None => false
+      }
+    }
+    None => false
+  }
+}
+
+///|
+fn server_action_csrf_token_name(action : @view.ServerAction) -> String {
+  "server_action:" + action.name
 }
 
 ///|

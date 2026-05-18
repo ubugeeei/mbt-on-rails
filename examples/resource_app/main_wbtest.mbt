@@ -37,12 +37,16 @@ test "resource app runtime and main smoke stay runnable" {
         verb=@mbor.http_post(),
         path="/_actions/notes.create",
         query=[],
-        form=[],
-        session_id=None,
+        form=[("title", "hello"), ("body", "body"), ("slug", "hello")],
+        session_id=Some("sess_1"),
         body="{\"title\":\"hello\"}",
       ),
       "x-csrf-token",
-      "token",
+      @mbor.sign_cookie_value(
+        "server_action:notes.create",
+        "sess_1",
+        app.auth.secret_key_base,
+      ),
     ),
   )
   let new_guest_response = @mbor.handle_request(
