@@ -229,6 +229,129 @@ test "action view style helpers render concise typed html fragments" {
 }
 
 ///|
+test "application json scripts remain parseable and block script breakouts" {
+  let page = page_module(
+    route_name="security_probe",
+    route_path="/security",
+    file_path=mbtv_path("examples/security/views/pages/probe.mbtv"),
+    title="Security",
+    component=server_component(
+      name="SecurityProbePage",
+      source_path=mbtv_path("examples/security/views/pages/probe.mbtv"),
+      props=[],
+    ),
+  )
+  let injected = "</script><script>alert(1)</script>&"
+  let rendered = render_page(page, [("payload", injected)], [], [])
+
+  assert_true(
+    rendered.data_json.contains(
+      "\"payload\": \"</script><script>alert(1)</script>&\"",
+    ),
+  )
+  assert_false(rendered.html.contains("&quot;payload&quot;"))
+  assert_true(
+    rendered.html.contains(
+      "\"payload\": \"\\u003c/script\\u003e\\u003cscript\\u003ealert(1)\\u003c/script\\u003e\\u0026\"",
+    ),
+  )
+  assert_false(rendered.html.contains("</script><script>alert(1)</script>"))
+}
+
+///|
+test "component fallback html is escaped in placeholders and manifests" {
+  let fallback = "<img src=x onerror=alert(1)></template><script>alert(1)</script>"
+  let page = page_module(
+    route_name="fallback_probe",
+    route_path="/fallback",
+    file_path=mbtv_path("examples/security/views/pages/fallback.mbtv"),
+    title="Fallback",
+    component=server_component(
+        name="FallbackProbePage",
+        source_path=mbtv_path("examples/security/views/pages/fallback.mbtv"),
+        props=[],
+      )
+      .with_fallback(fallback)
+      .with_child(
+        suspense_boundary(name="AsyncPanel", fallback_html=fallback, children=[]),
+      ),
+  )
+  let rendered = render_page(page, [], [], [])
+
+  assert_true(rendered.html.contains("data-mbor-fallback"))
+  assert_true(rendered.html.contains("&lt;img src=x onerror=alert(1)&gt;"))
+  assert_true(rendered.html.contains("&lt;/template&gt;"))
+  assert_false(rendered.html.contains("<img src=x"))
+  assert_false(rendered.html.contains("</template><script>alert(1)</script>"))
+  assert_true(
+    rendered.component_manifest_json.contains(
+      "&lt;img src=x onerror=alert(1)&gt;",
+    ),
+  )
+  assert_false(rendered.component_manifest_json.contains("<script>alert"))
+}
+
+///|
+test "view helpers and page assets neutralize dangerous url schemes" {
+  assert_eq(
+    link_to(label="Docs", href="https://example.com/docs"),
+    "<a href=\"https://example.com/docs\">Docs</a>",
+  )
+  assert_eq(
+    link_to(label="Email", href="mailto:hello@example.com"),
+    "<a href=\"mailto:hello@example.com\">Email</a>",
+  )
+  assert_eq(
+    link_to(label="Bad", href=" java\nscript:alert(1)", attrs=[
+      ("onclick", "alert(1)"),
+    ]),
+    "<a href=\"#\">Bad</a>",
+  )
+  assert_eq(
+    button_to(label="Go", action="javascript:alert(1)"),
+    "<form action=\"#\" method=\"post\"><button type=\"submit\">Go</button></form>",
+  )
+  assert_eq(
+    image_tag(src="data:text/html,<script>alert(1)</script>", alt="Logo", attrs=[
+      ("onerror", "alert(1)"),
+    ]),
+    "<img src=\"about:blank\" alt=\"Logo\">",
+  )
+  assert_true(
+    image_tag(src="data:image/png;base64,AAAA", alt="Pixel").contains(
+      "src=\"data:image/png;base64,AAAA\"",
+    ),
+  )
+
+  let page = page_module(
+    route_name="asset_probe",
+    route_path="/assets",
+    file_path=mbtv_path("examples/security/views/pages/assets.mbtv"),
+    title="Assets",
+    component=server_component(
+      name="AssetProbePage",
+      source_path=mbtv_path("examples/security/views/pages/assets.mbtv"),
+      props=[],
+    ),
+  ).with_assets(
+    asset_manifest(
+      style_urls=[
+        "/assets/app.css", "javascript:alert(1)", "data:text/css,body{}",
+      ],
+      script_urls=[
+        "https://cdn.example.test/app.js", "data:text/javascript,alert(1)", "java\nscript:alert(1)",
+      ],
+    ),
+  )
+  let rendered = render_page(page, [], [], [])
+
+  assert_true(rendered.html.contains("href=\"/assets/app.css\""))
+  assert_true(rendered.html.contains("src=\"https://cdn.example.test/app.js\""))
+  assert_false(rendered.html.contains("javascript:alert"))
+  assert_false(rendered.html.contains("data:text"))
+}
+
+///|
 test "template validation ignores commented and string component imports" {
   let errors = validate_template_component_imports(
     "app/views/posts/show.mbtv",

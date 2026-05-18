@@ -245,7 +245,7 @@ fn render_component_entry(component : VaporComponentRef) -> String {
     None => "[]"
   }
   let fallback_html = match component.fallback_html {
-    Some(html) => @support.json_string(html)
+    Some(html) => @support.json_string(render_safe_fallback_html(html))
     None => "null"
   }
   let template_imports = render_template_imports(component.template_imports)
@@ -471,7 +471,7 @@ fn render_manifest_vapor_node(node : VaporNode) -> String {
       ", \"name\": " +
       @support.json_string(boundary.name) +
       ", \"fallback_html\": " +
-      @support.json_string(boundary.fallback_html) +
+      @support.json_string(render_safe_fallback_html(boundary.fallback_html)) +
       ", \"children\": " +
       render_vapor_nodes(boundary.children) +
       "}"

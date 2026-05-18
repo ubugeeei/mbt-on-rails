@@ -115,7 +115,7 @@ pub fn with_contract(
 }
 
 ///|
-/// Attaches trusted SSR fallback HTML to a component placeholder.
+/// Attaches escaped SSR fallback text to a component placeholder.
 pub fn with_fallback(
   component : VaporComponentRef,
   fallback_html : String,
