@@ -98,14 +98,14 @@ fn entry_fresh(entry : CacheEntry, now : String?) -> Bool {
     Some(expires_at) =>
       match now {
         None => true
-        Some(current) => lexicographic_lte(current, expires_at)
+        Some(current) => lexicographic_lt(current, expires_at)
       }
   }
 }
 
 ///|
 /// Compares two sortable timestamps without relying on platform date helpers.
-fn lexicographic_lte(left : String, right : String) -> Bool {
+fn lexicographic_lt(left : String, right : String) -> Bool {
   let left_chars = left.to_array()
   let right_chars = right.to_array()
   let limit = if left_chars.length() < right_chars.length() {
@@ -121,5 +121,5 @@ fn lexicographic_lte(left : String, right : String) -> Bool {
       return false
     }
   }
-  left_chars.length() <= right_chars.length()
+  left_chars.length() < right_chars.length()
 }
