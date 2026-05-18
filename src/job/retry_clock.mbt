@@ -33,7 +33,13 @@ fn parse_utc_timestamp(source : String) -> UtcTimestamp? {
                     Some(minute) =>
                       match parse_int_slice(source, 17, 19) {
                         Some(second) =>
-                          Some({ year, month, day, hour, minute, second })
+                          if valid_utc_timestamp_parts(
+                              year, month, day, hour, minute, second,
+                            ) {
+                            Some({ year, month, day, hour, minute, second })
+                          } else {
+                            None
+                          }
                         None => None
                       }
                     None => None
@@ -46,6 +52,28 @@ fn parse_utc_timestamp(source : String) -> UtcTimestamp? {
       }
     None => None
   }
+}
+
+///|
+fn valid_utc_timestamp_parts(
+  year : Int,
+  month : Int,
+  day : Int,
+  hour : Int,
+  minute : Int,
+  second : Int,
+) -> Bool {
+  year >= 0 &&
+  month >= 1 &&
+  month <= 12 &&
+  day >= 1 &&
+  day <= days_in_month(year, month) &&
+  hour >= 0 &&
+  hour <= 23 &&
+  minute >= 0 &&
+  minute <= 59 &&
+  second >= 0 &&
+  second <= 59
 }
 
 ///|

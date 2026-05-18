@@ -51,30 +51,30 @@ pub fn cache_fetch_with_notifications(
   now~ : String?,
   notifications~ : @support.Notifications,
 ) -> (CacheFetchResult, @support.Notifications) {
-  let (cached, after_read) = cache_read_with_notifications(
-    store~,
-    key~,
-    now~,
-    notifications~,
+  let fetched = cache_fetch(
+    store, key, fallback, version, expires_at, tags, now,
   )
-  match cached {
-    Some(value) => ({ store, value, hit: true }, after_read)
-    None => {
-      let after_generate = after_read.instrument(
-        name="cache_generate.active_support",
-        payload=[("store", store.store_name), ("key", key)],
-      )
-      let (updated_store, after_write) = cache_write_with_notifications(
-        store~,
-        key~,
-        value=fallback,
-        version~,
-        expires_at~,
-        tags~,
-        notifications=after_generate,
-      )
-      ({ store: updated_store, value: fallback, hit: false }, after_write)
-    }
+  let after_read = notifications.instrument(name="cache_read.active_support", payload=[
+    ("store", store.store_name),
+    ("key", key),
+    ("hit", if fetched.hit { "true" } else { "false" }),
+  ])
+  if fetched.hit {
+    (fetched, after_read)
+  } else {
+    let after_generate = after_read.instrument(
+      name="cache_generate.active_support",
+      payload=[("store", store.store_name), ("key", key)],
+    )
+    let after_write = after_generate.instrument(
+      name="cache_write.active_support",
+      payload=[
+        ("store", store.store_name),
+        ("key", key),
+        ("tag_count", tags.length().to_string()),
+      ],
+    )
+    (fetched, after_write)
   }
 }
 
