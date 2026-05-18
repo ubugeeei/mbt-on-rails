@@ -131,6 +131,12 @@ pub fn append_response_headers(
 }
 
 ///|
+/// Returns the same response status and headers with an empty body.
+pub fn without_response_body(response : Response) -> Response {
+  { status: response.status, headers: response.headers, body: Empty }
+}
+
+///|
 /// Returns a response with one `Set-Cookie` header appended.
 pub fn append_set_cookie(
   response : Response,

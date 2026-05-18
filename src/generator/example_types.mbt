@@ -129,7 +129,20 @@ pub fn generate_example_types_source(
     push_template_helper(lines, helper)
   }
 
-  for helper in route_helpers(frontend_source) {
+  let routes = route_helpers(frontend_source)
+  if routes.any(fn(helper) { !helper.params.is_empty() }) {
+    let include_path_segments = routes.any(fn(helper) {
+      helper.params.any(fn(param) {
+        match param.kind {
+          Param => false
+          _ => true
+        }
+      })
+    })
+    push_route_encoding_helpers(lines, include_path_segments)
+  }
+
+  for helper in routes {
     push_route_helper(lines, helper)
   }
 
@@ -153,6 +166,105 @@ fn push_template_helper(
   lines.push(
     "  @support.mbtv_path(" + moonbit_string_literal(helper.source_path) + ")",
   )
+  lines.push("}")
+  lines.push("")
+}
+
+///|
+fn push_route_encoding_helpers(
+  lines : Array[String],
+  include_path_segments : Bool,
+) -> Unit {
+  lines.push("///|")
+  lines.push("fn mbor_encode_route_segment(value : String) -> String {")
+  lines.push("  let builder = StringBuilder::new()")
+  lines.push("  for ch in value {")
+  lines.push("    if mbor_is_unreserved_route_char(ch) {")
+  lines.push("      builder.write_char(ch)")
+  lines.push("    } else {")
+  lines.push("      mbor_write_percent_encoded_utf8(builder, ch.to_int())")
+  lines.push("    }")
+  lines.push("  }")
+  lines.push("  builder.to_string()")
+  lines.push("}")
+  lines.push("")
+  if include_path_segments {
+    lines.push("///|")
+    lines.push("fn mbor_route_path_segments(value : String) -> String {")
+    lines.push("  let pieces : Array[String] = []")
+    lines.push(
+      "  for item in value.split(\"/\").map(fn(part) { part.to_owned() }).collect() {",
+    )
+    lines.push("    if item.length() > 0 {")
+    lines.push("      pieces.push(mbor_encode_route_segment(item))")
+    lines.push("    }")
+    lines.push("  }")
+    lines.push(
+      "  if pieces.is_empty() { \"\" } else { \"/\" + pieces.join(\"/\") }",
+    )
+    lines.push("}")
+    lines.push("")
+  }
+
+  lines.push("///|")
+  lines.push(
+    "fn mbor_write_percent_encoded_utf8(builder : StringBuilder, code : Int) -> Unit {",
+  )
+  lines.push("  if code <= 0x7F {")
+  lines.push("    mbor_write_percent_encoded_byte(builder, code)")
+  lines.push("  } else if code <= 0x7FF {")
+  lines.push("    mbor_write_percent_encoded_byte(builder, 0xC0 + code / 0x40)")
+  lines.push("    mbor_write_percent_encoded_byte(builder, 0x80 + code % 0x40)")
+  lines.push("  } else if code <= 0xFFFF {")
+  lines.push(
+    "    mbor_write_percent_encoded_byte(builder, 0xE0 + code / 0x1000)",
+  )
+  lines.push(
+    "    mbor_write_percent_encoded_byte(builder, 0x80 + code / 0x40 % 0x40)",
+  )
+  lines.push("    mbor_write_percent_encoded_byte(builder, 0x80 + code % 0x40)")
+  lines.push("  } else {")
+  lines.push(
+    "    mbor_write_percent_encoded_byte(builder, 0xF0 + code / 0x40000)",
+  )
+  lines.push(
+    "    mbor_write_percent_encoded_byte(builder, 0x80 + code / 0x1000 % 0x40)",
+  )
+  lines.push(
+    "    mbor_write_percent_encoded_byte(builder, 0x80 + code / 0x40 % 0x40)",
+  )
+  lines.push("    mbor_write_percent_encoded_byte(builder, 0x80 + code % 0x40)")
+  lines.push("  }")
+  lines.push("}")
+  lines.push("")
+  lines.push("///|")
+  lines.push(
+    "fn mbor_write_percent_encoded_byte(builder : StringBuilder, byte : Int) -> Unit {",
+  )
+  lines.push("  builder.write_char('%')")
+  lines.push("  builder.write_char(mbor_hex_digit(byte / 16))")
+  lines.push("  builder.write_char(mbor_hex_digit(byte % 16))")
+  lines.push("}")
+  lines.push("")
+  lines.push("///|")
+  lines.push("fn mbor_hex_digit(value : Int) -> Char {")
+  lines.push("  if value < 10 {")
+  lines.push("    ('0'.to_int() + value).to_char().unwrap()")
+  lines.push("  } else {")
+  lines.push("    ('A'.to_int() + value - 10).to_char().unwrap()")
+  lines.push("  }")
+  lines.push("}")
+  lines.push("")
+  lines.push("///|")
+  lines.push("fn mbor_is_unreserved_route_char(ch : Char) -> Bool {")
+  lines.push("  let code = ch.to_int()")
+  lines.push("  (code >= 'a'.to_int() && code <= 'z'.to_int()) ||")
+  lines.push("  (code >= 'A'.to_int() && code <= 'Z'.to_int()) ||")
+  lines.push("  (code >= '0'.to_int() && code <= '9'.to_int()) ||")
+  lines.push("  ch == '-' ||")
+  lines.push("  ch == '.' ||")
+  lines.push("  ch == '_' ||")
+  lines.push("  ch == '~'")
   lines.push("}")
   lines.push("")
 }
@@ -626,7 +738,7 @@ fn render_path_expression(route_path : String, params_name : String) -> String {
         params_name +
         "." +
         field_name +
-        " { Some(value) => if value.length() == 0 { \"\" } else { \"/\" + value } None => \"\" }",
+        " { Some(value) => mbor_route_path_segments(value) None => \"\" }",
       )
     } else if segment.has_prefix("[...") && segment.has_suffix("]") {
       let raw_name = String::unsafe_substring(
@@ -634,14 +746,26 @@ fn render_path_expression(route_path : String, params_name : String) -> String {
         start=4,
         end=segment.length() - 1,
       )
-      pieces.push("\"/\" + " + params_name + "." + snake_identifier(raw_name))
+      pieces.push(
+        "mbor_route_path_segments(" +
+        params_name +
+        "." +
+        snake_identifier(raw_name) +
+        ")",
+      )
     } else if segment.has_prefix("[") && segment.has_suffix("]") {
       let raw_name = String::unsafe_substring(
         segment,
         start=1,
         end=segment.length() - 1,
       )
-      pieces.push("\"/\" + " + params_name + "." + snake_identifier(raw_name))
+      pieces.push(
+        "\"/\" + mbor_encode_route_segment(" +
+        params_name +
+        "." +
+        snake_identifier(raw_name) +
+        ")",
+      )
     } else {
       pieces.push(moonbit_string_literal("/" + segment))
     }

@@ -80,7 +80,7 @@ pub fn build_path(
       Static(value) => pieces.push(value)
       Param(name) =>
         match @support.find_entry(params, name) {
-          Some(value) => pieces.push(value)
+          Some(value) => pieces.push(percent_encode_path_segment(value))
           None => pieces.push(":" + name)
         }
       CatchAll(name) =>
@@ -92,7 +92,7 @@ pub fn build_path(
               .map(fn(part) { part.to_owned() })
               .collect() {
               if item.length() > 0 {
-                pieces.push(item)
+                pieces.push(percent_encode_path_segment(item))
               }
             }
           None => pieces.push("*")
@@ -106,7 +106,7 @@ pub fn build_path(
               .map(fn(part) { part.to_owned() })
               .collect() {
               if item.length() > 0 {
-                pieces.push(item)
+                pieces.push(percent_encode_path_segment(item))
               }
             }
           None => ()
@@ -126,6 +126,23 @@ pub fn recognize(
   routes : Array[RouteSpec],
   incoming : Request,
 ) -> MatchedRoute? {
+  match recognize_exact(routes, incoming) {
+    Some(matched) => return Some(matched)
+    None => ()
+  }
+  if incoming.verb == Head {
+    let get_request = { ..incoming, verb: Get }
+    recognize_exact(routes, get_request)
+  } else {
+    None
+  }
+}
+
+///|
+fn recognize_exact(
+  routes : Array[RouteSpec],
+  incoming : Request,
+) -> MatchedRoute? {
   for current in routes {
     if current.verb != incoming.verb {
       continue
@@ -136,6 +153,66 @@ pub fn recognize(
     }
   }
   None
+}
+
+///|
+fn percent_encode_path_segment(value : String) -> String {
+  let builder = StringBuilder::new()
+  for ch in value {
+    if is_unreserved_path_char(ch) {
+      builder.write_char(ch)
+    } else {
+      write_percent_encoded_utf8(builder, ch.to_int())
+    }
+  }
+  builder.to_string()
+}
+
+///|
+fn write_percent_encoded_utf8(builder : StringBuilder, code : Int) -> Unit {
+  if code <= 0x7F {
+    write_percent_encoded_byte(builder, code)
+  } else if code <= 0x7FF {
+    write_percent_encoded_byte(builder, 0xC0 + code / 0x40)
+    write_percent_encoded_byte(builder, 0x80 + code % 0x40)
+  } else if code <= 0xFFFF {
+    write_percent_encoded_byte(builder, 0xE0 + code / 0x1000)
+    write_percent_encoded_byte(builder, 0x80 + code / 0x40 % 0x40)
+    write_percent_encoded_byte(builder, 0x80 + code % 0x40)
+  } else {
+    write_percent_encoded_byte(builder, 0xF0 + code / 0x40000)
+    write_percent_encoded_byte(builder, 0x80 + code / 0x1000 % 0x40)
+    write_percent_encoded_byte(builder, 0x80 + code / 0x40 % 0x40)
+    write_percent_encoded_byte(builder, 0x80 + code % 0x40)
+  }
+}
+
+///|
+fn write_percent_encoded_byte(builder : StringBuilder, byte : Int) -> Unit {
+  builder.write_char('%')
+  builder.write_char(hex_digit(byte / 16))
+  builder.write_char(hex_digit(byte % 16))
+}
+
+///|
+fn hex_digit(value : Int) -> Char {
+  if value < 10 {
+    ('0'.to_int() + value).to_char().unwrap()
+  } else {
+    ('A'.to_int() + value - 10).to_char().unwrap()
+  }
+}
+
+///|
+fn is_unreserved_path_char(ch : Char) -> Bool {
+  let code = ch.to_int()
+  (code >= 'a'.to_int() && code <= 'z'.to_int()) ||
+  (code >= 'A'.to_int() && code <= 'Z'.to_int()) ||
+  (code >= '0'.to_int() && code <= '9'.to_int()) ||
+  ch == '-' ||
+  ch == '.' ||
+  ch == '_' ||
+  ch == '~'
 }
 
 ///|

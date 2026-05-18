@@ -118,6 +118,8 @@ pub fn with_param_name(ResourceOptions, String) -> ResourceOptions
 #label_migration(store, allow_positional=true)
 pub fn with_request_session(Request, store~ : @auth.SessionStore, fallback_store? : @auth.SessionStore?) -> Request
 
+pub fn without_response_body(Response) -> Response
+
 // Errors
 
 // Types and methods

@@ -91,15 +91,24 @@ fn filter_entries(
 ) -> PermittedParams {
   let values : Array[(String, String)] = []
   let rejected : Array[String] = []
+  let allowed_keys : Array[String] = []
+  for key in allowed {
+    if !allowed_keys.contains(key) {
+      allowed_keys.push(key)
+    }
+  }
   for entry in source {
-    if allowed.contains(entry.0) {
+    if allowed_keys.contains(entry.0) {
+      if @support.find_entry(values, entry.0) is Some(_) {
+        continue
+      }
       values.push(entry)
     } else {
       rejected.push(entry.0)
     }
   }
   let missing : Array[String] = []
-  for key in allowed {
+  for key in allowed_keys {
     if @support.find_entry(values, key) is None {
       missing.push(key)
     }

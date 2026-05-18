@@ -46,6 +46,9 @@ test "generate example types source includes typed view helpers and labeled rout
       "pub fn posts_edit_path(params : PostsEditRouteParams) -> String",
     ),
   )
+  assert_true(source.contains("fn mbor_encode_route_segment(value : String)"))
+  assert_true(!source.contains("fn mbor_route_path_segments(value : String)"))
+  assert_true(source.contains("\"/\" + mbor_encode_route_segment(params.id)"))
   assert_true(source.contains("pub struct PostsCreateActionInput"))
   assert_true(
     source.contains(
@@ -61,6 +64,25 @@ test "generate example types source includes typed view helpers and labeled rout
   assert_true(
     source.contains(
       "entries.push((\"published\", if self.published { \"true\" } else { \"false\" }))",
+    ),
+  )
+}
+
+///|
+test "generated route helpers encode params and preserve catchall separators" {
+  let source = generate_example_types_source(
+    views_dir="examples/demo_blog/views",
+    template_paths=[],
+    frontend_source="fn demo() {\n" +
+      "  page_module(\"assets_show\", \"/assets/[...path]\", path(), \"Asset\", component())\n" +
+      "  page_module(\"docs_show\", \"/docs/[[...parts]]\", path(), \"Docs\", component())\n" +
+      "}\n",
+  )
+
+  assert_true(source.contains("mbor_route_path_segments(params.path)"))
+  assert_true(
+    source.contains(
+      "match params.parts { Some(value) => mbor_route_path_segments(value) None => \"\" }",
     ),
   )
 }

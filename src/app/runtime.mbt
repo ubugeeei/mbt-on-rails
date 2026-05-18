@@ -11,21 +11,19 @@ pub fn handle_request(
   )
   let request = prepare_request_for_auth(request_result.0, app.auth)
   match request_result.1 {
-    Some(response) =>
-      return @middleware.apply_reached_response_middleware(
+    Some(response) => {
+      let prepared = @middleware.apply_reached_response_middleware(
         request_result.2,
         response,
       )
+      return response_for_request(request, prepared)
+    }
     None => ()
   }
 
   match find_server_action(app.server_actions, request) {
     Some(action) =>
-      return @middleware.apply_response_middleware(
-        app.middlewares,
-        request,
-        server_action_response(app, action, request),
-      )
+      return respond(app, request, server_action_response(app, action, request))
     None => ()
   }
 
@@ -38,12 +36,7 @@ pub fn handle_request(
           matched.route.action,
           request,
         ) {
-        Some(response) =>
-          return @middleware.apply_response_middleware(
-            app.middlewares,
-            request,
-            response,
-          )
+        Some(response) => return respond(app, request, response)
         None => ()
       }
       match matched.route.page_name {
@@ -60,15 +53,11 @@ pub fn handle_request(
                 loader_data,
                 app.server_actions,
               )
-              @middleware.apply_response_middleware(
-                app.middlewares,
-                request,
-                @http.ok_html(rendered.html),
-              )
+              respond(app, request, @http.ok_html(rendered.html))
             }
             None =>
-              @middleware.apply_response_middleware(
-                app.middlewares,
+              respond(
+                app,
                 request,
                 @http.ok_text(
                   matched.route.controller +
@@ -86,14 +75,10 @@ pub fn handle_request(
               matched.params,
             ) {
             Some(location) =>
-              @middleware.apply_response_middleware(
-                app.middlewares,
-                request,
-                @http.redirect_response(location),
-              )
+              respond(app, request, @http.redirect_response(location))
             None =>
-              @middleware.apply_response_middleware(
-                app.middlewares,
+              respond(
+                app,
                 request,
                 @http.ok_text(
                   "handled " +
@@ -105,12 +90,33 @@ pub fn handle_request(
           }
       }
     }
-    None =>
-      @middleware.apply_response_middleware(
-        app.middlewares,
-        request,
-        @http.not_found_response(),
-      )
+    None => respond(app, request, @http.not_found_response())
+  }
+}
+
+///|
+fn respond(
+  app : MbtOnRailsApp,
+  request : @http.Request,
+  response : @http.Response,
+) -> @http.Response {
+  let prepared = @middleware.apply_response_middleware(
+    app.middlewares,
+    request,
+    response,
+  )
+  response_for_request(request, prepared)
+}
+
+///|
+fn response_for_request(
+  request : @http.Request,
+  response : @http.Response,
+) -> @http.Response {
+  if request.verb == @http.http_head() {
+    @http.without_response_body(response)
+  } else {
+    response
   }
 }
 

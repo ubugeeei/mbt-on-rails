@@ -37,6 +37,66 @@ pub fn view_components_note_counter() -> @support.MbtvPath {
 }
 
 ///|
+fn mbor_encode_route_segment(value : String) -> String {
+  let builder = StringBuilder::new()
+  for ch in value {
+    if mbor_is_unreserved_route_char(ch) {
+      builder.write_char(ch)
+    } else {
+      mbor_write_percent_encoded_utf8(builder, ch.to_int())
+    }
+  }
+  builder.to_string()
+}
+
+///|
+fn mbor_write_percent_encoded_utf8(builder : StringBuilder, code : Int) -> Unit {
+  if code <= 0x7F {
+    mbor_write_percent_encoded_byte(builder, code)
+  } else if code <= 0x7FF {
+    mbor_write_percent_encoded_byte(builder, 0xC0 + code / 0x40)
+    mbor_write_percent_encoded_byte(builder, 0x80 + code % 0x40)
+  } else if code <= 0xFFFF {
+    mbor_write_percent_encoded_byte(builder, 0xE0 + code / 0x1000)
+    mbor_write_percent_encoded_byte(builder, 0x80 + code / 0x40 % 0x40)
+    mbor_write_percent_encoded_byte(builder, 0x80 + code % 0x40)
+  } else {
+    mbor_write_percent_encoded_byte(builder, 0xF0 + code / 0x40000)
+    mbor_write_percent_encoded_byte(builder, 0x80 + code / 0x1000 % 0x40)
+    mbor_write_percent_encoded_byte(builder, 0x80 + code / 0x40 % 0x40)
+    mbor_write_percent_encoded_byte(builder, 0x80 + code % 0x40)
+  }
+}
+
+///|
+fn mbor_write_percent_encoded_byte(builder : StringBuilder, byte : Int) -> Unit {
+  builder.write_char('%')
+  builder.write_char(mbor_hex_digit(byte / 16))
+  builder.write_char(mbor_hex_digit(byte % 16))
+}
+
+///|
+fn mbor_hex_digit(value : Int) -> Char {
+  if value < 10 {
+    ('0'.to_int() + value).to_char().unwrap()
+  } else {
+    ('A'.to_int() + value - 10).to_char().unwrap()
+  }
+}
+
+///|
+fn mbor_is_unreserved_route_char(ch : Char) -> Bool {
+  let code = ch.to_int()
+  (code >= 'a'.to_int() && code <= 'z'.to_int()) ||
+  (code >= 'A'.to_int() && code <= 'Z'.to_int()) ||
+  (code >= '0'.to_int() && code <= '9'.to_int()) ||
+  ch == '-' ||
+  ch == '.' ||
+  ch == '_' ||
+  ch == '~'
+}
+
+///|
 /// Returns the concrete path for this static route.
 pub fn notes_index_path() -> String {
   "/notes"
@@ -79,7 +139,7 @@ pub fn NotesShowRouteParams::entries(
 ///|
 /// Builds the concrete path for this route.
 pub fn notes_show_path(params : NotesShowRouteParams) -> String {
-  "/notes" + "/" + params.id
+  "/notes" + "/" + mbor_encode_route_segment(params.id)
 }
 
 ///|
@@ -131,7 +191,7 @@ pub fn NotesEditRouteParams::entries(
 ///|
 /// Builds the concrete path for this route.
 pub fn notes_edit_path(params : NotesEditRouteParams) -> String {
-  "/notes" + "/" + params.id + "/edit"
+  "/notes" + "/" + mbor_encode_route_segment(params.id) + "/edit"
 }
 
 ///|
