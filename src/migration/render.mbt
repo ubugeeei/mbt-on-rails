@@ -103,11 +103,10 @@ fn step_up_sql(step : MigrationStep) -> Array[String] {
           table_name, column_name, target_table, validate, on_delete,
         ),
       ]
-    ValidateForeignKey(table_name, column_name, _) =>
+    ValidateForeignKey(table_name, column_name, target_table) =>
       [
-        validate_constraint_statement(
-          table_name,
-          foreign_key_constraint_name(table_name, column_name),
+        validate_foreign_key_constraint_statement(
+          table_name, column_name, target_table,
         ),
       ]
     RemoveForeignKey(table_name, column_name, _, _, _) =>

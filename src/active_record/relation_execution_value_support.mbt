@@ -146,25 +146,41 @@ fn compare_boolean_strings(left : String, right : String) -> Int {
 
 ///|
 fn like_matches(value : String, pattern : String) -> Bool {
-  if pattern == "%" {
-    return true
+  like_match_from(value.to_array(), pattern.to_array(), 0, 0)
+}
+
+///|
+fn like_match_from(
+  value : Array[Char],
+  pattern : Array[Char],
+  value_index : Int,
+  pattern_index : Int,
+) -> Bool {
+  if pattern_index == pattern.length() {
+    return value_index == value.length()
   }
-  if pattern.has_prefix("%") && pattern.has_suffix("%") {
-    return value.contains(
-      String::unsafe_substring(pattern, start=1, end=pattern.length() - 1),
-    )
+  match pattern[pattern_index] {
+    '%' => {
+      if like_match_from(value, pattern, value_index, pattern_index + 1) {
+        return true
+      }
+      let mut next_value_index = value_index
+      while next_value_index < value.length() {
+        next_value_index += 1
+        if like_match_from(value, pattern, next_value_index, pattern_index + 1) {
+          return true
+        }
+      }
+      false
+    }
+    '_' =>
+      value_index < value.length() &&
+      like_match_from(value, pattern, value_index + 1, pattern_index + 1)
+    current =>
+      value_index < value.length() &&
+      value[value_index] == current &&
+      like_match_from(value, pattern, value_index + 1, pattern_index + 1)
   }
-  if pattern.has_prefix("%") {
-    return value.has_suffix(
-      String::unsafe_substring(pattern, start=1, end=pattern.length()),
-    )
-  }
-  if pattern.has_suffix("%") {
-    return value.has_prefix(
-      String::unsafe_substring(pattern, start=0, end=pattern.length() - 1),
-    )
-  }
-  value == pattern
 }
 
 ///|

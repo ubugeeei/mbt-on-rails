@@ -93,7 +93,7 @@ test "orm migration example builders keep relation migration and validation stab
   )
   assert_true(
     constraint_up.contains(
-      "ALTER TABLE posts VALIDATE CONSTRAINT fk_posts_author_id",
+      "ALTER TABLE posts VALIDATE CONSTRAINT fk_posts_author_id /* references users(id) */",
     ),
   )
 
