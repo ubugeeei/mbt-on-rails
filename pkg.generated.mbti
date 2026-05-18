@@ -516,6 +516,8 @@ pub fn invalid_secret_names(@secrets.SecretsConfig) -> Array[String]
 
 pub fn invoke_server_action_step(String) -> @controller.ActionStep
 
+pub fn is_safe_internal_redirect(String) -> Bool
+
 pub fn issue_email_verification(String, String, String, entropy? : String?, secret? : String?) -> @auth.EmailVerificationToken
 
 pub fn issue_password_reset(String, String, String, entropy? : String?, secret? : String?) -> @auth.PasswordResetToken
@@ -772,6 +774,8 @@ pub fn record(String, Array[(String, String)]) -> @active_record.Record
 pub fn redirect_format() -> @controller.ResponseFormat
 
 pub fn redirect_response(String) -> @http.Response
+
+pub fn redirect_response_to_external(String) -> @http.Response
 
 pub fn redirect_to_step(String) -> @controller.ActionStep
 

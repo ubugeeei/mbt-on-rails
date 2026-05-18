@@ -67,15 +67,69 @@ pub fn ok_text(body : String) -> Response {
 }
 
 ///|
-/// Builds a redirect response.
+/// Builds a redirect response that may only target an internal path.
+///
+/// Locations that are not safe internal paths (external schemes,
+/// protocol-relative URLs, paths starting with `\\`, or strings with
+/// control characters) are rejected with a `400 Bad Request` response
+/// rather than emitted as a `Location` header. Callers that explicitly
+/// want to send the browser off-site must use
+/// `redirect_response_to_external` and acknowledge the choice.
 pub fn redirect_response(location : String) -> Response {
   redirect_with_status(302, location)
 }
 
 ///|
-/// Builds a `303 See Other` redirect response.
+/// Builds a `303 See Other` redirect response with the same internal-only
+/// validation as `redirect_response`.
 pub fn see_other_response(location : String) -> Response {
   redirect_with_status(303, location)
+}
+
+///|
+/// Builds a `302 Found` response that points at an absolute, external URL.
+///
+/// This is the only redirect builder that emits a `Location` whose scheme
+/// or host is outside the application. It is the caller's responsibility
+/// to make sure the URL is trusted (allowlist, signed redirect target,
+/// etc.) — the helper does not consult any policy of its own.
+pub fn redirect_response_to_external(absolute_url : String) -> Response {
+  let safe_location = sanitize_header_value(absolute_url)
+  response_with_headers(
+    302,
+    [("location", safe_location)],
+    Redirect(safe_location),
+  )
+}
+
+///|
+/// Returns whether `path` is a safe internal redirect target.
+///
+/// Safe paths start with a single `/`, never `//` or `/\\` (which the
+/// browser treats as protocol-relative or host-relative), contain no
+/// ASCII control characters, and are not URL schemes such as
+/// `javascript:` or `data:`.
+pub fn is_safe_internal_redirect(path : String) -> Bool {
+  if path.length() == 0 {
+    return false
+  }
+  let chars = path.to_array()
+  if chars[0] != '/' {
+    return false
+  }
+  if chars.length() >= 2 {
+    let second = chars[1]
+    if second == '/' || second == '\\' {
+      return false
+    }
+  }
+  for ch in chars {
+    let code = ch.to_uint()
+    if code < 0x20 || code == 0x7f {
+      return false
+    }
+  }
+  true
 }
 
 ///|
@@ -181,6 +235,13 @@ pub fn render_response_body(body : ResponseBody) -> String {
 ///|
 fn redirect_with_status(status : Int, location : String) -> Response {
   let safe_location = sanitize_header_value(location)
+  if !is_safe_internal_redirect(safe_location) {
+    return response_with_headers(
+      400,
+      [("content-type", "text/plain; charset=utf-8")],
+      Text("Bad Request: refusing external or unsafe redirect target"),
+    )
+  }
   response_with_headers(
     status,
     [("location", safe_location)],

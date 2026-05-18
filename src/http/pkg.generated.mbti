@@ -41,6 +41,8 @@ pub fn http_post() -> HttpMethod
 
 pub fn http_put() -> HttpMethod
 
+pub fn is_safe_internal_redirect(String) -> Bool
+
 pub fn json_response(Int, String) -> Response
 
 pub fn match_route(RoutePattern, String) -> Array[(String, String)]?
@@ -62,6 +64,8 @@ pub fn parse_route_pattern(String) -> RoutePattern
 pub fn recognize(Array[RouteSpec], Request) -> MatchedRoute?
 
 pub fn redirect_response(String) -> Response
+
+pub fn redirect_response_to_external(String) -> Response
 
 pub fn render_response_body(ResponseBody) -> String
 
