@@ -1,0 +1,40 @@
+name: Dependency Refresh
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 19 * * 0"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  moonbit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Set up MoonBit and refresh dependencies
+        uses: ./.github/actions/setup-moonbit
+        with:
+          update-deps: "true"
+
+      - name: Check generated files are committed
+        run: |
+          moon info
+          moon fmt
+          git diff --exit-code
+
+      - name: Run tests
+        run: moon test
