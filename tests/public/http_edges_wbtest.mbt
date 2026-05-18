@@ -151,9 +151,21 @@ test "request helpers decode cookies csrf tokens and session stores" {
   let session = issue_session("42", "browser")
   let store = session_store_for_config(config~, remember_me=false)
   let remember_store = session_store_for_config(config~, remember_me=true)
+  let cache_store = cache_session_store(key="_cache_session")
+  let redis_store = redis_session_store(key="_redis_session")
+  let cross_site_store = cookie_session_store(
+    key="_cross_site_session",
+    secure=false,
+    same_site=cookie_same_site_none(),
+    signing_secret=Some(config.secret_key_base),
+  )
   let session_cookie_value = session_cookie_with_store(store~, session~)
   let remember_cookie_value = session_cookie_with_store(
     store=remember_store,
+    session~,
+  )
+  let cross_site_cookie_value = session_cookie_with_store(
+    store=cross_site_store,
     session~,
   )
   let current = append_request_header(
@@ -184,6 +196,30 @@ test "request helpers decode cookies csrf tokens and session stores" {
     "cookie",
     config.remember_cookie + "=" + remember_cookie_value.value,
   )
+  let forged_cache = append_request_header(
+    request(
+      verb=http_get(),
+      path="/posts",
+      query=[],
+      form=[],
+      session_id=None,
+      body="",
+    ),
+    "cookie",
+    "_cache_session=forged-session-id",
+  )
+  let forged_redis = append_request_header(
+    request(
+      verb=http_get(),
+      path="/posts",
+      query=[],
+      form=[],
+      session_id=None,
+      body="",
+    ),
+    "cookie",
+    "_redis_session=forged-session-id",
+  )
 
   assert_true(
     request_header(current, "cookie") ==
@@ -203,7 +239,13 @@ test "request helpers decode cookies csrf tokens and session stores" {
     Some(session.id),
   )
   assert_true(request_session_id(current, store) == Some(session.id))
+  assert_true(request_session_id(forged_cache, cache_store) == None)
+  assert_true(request_session_id(forged_redis, redis_store) == None)
   assert_true(request_csrf_token(current, config) == Some(session.csrf_token))
+  assert_true(cross_site_store.secure)
+  assert_true(cross_site_cookie_value.secure)
+  assert_true(cookie_header(cross_site_cookie_value).contains("Secure"))
+  assert_true(cookie_header(cross_site_cookie_value).contains("SameSite=None"))
   assert_true(
     request_csrf_token(
       request(

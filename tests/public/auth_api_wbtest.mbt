@@ -40,12 +40,52 @@ test "session helpers generate fresh sessions and signed cookies" {
   let reset = issue_password_reset(
     "7", "editor@example.com", "2026-03-25T10:00:00Z",
   )
+  let next_reset = issue_password_reset(
+    "7", "editor@example.com", "2026-03-25T10:00:00Z",
+  )
+  let reset_with_entropy = issue_password_reset(
+    "7",
+    "editor@example.com",
+    "2026-03-25T10:00:00Z",
+    entropy=Some("reset-entropy"),
+    secret=Some(config.secret_key_base),
+  )
+  let reset_with_other_secret = issue_password_reset(
+    "7",
+    "editor@example.com",
+    "2026-03-25T10:00:00Z",
+    entropy=Some("reset-entropy"),
+    secret=Some("rotated-secret"),
+  )
   let verification = issue_email_verification(
     "7", "editor@example.com", "2026-03-25T10:00:00Z",
   )
+  let next_verification = issue_email_verification(
+    "7", "editor@example.com", "2026-03-25T10:00:00Z",
+  )
+  let verification_with_entropy = issue_email_verification(
+    "7",
+    "editor@example.com",
+    "2026-03-25T10:00:00Z",
+    entropy=Some("verify-entropy"),
+    secret=Some(config.secret_key_base),
+  )
+  let verification_with_other_secret = issue_email_verification(
+    "7",
+    "editor@example.com",
+    "2026-03-25T10:00:00Z",
+    entropy=Some("verify-entropy"),
+    secret=Some("rotated-secret"),
+  )
   assert_true(reset.token.has_prefix("reset_"))
+  assert_false(reset.token == next_reset.token)
+  assert_false(reset_with_entropy.token == reset_with_other_secret.token)
   assert_eq(reset.expires_at, "2026-03-25T10:00:00Z+15m")
   assert_true(verification.token.has_prefix("verify_"))
+  assert_false(verification.token == next_verification.token)
+  assert_false(
+    verification_with_entropy.token == verification_with_other_secret.token,
+  )
   assert_eq(verification.expires_at, "2026-03-25T10:00:00Z+24h")
 
   let remember = session_cookie(config~, session~, remember_me=true)
@@ -80,6 +120,7 @@ test "cookie stores and forgery strategies stay explicit and type safe" {
   let redis_store = redis_session_store(
     key="_redis_session",
     same_site=cookie_same_site_none(),
+    secure=false,
   )
   let unsigned_signed_store = cookie_session_store(key="_unsafe_session")
   let disabled = disabled_session_store()
@@ -88,6 +129,7 @@ test "cookie stores and forgery strategies stay explicit and type safe" {
   assert_true(remember_store.expire_after_seconds == Some(60 * 60 * 24 * 30))
   assert_true(session_store_summary(cache_store).contains("store=cache"))
   assert_eq(redis_store.same_site, cookie_same_site_none())
+  assert_true(redis_store.secure)
   assert_true(session_store_summary(disabled).contains("store=disabled"))
 
   let signed = signed_cookie(
@@ -102,6 +144,16 @@ test "cookie stores and forgery strategies stay explicit and type safe" {
   assert_true(
     cookie_header(signed).contains("Expires=Wed, 26 Mar 2026 10:00:00 GMT"),
   )
+  let cross_site_signed = signed_cookie(
+    name="cross_site",
+    value="token-1",
+    secret=config.secret_key_base,
+    secure=false,
+    same_site=cookie_same_site_none(),
+  )
+  assert_true(cross_site_signed.secure)
+  assert_true(cookie_header(cross_site_signed).contains("SameSite=None"))
+  assert_true(cookie_header(cross_site_signed).contains("Secure"))
   let injected = signed_cookie(
     name="preview\r\nset-cookie: forged",
     value="token-1\r\nx: y",

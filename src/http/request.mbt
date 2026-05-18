@@ -62,7 +62,10 @@ pub fn request_session_id(
           None => None
         }
       } else {
-        Some(value)
+        match store.kind {
+          CookieStore => Some(value)
+          CacheStore | RedisStore | DisabledStore => None
+        }
       }
     None => None
   }

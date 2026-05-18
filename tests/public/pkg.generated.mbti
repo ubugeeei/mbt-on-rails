@@ -516,9 +516,9 @@ pub fn invalid_secret_names(@secrets.SecretsConfig) -> Array[String]
 
 pub fn invoke_server_action_step(String) -> @controller.ActionStep
 
-pub fn issue_email_verification(String, String, String) -> @auth.EmailVerificationToken
+pub fn issue_email_verification(String, String, String, entropy? : String?, secret? : String?) -> @auth.EmailVerificationToken
 
-pub fn issue_password_reset(String, String, String) -> @auth.PasswordResetToken
+pub fn issue_password_reset(String, String, String, entropy? : String?, secret? : String?) -> @auth.PasswordResetToken
 
 pub fn issue_session(String, String, entropy? : String?, secret? : String?) -> @auth.Session
 

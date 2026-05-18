@@ -46,9 +46,9 @@ pub fn forgery_strategy_summary(RequestForgeryStrategy) -> String
 
 pub fn identity(String, String, String, Array[String], String?) -> Identity
 
-pub fn issue_email_verification(String, String, String) -> EmailVerificationToken
+pub fn issue_email_verification(String, String, String, entropy? : String?, secret? : String?) -> EmailVerificationToken
 
-pub fn issue_password_reset(String, String, String) -> PasswordResetToken
+pub fn issue_password_reset(String, String, String, entropy? : String?, secret? : String?) -> PasswordResetToken
 
 pub fn issue_session(String, String, entropy? : String?, secret? : String?) -> Session
 
