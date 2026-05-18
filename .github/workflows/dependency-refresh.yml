@@ -36,5 +36,7 @@ jobs:
           moon fmt
           git diff --exit-code
 
-      - name: Run tests
-        run: moon test
+      - name: Run checks and tests
+        run: |
+          scripts/check_moon_warnings.sh
+          moon test

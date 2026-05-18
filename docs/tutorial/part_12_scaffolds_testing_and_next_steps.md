@@ -43,6 +43,11 @@ Run it with:
 moon run --target native cmd/generate_example_types -- <package_dir> <frontend_path> <output_path>
 ```
 
+This helper is a repository-maintenance command for regenerating the examples in
+this source tree. Published packages intentionally exclude `cmd/**`, so package
+consumers should use the checked-in generated helpers instead of expecting this
+command to be available from an installed package.
+
 ## Tests
 
 `tests/public` is the best place to study the public API surface.

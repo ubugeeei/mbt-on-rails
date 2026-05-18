@@ -8,9 +8,10 @@ struct GenerateExampleTypesCommand {
 
 ///|
 fn main {
+  ensure_supported_target()
   match parse_command(@env.args()) {
     Some(command) => run(command)
-    None => print_usage()
+    None => fail_usage()
   }
 }
 
@@ -43,6 +44,12 @@ fn print_usage() -> Unit {
   println(
     "usage: moon run --target native cmd/generate_example_types -- <package_dir> <frontend_path> <output_path>",
   )
+}
+
+///|
+fn fail_usage() -> Unit {
+  print_usage()
+  fatal_cli("invalid arguments")
 }
 
 ///|
