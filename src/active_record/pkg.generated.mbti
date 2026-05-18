@@ -89,6 +89,8 @@ pub fn has_one(name~ : String, target~ : String, foreign_key~ : String) -> Assoc
 
 pub fn having_raw(Relation, String) -> Relation
 
+pub fn having_with_binds(Relation, String, Array[RelationBind]) -> Relation
+
 pub fn index_statements(ModelSchema) -> Array[String]
 
 pub fn indexed(Column) -> Column
@@ -134,6 +136,8 @@ pub fn relation_for(ModelSchema) -> Relation
 
 pub fn relation_to_sql(Relation) -> String
 
+pub fn render_relation_bind(RelationBind) -> String
+
 pub fn reorder_by(Relation, String, descending? : Bool) -> Relation
 
 pub fn reverse_order(Relation) -> Relation
@@ -156,6 +160,8 @@ pub fn serialize_record_json(ModelSchema, Record) -> SerializeRecordOutcome
 
 pub fn string_column(String) -> Column
 
+pub fn substitute_relation_binds(String, Array[RelationBind]) -> String
+
 pub fn text_column(String) -> Column
 
 pub fn timestamp_column(String) -> Column
@@ -169,6 +175,12 @@ pub fn typed_field(String, AttributeValue) -> TypedField
 pub fn typed_record(String, Array[TypedField]) -> TypedRecord
 
 pub fn unique(Column) -> Column
+
+pub fn unsafe_having_raw(Relation, String) -> Relation
+
+pub fn unsafe_join_relation(Relation, String) -> Relation
+
+pub fn unsafe_where_raw(Relation, String) -> Relation
 
 pub fn update_sql(ModelSchema, Record, String) -> String
 
@@ -234,6 +246,8 @@ pub fn where_lt(Relation, String, String) -> Relation
 pub fn where_not_eq(Relation, String, String) -> Relation
 
 pub fn where_raw(Relation, String) -> Relation
+
+pub fn where_with_binds(Relation, String, Array[RelationBind]) -> Relation
 
 pub fn with_association(ModelSchema, Association) -> ModelSchema
 
@@ -442,6 +456,7 @@ pub fn Relation::distinct_records(Self) -> Self
 pub fn Relation::execute(Self, ModelSchema, MemoryDatabase) -> RelationExecutionOutcome
 pub fn Relation::group_by(Self, Array[String]) -> Self
 pub fn Relation::having_raw(Self, String) -> Self
+pub fn Relation::having_with_binds(Self, String, Array[RelationBind]) -> Self
 pub fn Relation::join_relation(Self, String) -> Self
 pub fn Relation::limit_to(Self, Int) -> Self
 pub fn Relation::merge_relation(Self, Self) -> Self
@@ -459,6 +474,17 @@ pub fn Relation::where_like(Self, String, String) -> Self
 pub fn Relation::where_lt(Self, String, String) -> Self
 pub fn Relation::where_not_eq(Self, String, String) -> Self
 pub fn Relation::where_raw(Self, String) -> Self
+pub fn Relation::where_with_binds(Self, String, Array[RelationBind]) -> Self
+pub fn Relation::unsafe_having_raw(Self, String) -> Self
+pub fn Relation::unsafe_join_relation(Self, String) -> Self
+pub fn Relation::unsafe_where_raw(Self, String) -> Self
+
+pub enum RelationBind {
+  BindText(String)
+  BindInt(Int64)
+  BindBool(Bool)
+  BindNull
+} derive(@debug.Debug)
 
 pub struct RelationExecutionIssue {
   feature : String

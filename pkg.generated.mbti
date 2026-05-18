@@ -454,6 +454,8 @@ pub fn hash_string(String) -> String
 
 pub fn having_raw(@active_record.Relation, String) -> @active_record.Relation
 
+pub fn having_with_binds(@active_record.Relation, String, Array[@active_record.RelationBind]) -> @active_record.Relation
+
 #label_migration(detail, allow_positional=true)
 #label_migration(name, allow_positional=true)
 #label_migration(ok, allow_positional=true)
@@ -839,6 +841,8 @@ pub fn render_partial(name~ : String, locals~ : Array[(String, String)]) -> @vie
 
 pub fn render_prometheus(@metrics.MetricsRegistry) -> String
 
+pub fn render_relation_bind(@active_record.RelationBind) -> String
+
 pub fn render_response_body(@http.ResponseBody) -> String
 
 pub fn render_route_tree(Array[@view.PageModule]) -> String
@@ -1039,6 +1043,8 @@ pub fn string_column(String) -> @active_record.Column
 #label_migration(name, allow_positional=true)
 pub fn string_field(name~ : String) -> @validation.FieldSchema
 
+pub fn substitute_relation_binds(String, Array[@active_record.RelationBind]) -> String
+
 pub fn suspense_boundary(name~ : String, fallback_html~ : String, children~ : Array[@view.VaporNode]) -> @view.VaporNode
 
 pub fn tag(name~ : String, attrs? : Array[(String, String)]) -> String
@@ -1083,6 +1089,12 @@ pub fn typed_text_response(Int, String, String) -> @http.Response
 pub fn unauthorized_response(message? : String) -> @http.Response
 
 pub fn unique(@active_record.Column) -> @active_record.Column
+
+pub fn unsafe_having_raw(@active_record.Relation, String) -> @active_record.Relation
+
+pub fn unsafe_join_relation(@active_record.Relation, String) -> @active_record.Relation
+
+pub fn unsafe_where_raw(@active_record.Relation, String) -> @active_record.Relation
 
 pub fn unprocessable_entity_response(message? : String) -> @http.Response
 
@@ -1191,6 +1203,8 @@ pub fn where_lt(@active_record.Relation, String, String) -> @active_record.Relat
 pub fn where_not_eq(@active_record.Relation, String, String) -> @active_record.Relation
 
 pub fn where_raw(@active_record.Relation, String) -> @active_record.Relation
+
+pub fn where_with_binds(@active_record.Relation, String, Array[@active_record.RelationBind]) -> @active_record.Relation
 
 pub fn with_action_name(@view.PageModule, String) -> @view.PageModule
 
