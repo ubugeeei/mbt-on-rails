@@ -482,6 +482,12 @@ pub fn has_one(name~ : String, target~ : String, foreign_key~ : String) -> @acti
 
 pub fn hash_string(String) -> String
 
+pub fn hex_encode_bytes(Array[UInt]) -> String
+
+pub fn hmac_sha256_bytes(Array[UInt], Array[UInt]) -> Array[UInt]
+
+pub fn hmac_sha256_hex(String, String) -> String
+
 pub fn having_raw(@active_record.Relation, String) -> @active_record.Relation
 
 pub fn having_with_binds(@active_record.Relation, String, Array[@active_record.RelationBind]) -> @active_record.Relation
@@ -1007,6 +1013,10 @@ pub fn schema_dump(Array[@active_record.ModelSchema]) -> String
 
 pub fn schema_sql(Array[@migration.Migration]) -> Array[String]
 
+pub fn sha256_bytes(Array[UInt]) -> Array[UInt]
+
+pub fn sha256_hex(String) -> String
+
 #label_migration(name, allow_positional=true)
 #label_migration(relation, allow_positional=true)
 pub fn scope(name~ : String, relation~ : @active_record.Relation) -> @active_record.ScopeDefinition
@@ -1175,6 +1185,8 @@ pub fn upsert_sql(@active_record.ModelSchema, @active_record.Record, String) -> 
 pub fn use_id(String, Int) -> String
 
 pub fn[T] use_template_ref(String) -> @view.TemplateRef[T]
+
+pub fn utf8_bytes(String) -> Array[UInt]
 
 pub fn validate_check_constraint_step(String, String) -> @migration.MigrationStep
 

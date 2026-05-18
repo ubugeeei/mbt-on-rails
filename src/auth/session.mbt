@@ -310,12 +310,18 @@ pub fn session_store_for_config(
 
 ///|
 /// Signs one cookie value using the supplied secret.
+///
+/// The signature is `HMAC-SHA-256(secret, name || "::" || value)` rendered as
+/// a lowercase hex string. The resulting cookie is encoded as
+/// `value--<hex-tag>` so verifiers can locate the delimiter even when the
+/// value itself contains literal `--` sequences (only the final `--`
+/// counts).
 pub fn sign_cookie_value(
   name : String,
   value : String,
   secret : String,
 ) -> String {
-  value + "--" + @support.hash_string(secret + "::" + name + "::" + value)
+  value + "--" + @support.hmac_sha256_hex(secret, name + "::" + value)
 }
 
 ///|
@@ -333,7 +339,7 @@ pub fn verify_signed_cookie_value(
         start=index + 2,
         end=signed_value.length(),
       )
-      let expected = @support.hash_string(secret + "::" + name + "::" + value)
+      let expected = @support.hmac_sha256_hex(secret, name + "::" + value)
       if @support.constant_time_eq(digest, expected) {
         Some(value)
       } else {
