@@ -988,6 +988,8 @@ pub fn rollback_transaction(@active_record.MemoryTransaction) -> @active_record.
 #label_migration(verb, allow_positional=true)
 pub fn route(name~ : String, verb~ : @http.HttpMethod, path~ : String, controller~ : String, action~ : String, page_name~ : String?) -> @http.RouteSpec
 
+pub fn rotate_session(@auth.Session, String, entropy? : String?, secret? : String?) -> @auth.Session
+
 pub fn run_record_callbacks(Array[(@active_record.Record) -> @active_record.CallbackOutcome], @active_record.Record) -> @active_record.CallbackOutcome
 
 pub fn safe_join(Array[String], separator? : String) -> String

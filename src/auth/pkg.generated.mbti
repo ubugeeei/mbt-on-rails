@@ -78,6 +78,8 @@ pub fn request_forgery_reset_session() -> RequestForgeryStrategy
 
 pub fn role_access(String) -> AuthRequirement
 
+pub fn rotate_session(Session, String, entropy? : String?, secret? : String?) -> Session
+
 #label_migration(config, allow_positional=true)
 #label_migration(remember_me, allow_positional=true)
 #label_migration(session, allow_positional=true)

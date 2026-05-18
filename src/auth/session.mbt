@@ -39,6 +39,24 @@ pub fn issue_session(
 }
 
 ///|
+/// Rotates `current` into a brand-new session pair while preserving the
+/// caller's `user_id`. Every sign-in path must call this so an attacker-
+/// fixed session id does not survive the upgrade from anonymous to
+/// authenticated traffic.
+///
+/// `entropy` and `secret` are mixed into the seed exactly as in
+/// `issue_session`; the helper exists to make the rotation pattern
+/// observable at the call site, not to introduce new behaviour.
+pub fn rotate_session(
+  current : Session,
+  agent_hint : String,
+  entropy? : String? = None,
+  secret? : String? = None,
+) -> Session {
+  issue_session(current.user_id, agent_hint, entropy~, secret~)
+}
+
+///|
 let session_rng : @random.Rand = @random.Rand::new()
 
 ///|

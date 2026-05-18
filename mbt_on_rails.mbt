@@ -144,6 +144,7 @@ pub using @auth {
   issue_email_verification,
   issue_password_reset,
   issue_session,
+  rotate_session,
   parse_cookie_header,
   permission_access,
   policy_rule,
