@@ -142,9 +142,9 @@ pub fn model(name~ : String, table~ : String, columns~ : Array[Column], timestam
 
 pub fn none_relation(Relation) -> Relation
 
-pub fn nullable(Column) -> Column
-
 pub fn null_database_adapter() -> DatabaseAdapter
+
+pub fn nullable(Column) -> Column
 
 pub fn offset_by(Relation, Int) -> Relation
 
@@ -298,6 +298,14 @@ pub fn with_validation(ModelSchema, Validation) -> ModelSchema
 // Errors
 
 // Types and methods
+pub enum AdapterError {
+  ConnectionFailed(String)
+  SyntaxError(String)
+  IntegrityViolation(String)
+  AdapterTimeout(String)
+  OtherAdapterError(String)
+}
+
 pub struct Association {
   name : String
   target : String
@@ -338,6 +346,11 @@ pub struct Callback {
   function_name : String
 }
 
+pub enum CallbackOutcome {
+  Continue(Record)
+  Halt(String)
+}
+
 pub enum CastRecordOutcome {
   CastedRecord(TypedRecord)
   CastRecordFailed(Array[AttributeCastError])
@@ -369,20 +382,7 @@ pub enum ColumnType {
   References(String)
 } derive(Eq, @debug.Debug)
 
-pub(all) enum AdapterError {
-  ConnectionFailed(String)
-  SyntaxError(String)
-  IntegrityViolation(String)
-  AdapterTimeout(String)
-  OtherAdapterError(String)
-}
-
-pub(all) enum CallbackOutcome {
-  Continue(Record)
-  Halt(String)
-}
-
-pub(all) struct DatabaseAdapter {
+pub struct DatabaseAdapter {
   name : String
   execute : (String, Array[RelationBind]) -> QueryOutcome
   begin : () -> TransactionBeginOutcome
@@ -396,7 +396,7 @@ pub enum DestroyOutcome {
   DestroyNotFound(MemoryDatabase)
 }
 
-pub(all) enum DestroyWithCallbacksOutcome {
+pub enum DestroyWithCallbacksOutcome {
   DestroyedAfterCallbacks(MemoryDatabase, Record)
   DestroyTargetMissing(MemoryDatabase)
   DestroyCallbackHalted(String)
@@ -494,6 +494,18 @@ pub enum Predicate {
   Raw(String)
 } derive(@debug.Debug)
 
+pub enum QueryOutcome {
+  QuerySucceeded(QueryResult)
+  QueryFailed(AdapterError)
+}
+
+pub struct QueryResult {
+  columns : Array[String]
+  rows : Array[Record]
+  affected_rows : Int
+  last_insert_id : String?
+}
+
 pub struct Record {
   table : String
   fields : Array[(String, String)]
@@ -531,6 +543,9 @@ pub fn Relation::preload(Self, String) -> Self
 pub fn Relation::reorder_by(Self, String, descending? : Bool) -> Self
 pub fn Relation::reverse_order(Self) -> Self
 pub fn Relation::select_columns(Self, Array[String]) -> Self
+pub fn Relation::unsafe_having_raw(Self, String) -> Self
+pub fn Relation::unsafe_join_relation(Self, String) -> Self
+pub fn Relation::unsafe_where_raw(Self, String) -> Self
 pub fn Relation::where_eq(Self, String, String) -> Self
 pub fn Relation::where_gt(Self, String, String) -> Self
 pub fn Relation::where_in(Self, String, Array[String]) -> Self
@@ -539,28 +554,13 @@ pub fn Relation::where_lt(Self, String, String) -> Self
 pub fn Relation::where_not_eq(Self, String, String) -> Self
 pub fn Relation::where_raw(Self, String) -> Self
 pub fn Relation::where_with_binds(Self, String, Array[RelationBind]) -> Self
-pub fn Relation::unsafe_having_raw(Self, String) -> Self
-pub fn Relation::unsafe_join_relation(Self, String) -> Self
-pub fn Relation::unsafe_where_raw(Self, String) -> Self
 
-pub(all) enum RelationBind {
+pub enum RelationBind {
   BindText(String)
   BindInt(Int64)
   BindBool(Bool)
   BindNull
 } derive(@debug.Debug)
-
-pub(all) enum QueryOutcome {
-  QuerySucceeded(QueryResult)
-  QueryFailed(AdapterError)
-}
-
-pub(all) struct QueryResult {
-  columns : Array[String]
-  rows : Array[Record]
-  affected_rows : Int
-  last_insert_id : String?
-}
 
 pub struct RelationExecutionIssue {
   feature : String
@@ -583,7 +583,7 @@ pub enum SaveOutcome {
   ValidationFailed(ValidationErrors)
 }
 
-pub(all) enum SaveWithCallbacksOutcome {
+pub enum SaveWithCallbacksOutcome {
   SavedAfterCallbacks(MemoryDatabase, Record)
   SaveValidationFailed(ValidationErrors)
   SaveCallbackHalted(String)
@@ -601,12 +601,12 @@ pub enum SerializeRecordOutcome {
 pub fn SerializeRecordOutcome::errors(Self) -> Array[AttributeCastError]
 pub fn SerializeRecordOutcome::json(Self) -> String?
 
-pub(all) enum TransactionBeginOutcome {
+pub enum TransactionBeginOutcome {
   TransactionStarted(TxHandle)
   TransactionBeginFailed(AdapterError)
 }
 
-pub(all) enum TransactionCloseOutcome {
+pub enum TransactionCloseOutcome {
   TransactionClosed
   TransactionCloseFailed(AdapterError)
 }
@@ -616,14 +616,14 @@ pub enum TransactionSaveOutcome {
   TransactionValidationFailed(MemoryTransaction, ValidationErrors)
 }
 
-pub(all) struct TxHandle {
-  id : String
-  adapter_name : String
-}
-
 pub struct TransactionSavepoint {
   name : String
   database : MemoryDatabase
+}
+
+pub struct TxHandle {
+  id : String
+  adapter_name : String
 }
 
 pub struct TypedField {
