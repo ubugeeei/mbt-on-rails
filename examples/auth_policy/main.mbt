@@ -68,7 +68,12 @@ fn print_policy_checks(identity : @mbor.Identity) -> Unit {
 /// Prints session, cookie, and CSRF behavior.
 fn print_session_checks(identity : @mbor.Identity) -> Unit {
   let config = @mbor.default_auth_config()
-  let session = @mbor.issue_session(identity.user_id, "examples/auth_policy")
+  let session = @mbor.issue_session(
+    identity.user_id,
+    "examples/auth_policy",
+    entropy=Some("demo-request-entropy"),
+    secret=Some(config.secret_key_base),
+  )
   let cookie = @mbor.session_cookie(config~, session~, remember_me=true)
 
   println("Session + Cookie")

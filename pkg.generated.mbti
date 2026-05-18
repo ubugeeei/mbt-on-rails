@@ -514,7 +514,7 @@ pub fn issue_email_verification(String, String, String) -> @auth.EmailVerificati
 
 pub fn issue_password_reset(String, String, String) -> @auth.PasswordResetToken
 
-pub fn issue_session(String, String) -> @auth.Session
+pub fn issue_session(String, String, entropy? : String?, secret? : String?) -> @auth.Session
 
 #label_migration(argument_types, allow_positional=true)
 #label_migration(name, allow_positional=true)

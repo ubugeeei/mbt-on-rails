@@ -44,6 +44,11 @@ Session helpers include:
 - `issue_password_reset(...)`
 - `issue_email_verification(...)`
 
+`issue_session(...)` accepts optional `entropy` and `secret` labels. Production
+callers should pass per-session entropy from the runtime and an application
+secret so session ids and CSRF tokens are not derived from stable user or agent
+hints alone.
+
 The current implementation is still lightweight, but it now models:
 
 - typed cookie SameSite policies
