@@ -192,6 +192,30 @@ test "job adapters and serialized jobs preserve queue contracts" {
 }
 
 ///|
+test "job payload serialization escapes and parses JSON control characters" {
+  let controls = "a\u{0000}b\u{0001}c\u{0008}d\u{000C}e\u{001F}f"
+  let payload_json = serialize_payload([("controls", controls)])
+
+  assert_eq(
+    payload_json, "{\"controls\": \"a\\u0000b\\u0001c\\bd\\fe\\u001ff\"}",
+  )
+
+  match deserialize_payload(payload_json) {
+    Some(payload) => assert_eq(find_entry(payload, "controls"), Some(controls))
+    None => assert_true(false)
+  }
+
+  match deserialize_payload("{\"controls\": \"x\\u0008\\u000Cy\\u001Fz\"}") {
+    Some(payload) =>
+      assert_eq(
+        find_entry(payload, "controls"),
+        Some("x\u{0008}\u{000C}y\u{001F}z"),
+      )
+    None => assert_true(false)
+  }
+}
+
+///|
 test "component contracts surface server client boundaries in manifests" {
   let action = server_action(
     name="posts.create",

@@ -12,11 +12,47 @@ pub fn json_string(source : String) -> String {
       '\n' => sb.write_string("\\n")
       '\r' => sb.write_string("\\r")
       '\t' => sb.write_string("\\t")
-      _ => sb.write_char(ch)
+      _ =>
+        if ch.to_int() < 0x20 {
+          write_json_unicode_escape(sb, ch)
+        } else {
+          sb.write_char(ch)
+        }
     }
   }
   sb.write_char('"')
   sb.to_string()
+}
+
+///|
+fn write_json_unicode_escape(sb : StringBuilder, ch : Char) -> Unit {
+  let code = ch.to_int()
+  sb.write_string("\\u00")
+  sb.write_char(hex_digit(code / 16))
+  sb.write_char(hex_digit(code % 16))
+}
+
+///|
+fn hex_digit(value : Int) -> Char {
+  match value {
+    0 => '0'
+    1 => '1'
+    2 => '2'
+    3 => '3'
+    4 => '4'
+    5 => '5'
+    6 => '6'
+    7 => '7'
+    8 => '8'
+    9 => '9'
+    10 => 'a'
+    11 => 'b'
+    12 => 'c'
+    13 => 'd'
+    14 => 'e'
+    15 => 'f'
+    _ => '0'
+  }
 }
 
 ///|
