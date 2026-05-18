@@ -16,14 +16,64 @@ pub fn verify_password(
 
 ///|
 /// Issues a new session identifier and CSRF token pair.
-pub fn issue_session(user_id : String, agent_hint : String) -> Session {
-  let seed = user_id + "::" + agent_hint
+///
+/// Production callers should pass per-session entropy and an application
+/// secret; the fallback nonce keeps demo calls from repeating stable hints.
+pub fn issue_session(
+  user_id : String,
+  agent_hint : String,
+  entropy? : String? = None,
+  secret? : String? = None,
+) -> Session {
+  let seed = session_seed(user_id, agent_hint, entropy, secret)
   {
-    id: "sess_" + @support.hash_string(seed),
+    id: "sess_" + token_digest("session", seed),
     user_id,
-    csrf_token: "csrf_" + @support.hash_string("csrf::" + seed),
+    csrf_token: "csrf_" + token_digest("csrf", seed),
     fresh: true,
   }
+}
+
+///|
+let session_rng : @random.Rand = @random.Rand::new()
+
+///|
+fn session_seed(
+  user_id : String,
+  agent_hint : String,
+  entropy : String?,
+  secret : String?,
+) -> String {
+  user_id +
+  "::" +
+  agent_hint +
+  "::entropy=" +
+  optional_seed_part(entropy) +
+  "::secret=" +
+  optional_seed_part(secret) +
+  "::nonce=" +
+  session_nonce()
+}
+
+///|
+fn optional_seed_part(value : String?) -> String {
+  match value {
+    Some(current) => @support.hash_string(current)
+    None => "none"
+  }
+}
+
+///|
+fn token_digest(purpose : String, seed : String) -> String {
+  @support.hash_string(purpose + "::0::" + seed) +
+  @support.hash_string(purpose + "::1::" + seed) +
+  @support.hash_string(purpose + "::2::" + seed) +
+  @support.hash_string(purpose + "::3::" + seed)
+}
+
+///|
+fn session_nonce() -> String {
+  session_rng.uint64().to_string() + ":" + session_rng.uint64().to_string()
 }
 
 ///|

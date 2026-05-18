@@ -46,7 +46,7 @@ pub fn issue_email_verification(String, String, String) -> EmailVerificationToke
 
 pub fn issue_password_reset(String, String, String) -> PasswordResetToken
 
-pub fn issue_session(String, String) -> Session
+pub fn issue_session(String, String, entropy? : String?, secret? : String?) -> Session
 
 pub fn parse_cookie_header(String) -> Array[(String, String)]
 

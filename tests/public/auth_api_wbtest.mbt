@@ -1,16 +1,41 @@
 ///|
-test "session helpers generate stable digests tokens and cookies" {
+test "session helpers generate fresh sessions and signed cookies" {
   let config = default_auth_config()
   let digest = digest_password("secret", "salt")
   assert_true(verify_password("secret", "salt", digest))
   assert_false(verify_password("nope", "salt", digest))
 
-  let session = issue_session("7", "browser")
+  let session = issue_session(
+    "7",
+    "browser",
+    entropy=Some("request-entropy-a"),
+    secret=Some(config.secret_key_base),
+  )
   assert_true(session.id.has_prefix("sess_"))
   assert_true(session.csrf_token.has_prefix("csrf_"))
   assert_true(csrf_valid(Some(session), Some(session.csrf_token)))
   assert_false(csrf_valid(Some(session), Some("wrong")))
   assert_false(csrf_valid(None, Some("wrong")))
+  let different_entropy = issue_session(
+    "7",
+    "browser",
+    entropy=Some("request-entropy-b"),
+    secret=Some(config.secret_key_base),
+  )
+  assert_false(session.id == different_entropy.id)
+  assert_false(session.csrf_token == different_entropy.csrf_token)
+  let different_secret = issue_session(
+    "7",
+    "browser",
+    entropy=Some("request-entropy-a"),
+    secret=Some("alternate-secret-key-base"),
+  )
+  assert_false(session.id == different_secret.id)
+  assert_false(session.csrf_token == different_secret.csrf_token)
+  let implicit_entropy = issue_session("7", "browser")
+  let next_implicit_entropy = issue_session("7", "browser")
+  assert_false(implicit_entropy.id == next_implicit_entropy.id)
+  assert_false(implicit_entropy.csrf_token == next_implicit_entropy.csrf_token)
 
   let reset = issue_password_reset(
     "7", "editor@example.com", "2026-03-25T10:00:00Z",
