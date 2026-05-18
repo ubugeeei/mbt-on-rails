@@ -15,7 +15,7 @@ pub enum Predicate {
 /// and `having_with_binds`. Every variant renders through a SQL-literal
 /// path that quotes and escapes its payload — at no point is a caller
 /// value concatenated into the template as a raw fragment.
-pub enum RelationBind {
+pub(all) enum RelationBind {
   BindText(String)
   BindInt(Int64)
   BindBool(Bool)

@@ -37,15 +37,11 @@ test "substitute_relation_binds expands missing binds to NULL" {
 
 ///|
 test "where_with_binds and having_with_binds substitute through the same pipeline" {
-  let model = model(
-    name="post",
-    table="posts",
-    columns=[
-      indexed(string_column("title")),
-      integer_column("views"),
-      string_column("status"),
-    ],
-  )
+  let model = model(name="post", table="posts", columns=[
+    indexed(string_column("title")),
+    integer_column("views"),
+    string_column("status"),
+  ])
   let base = relation_for(model)
   let constrained = where_with_binds(base, "status = ? AND views > ?", [
     BindText("published"),
@@ -54,25 +50,19 @@ test "where_with_binds and having_with_binds substitute through the same pipelin
   let sql = relation_to_sql(constrained)
   assert_true(sql.contains("status = 'published'"))
   assert_true(sql.contains("views > 100"))
-  let grouped = group_by(base, ["status"]).having_with_binds(
-    "count(*) > ?",
-    [BindInt(5L)],
-  )
+  let grouped = group_by(base, ["status"]).having_with_binds("count(*) > ?", [
+    BindInt(5L),
+  ])
   let grouped_sql = relation_to_sql(grouped)
   assert_true(grouped_sql.contains("HAVING count(*) > 5"))
 }
 
 ///|
 test "unsafe_where_raw still emits raw SQL so callers can opt in explicitly" {
-  let model = model(
-    name="post",
-    table="posts",
-    columns=[indexed(string_column("title"))],
-  )
-  let relation = unsafe_where_raw(
-    relation_for(model),
-    "title LIKE 'launch%'",
-  )
+  let model = model(name="post", table="posts", columns=[
+    indexed(string_column("title")),
+  ])
+  let relation = unsafe_where_raw(relation_for(model), "title LIKE 'launch%'")
   let sql = relation_to_sql(relation)
   assert_true(sql.contains("title LIKE 'launch%'"))
 }

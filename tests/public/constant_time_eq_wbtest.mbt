@@ -4,8 +4,7 @@ test "constant_time_eq accepts identical strings of every shape we care about" {
   assert_true(constant_time_eq("a", "a"))
   assert_true(
     constant_time_eq(
-      "csrf_18394701239847012394871029384701923847",
-      "csrf_18394701239847012394871029384701923847",
+      "csrf_18394701239847012394871029384701923847", "csrf_18394701239847012394871029384701923847",
     ),
   )
   assert_true(
@@ -35,8 +34,7 @@ test "constant_time_eq rejects length mismatches without early return" {
   assert_false(constant_time_eq("token", "token--"))
   assert_false(
     constant_time_eq(
-      "csrf_18394701239847012394871029384701923847",
-      "csrf_18394701239847012394871029384701923847x",
+      "csrf_18394701239847012394871029384701923847", "csrf_18394701239847012394871029384701923847x",
     ),
   )
 }
