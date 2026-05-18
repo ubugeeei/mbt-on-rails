@@ -7,6 +7,20 @@ import {
 }
 
 // Values
+pub fn adapter_begin(DatabaseAdapter) -> TransactionBeginOutcome
+
+pub fn adapter_close(DatabaseAdapter) -> TransactionCloseOutcome
+
+pub fn adapter_commit(DatabaseAdapter, TxHandle) -> TransactionCloseOutcome
+
+pub fn adapter_error_message(AdapterError) -> String
+
+pub fn adapter_execute(DatabaseAdapter, String, Array[RelationBind]) -> QueryOutcome
+
+pub fn adapter_rollback(DatabaseAdapter, TxHandle) -> TransactionCloseOutcome
+
+pub fn adapter_summary(DatabaseAdapter) -> String
+
 pub fn after_create(String) -> Callback
 
 pub fn after_destroy(String) -> Callback
@@ -45,6 +59,8 @@ pub fn count_sql(Relation) -> String
 pub fn create_savepoint(MemoryTransaction, String) -> MemoryTransaction
 
 pub fn create_table_sql(ModelSchema) -> String
+
+pub fn database_adapter(String, (String, Array[RelationBind]) -> QueryOutcome, () -> TransactionBeginOutcome, (TxHandle) -> TransactionCloseOutcome, (TxHandle) -> TransactionCloseOutcome, () -> TransactionCloseOutcome) -> DatabaseAdapter
 
 pub fn delete_sql(ModelSchema, String) -> String
 
@@ -120,6 +136,8 @@ pub fn none_relation(Relation) -> Relation
 
 pub fn nullable(Column) -> Column
 
+pub fn null_database_adapter() -> DatabaseAdapter
+
 pub fn offset_by(Relation, Int) -> Relation
 
 pub fn order_by(Relation, String, descending? : Bool) -> Relation
@@ -127,6 +145,8 @@ pub fn order_by(Relation, String, descending? : Bool) -> Relation
 pub fn pluck_sql(Relation, Array[String]) -> String
 
 pub fn preload(Relation, String) -> Relation
+
+pub fn query_result(Array[String], Array[Record], Int, last_insert_id? : String?) -> QueryResult
 
 pub fn record(String, Array[(String, String)]) -> Record
 
@@ -339,10 +359,27 @@ pub enum ColumnType {
   References(String)
 } derive(Eq, @debug.Debug)
 
+pub enum AdapterError {
+  ConnectionFailed(String)
+  SyntaxError(String)
+  IntegrityViolation(String)
+  AdapterTimeout(String)
+  OtherAdapterError(String)
+} derive(@debug.Debug)
+
 pub enum CallbackOutcome {
   Continue(Record)
   Halt(String)
 } derive(@debug.Debug)
+
+pub struct DatabaseAdapter {
+  name : String
+  execute : (String, Array[RelationBind]) -> QueryOutcome
+  begin : () -> TransactionBeginOutcome
+  commit : (TxHandle) -> TransactionCloseOutcome
+  rollback : (TxHandle) -> TransactionCloseOutcome
+  close : () -> TransactionCloseOutcome
+}
 
 pub enum DestroyOutcome {
   DestroyedRecord(MemoryDatabase, Record)
@@ -503,6 +540,18 @@ pub enum RelationBind {
   BindNull
 } derive(@debug.Debug)
 
+pub enum QueryOutcome {
+  QuerySucceeded(QueryResult)
+  QueryFailed(AdapterError)
+} derive(@debug.Debug)
+
+pub struct QueryResult {
+  columns : Array[String]
+  rows : Array[Record]
+  affected_rows : Int
+  last_insert_id : String?
+}
+
 pub struct RelationExecutionIssue {
   feature : String
   detail : String
@@ -542,9 +591,24 @@ pub enum SerializeRecordOutcome {
 pub fn SerializeRecordOutcome::errors(Self) -> Array[AttributeCastError]
 pub fn SerializeRecordOutcome::json(Self) -> String?
 
+pub enum TransactionBeginOutcome {
+  TransactionStarted(TxHandle)
+  TransactionBeginFailed(AdapterError)
+} derive(@debug.Debug)
+
+pub enum TransactionCloseOutcome {
+  TransactionClosed
+  TransactionCloseFailed(AdapterError)
+} derive(@debug.Debug)
+
 pub enum TransactionSaveOutcome {
   TransactionSaved(MemoryTransaction, Record)
   TransactionValidationFailed(MemoryTransaction, ValidationErrors)
+}
+
+pub struct TxHandle {
+  id : String
+  adapter_name : String
 }
 
 pub struct TransactionSavepoint {

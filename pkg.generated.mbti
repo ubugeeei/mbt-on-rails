@@ -50,6 +50,26 @@ pub fn add_reference_step(table_name~ : String, column_name~ : String, target_ta
 
 pub fn add_timestamps_step(String, nullable? : Bool) -> @migration.MigrationStep
 
+pub fn adapter_begin(@active_record.DatabaseAdapter) -> @active_record.TransactionBeginOutcome
+
+pub fn adapter_close(@active_record.DatabaseAdapter) -> @active_record.TransactionCloseOutcome
+
+pub fn adapter_commit(@active_record.DatabaseAdapter, @active_record.TxHandle) -> @active_record.TransactionCloseOutcome
+
+pub fn adapter_error_message(@active_record.AdapterError) -> String
+
+pub fn adapter_execute(@active_record.DatabaseAdapter, String, Array[@active_record.RelationBind]) -> @active_record.QueryOutcome
+
+pub fn adapter_rollback(@active_record.DatabaseAdapter, @active_record.TxHandle) -> @active_record.TransactionCloseOutcome
+
+pub fn adapter_summary(@active_record.DatabaseAdapter) -> String
+
+pub fn database_adapter(String, (String, Array[@active_record.RelationBind]) -> @active_record.QueryOutcome, () -> @active_record.TransactionBeginOutcome, (@active_record.TxHandle) -> @active_record.TransactionCloseOutcome, (@active_record.TxHandle) -> @active_record.TransactionCloseOutcome, () -> @active_record.TransactionCloseOutcome) -> @active_record.DatabaseAdapter
+
+pub fn null_database_adapter() -> @active_record.DatabaseAdapter
+
+pub fn query_result(Array[String], Array[@active_record.Record], Int, last_insert_id? : String?) -> @active_record.QueryResult
+
 pub fn after_action(String?, String) -> @controller.AfterAction
 
 pub fn after_create(String) -> @active_record.Callback
