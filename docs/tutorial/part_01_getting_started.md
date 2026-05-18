@@ -22,7 +22,7 @@ The core public API is re-exported from [`../../mbt_on_rails.mbt`](../../mbt_on_
 ```bash
 moon test
 moon run examples/resource_app
-moon run examples/demo_blog
+moon run cmd/main
 ```
 
 `moon test` is the fastest way to see the framework surface in action.
