@@ -51,6 +51,46 @@ test "validator objects can be reused with interpolated message templates" {
 }
 
 ///|
+test "same_as fails when the comparison field is missing" {
+  let schema = object_schema(name="SignUp").with_field(
+    string_field(name="password").same_as("password_confirmation"),
+  )
+
+  let report = validate_object(schema, [("password", "secret123")])
+
+  assert_eq(report.for_path("password").length(), 1)
+  assert_true(
+    report.full_messages().contains("password must match password_confirmation"),
+  )
+  assert_eq(
+    report.for_path("password")[0].detail("other_field"),
+    Some("password_confirmation"),
+  )
+
+  let model_schema = model(
+    name="Account",
+    table="accounts",
+    columns=[string_column("password")],
+    timestamps=false,
+  ).with_validation(
+    validates_confirmation(
+      field="password",
+      confirmation_field="password_confirmation",
+    ),
+  )
+  let errors = validate_record_errors(
+    model_schema,
+    record("accounts", [("password", "secret123")]),
+    empty_memory_database(),
+  )
+
+  assert_true(errors.contains_attribute("password"))
+  assert_true(
+    errors.full_messages().contains("password confirmation does not match"),
+  )
+}
+
+///|
 test "active record validations can wrap generic field rules" {
   let schema = model(
     name="Account",

@@ -459,7 +459,16 @@ fn apply_rule(
               } else {
                 report
               }
-            None => report
+            None =>
+              report.add(
+                issue_for(
+                  path,
+                  rule,
+                  SameAs(other_field),
+                  "must match " + other_field,
+                  [("other_field", other_field)],
+                ),
+              )
           }
         None => report
       }

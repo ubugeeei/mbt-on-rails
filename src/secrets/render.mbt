@@ -13,7 +13,19 @@ pub fn missing_secrets(config : SecretsConfig) -> Array[String] {
 ///|
 /// Returns whether all required secrets are present.
 pub fn secrets_valid(config : SecretsConfig) -> Bool {
-  missing_secrets(config).is_empty()
+  missing_secrets(config).is_empty() && invalid_secret_names(config).is_empty()
+}
+
+///|
+/// Returns environment variable names that cannot be safely rendered or read.
+pub fn invalid_secret_names(config : SecretsConfig) -> Array[String] {
+  let invalid : Array[String] = []
+  for entry in config.entries {
+    if !valid_env_name(entry.name) {
+      invalid.push(entry.name)
+    }
+  }
+  invalid
 }
 
 ///|
@@ -30,7 +42,7 @@ pub fn masked_secret_summary(config : SecretsConfig) -> String {
         }
       None => "<missing>"
     }
-    lines.push(entry.name + "=" + value)
+    lines.push(summary_text(entry.name) + "=" + summary_text(value))
   }
   lines.join("\n")
 }
@@ -42,7 +54,7 @@ pub fn dotenv_preview(config : SecretsConfig) -> String {
   for entry in config.entries {
     match entry.value {
       Some(value) =>
-        if not(valid_env_name(entry.name)) ||
+        if !valid_env_name(entry.name) ||
           (entry.required && secret_missing(entry.value)) {
           ()
         } else if entry.sensitive {
@@ -59,7 +71,7 @@ pub fn dotenv_preview(config : SecretsConfig) -> String {
 ///|
 fn secret_missing(value : String?) -> Bool {
   match value {
-    Some(current) => current.trim().to_string().length() == 0
+    Some(current) => current.trim().to_owned().length() == 0
     None => true
   }
 }
@@ -94,7 +106,7 @@ fn valid_env_name(name : String) -> Bool {
       (ch >= '0' && ch <= '9') ||
       ch == '_'
     }
-    if not(valid) {
+    if !valid {
       return false
     }
     index += 1
@@ -104,7 +116,7 @@ fn valid_env_name(name : String) -> Bool {
 
 ///|
 fn dotenv_value(value : String) -> String {
-  if not(requires_dotenv_quotes(value)) {
+  if !requires_dotenv_quotes(value) {
     return value
   }
   let builder = StringBuilder::new()
@@ -135,4 +147,21 @@ fn requires_dotenv_quotes(value : String) -> Bool {
     }
   }
   false
+}
+
+///|
+fn summary_text(source : String) -> String {
+  let builder = StringBuilder::new()
+  for ch in source {
+    match ch {
+      '\n' | '\r' | '\t' => builder.write_char(' ')
+      _ => builder.write_char(ch)
+    }
+  }
+  let sanitized = builder.to_string().trim().to_owned()
+  if sanitized.length() == 0 {
+    "-"
+  } else {
+    sanitized
+  }
 }

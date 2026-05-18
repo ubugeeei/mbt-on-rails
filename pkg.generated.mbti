@@ -293,6 +293,8 @@ pub fn delivery_job(@mailer.MailDelivery, String, String?) -> @job.EnqueuedJob
 #label_migration(trust_proxy, allow_positional=true)
 pub fn deployment_config(environment~ : @production.Environment, host~ : String, port~ : Int, force_ssl~ : Bool, trust_proxy~ : Bool, asset_host~ : String?, health_path~ : String, ready_path~ : String) -> @production.DeploymentConfig
 
+pub fn deployment_config_valid(@production.DeploymentConfig) -> Bool
+
 pub fn deserialize_payload(String) -> Array[(String, String)]?
 
 pub fn destroy_record(@active_record.ModelSchema, @active_record.MemoryDatabase, String, deleted_at? : String?) -> @active_record.DestroyOutcome
@@ -507,6 +509,8 @@ pub fn insert_record(@active_record.MemoryDatabase, @active_record.Record) -> @a
 pub fn insert_sql(@active_record.ModelSchema, @active_record.Record) -> String
 
 pub fn integer_column(String) -> @active_record.Column
+
+pub fn invalid_secret_names(@secrets.SecretsConfig) -> Array[String]
 
 pub fn invoke_server_action_step(String) -> @controller.ActionStep
 
@@ -750,6 +754,8 @@ pub fn props_to_json(Array[(String, String)]) -> String
 pub fn protect_from_forgery(@auth.Session?, String?, @auth.RequestForgeryStrategy) -> @auth.RequestForgeryOutcome
 
 pub fn rate_limit_rule(String, String, Int, Int) -> @production.RateLimitRule
+
+pub fn rate_limit_rule_valid(@production.RateLimitRule) -> Bool
 
 pub fn rate_limit_summary(@production.RateLimitRule) -> String
 
@@ -1088,11 +1094,15 @@ pub fn validate_check_constraint_step(String, String) -> @migration.MigrationSte
 
 pub fn validate_component_tree(@view.VaporComponentRef) -> Array[String]
 
+pub fn validate_deployment_config(@production.DeploymentConfig) -> Array[String]
+
 pub fn validate_foreign_key_step(String, String, String) -> @migration.MigrationStep
 
 pub fn validate_object(@validation.ObjectSchema, Array[(String, String)]) -> @validation.ValidationReport
 
 pub fn validate_page_tree(@view.PageModule) -> Array[String]
+
+pub fn validate_rate_limit_rule(@production.RateLimitRule) -> Array[String]
 
 pub fn validate_record(@active_record.ModelSchema, @active_record.Record, @active_record.MemoryDatabase) -> Array[String]
 
