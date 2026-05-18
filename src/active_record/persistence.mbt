@@ -40,13 +40,13 @@ pub fn save_record(
   row : Record,
 ) -> SaveOutcome {
   let table_errors = validate_record_table(schema, row)
-  if not(table_errors.is_empty()) {
+  if !table_errors.is_empty() {
     return ValidationFailed(table_errors)
   }
   let current = resolve_current_record(schema, db, row)
   let candidate = normalize_persisted_record(schema, current, row)
   let errors = validate_record_errors(schema, candidate, db)
-  if not(errors.is_empty()) {
+  if !errors.is_empty() {
     return ValidationFailed(errors)
   }
   Saved(write_record(schema, db, candidate), candidate)
@@ -148,12 +148,12 @@ fn upsert_record_by_primary_key(
         rows.push(current)
       }
     }
-    if not(replaced) {
+    if !replaced {
       rows.push(row)
     }
     tables.push({ name: table.name, rows })
   }
-  if not(table_found) {
+  if !table_found {
     tables.push({ name: table_name, rows: [row] })
   }
   { tables, }
@@ -173,7 +173,7 @@ fn remove_record(
     }
     let rows : Array[Record] = []
     for current in table.rows {
-      if not(record_matches_primary_key(current, schema.primary_key, value)) {
+      if !record_matches_primary_key(current, schema.primary_key, value) {
         rows.push(current)
       }
     }
@@ -226,7 +226,7 @@ fn set_field(
       next.push(field)
     }
   }
-  if not(replaced) {
+  if !replaced {
     next.push((name, value))
   }
   next

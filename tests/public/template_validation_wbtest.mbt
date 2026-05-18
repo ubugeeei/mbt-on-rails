@@ -13,9 +13,9 @@ test "template validator requires explicit component imports" {
     "  </section>\n" +
     "</template>\n"
 
-  assert_eq(template_component_imports(source), ["LikeButton", "PostHero"])
-  assert_eq(template_component_usages(source), ["PostHero", "LikeButton"])
-  assert_eq(validate_template_component_imports("demo.mbtv", source), [])
+  assert_true(template_component_imports(source) == ["LikeButton", "PostHero"])
+  assert_true(template_component_usages(source) == ["PostHero", "LikeButton"])
+  assert_true(validate_template_component_imports("demo.mbtv", source) == [])
 }
 
 ///|

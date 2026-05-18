@@ -131,7 +131,7 @@ fn safe_summary_text(source : String) -> String {
       _ => builder.write_char(ch)
     }
   }
-  let sanitized = builder.to_string().trim().to_string()
+  let sanitized = builder.to_string().trim().to_owned()
   if sanitized.length() == 0 {
     "-"
   } else {

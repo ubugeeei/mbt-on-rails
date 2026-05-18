@@ -13,14 +13,12 @@ fn parse_utc_timestamp(source : String) -> UtcTimestamp? {
   if source.length() != 20 {
     return None
   }
-  if not(
-      unsafe_char_at(source, 4) == '-' &&
-      unsafe_char_at(source, 7) == '-' &&
-      unsafe_char_at(source, 10) == 'T' &&
-      unsafe_char_at(source, 13) == ':' &&
-      unsafe_char_at(source, 16) == ':' &&
-      unsafe_char_at(source, 19) == 'Z',
-    ) {
+  if !(unsafe_char_at(source, 4) == '-' &&
+    unsafe_char_at(source, 7) == '-' &&
+    unsafe_char_at(source, 10) == 'T' &&
+    unsafe_char_at(source, 13) == ':' &&
+    unsafe_char_at(source, 16) == ':' &&
+    unsafe_char_at(source, 19) == 'Z') {
     return None
   }
   match parse_int_slice(source, 0, 4) {

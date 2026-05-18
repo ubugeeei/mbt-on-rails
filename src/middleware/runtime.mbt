@@ -6,7 +6,7 @@ pub fn apply_request_middleware(
 ) -> (@http.Request, @http.Response?) {
   let mut current = request
   for layer in middlewares {
-    if not(middleware_matches(layer, current)) {
+    if !middleware_matches(layer, current) {
       continue
     }
     for header in layer.request_headers {
@@ -29,7 +29,7 @@ pub fn apply_response_middleware(
 ) -> @http.Response {
   let headers : Array[(String, String)] = []
   for layer in middlewares {
-    if not(middleware_matches(layer, request)) {
+    if !middleware_matches(layer, request) {
       continue
     }
     for header in layer.response_headers {

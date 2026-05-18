@@ -7,7 +7,7 @@ pub enum RuleKind {
   IncludedIn(Array[String])
   SameAs(String)
   Contains(String)
-} derive(Show)
+} derive(Debug)
 
 ///|
 /// Describes one composable rule in a valibot-like field schema.
@@ -15,7 +15,7 @@ pub struct FieldRule {
   kind : RuleKind
   message : String?
   validator_name : String?
-} derive(Show)
+} derive(Debug)
 
 ///|
 /// Wraps one reusable validator object around a field rule.
@@ -379,7 +379,7 @@ fn apply_rule(
     Required =>
       match field_value {
         Some(value) =>
-          if value.trim().to_string().length() == 0 {
+          if value.trim().to_owned().length() == 0 {
             report.add(issue_for(path, rule, Required, "must be present", []))
           } else {
             report
@@ -426,7 +426,7 @@ fn apply_rule(
     IncludedIn(values) =>
       match field_value {
         Some(value) =>
-          if not(values.contains(value)) {
+          if !values.contains(value) {
             report.add(
               issue_for(
                 path,
@@ -475,7 +475,7 @@ fn apply_rule(
     Contains(pattern) =>
       match field_value {
         Some(value) =>
-          if not(value.contains(pattern)) {
+          if !value.contains(pattern) {
             report.add(
               issue_for(
                 path,

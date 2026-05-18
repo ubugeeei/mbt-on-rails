@@ -185,26 +185,26 @@ test "request helpers decode cookies csrf tokens and session stores" {
     config.remember_cookie + "=" + remember_cookie_value.value,
   )
 
-  assert_eq(
-    request_header(current, "cookie"),
+  assert_true(
+    request_header(current, "cookie") ==
     Some(config.session_cookie + "=" + session_cookie_value.value),
   )
-  assert_eq(
-    request_cookie(current, config.session_cookie),
+  assert_true(
+    request_cookie(current, config.session_cookie) ==
     Some(session_cookie_value.value),
   )
   assert_eq(request_cookies(current).length(), 1)
-  assert_eq(
+  assert_true(
     signed_request_cookie(
       current,
       config.session_cookie,
       config.secret_key_base,
-    ),
+    ) ==
     Some(session.id),
   )
-  assert_eq(request_session_id(current, store), Some(session.id))
-  assert_eq(request_csrf_token(current, config), Some(session.csrf_token))
-  assert_eq(
+  assert_true(request_session_id(current, store) == Some(session.id))
+  assert_true(request_csrf_token(current, config) == Some(session.csrf_token))
+  assert_true(
     request_csrf_token(
       request(
         verb=http_post(),
@@ -215,16 +215,18 @@ test "request helpers decode cookies csrf tokens and session stores" {
         body="",
       ),
       config,
-    ),
+    ) ==
     Some("from-form"),
   )
-  assert_eq(with_request_session(current, store~).session_id, Some(session.id))
-  assert_eq(
+  assert_true(
+    with_request_session(current, store~).session_id == Some(session.id),
+  )
+  assert_true(
     with_request_session(
       remembered,
       store~,
       fallback_store=Some(remember_store),
-    ).session_id,
+    ).session_id ==
     Some(session.id),
   )
 }

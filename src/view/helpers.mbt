@@ -148,7 +148,7 @@ pub fn safe_join(parts : Array[String], separator? : String = "") -> String {
 pub fn class_names(entries : Array[(String, Bool)]) -> String {
   let parts : Array[String] = []
   for entry in entries {
-    let token = entry.0.trim().to_string()
+    let token = entry.0.trim().to_owned()
     if entry.1 && token.length() > 0 {
       parts.push(token)
     }
@@ -437,7 +437,7 @@ fn is_ascii_digit(ch : Char) -> Bool {
 
 ///|
 fn normalize_html_method(http_method : String) -> String {
-  let normalized = ascii_lowercase(http_method.trim().to_string())
+  let normalized = ascii_lowercase(http_method.trim().to_owned())
   if normalized.length() == 0 {
     "post"
   } else {

@@ -66,7 +66,7 @@ pub fn cache_delete(store : CacheStore, key : String) -> CacheStore {
 pub fn cache_delete_tag(store : CacheStore, tag : String) -> CacheStore {
   let entries : Array[CacheEntry] = []
   for entry in store.entries {
-    if not(entry.tags.contains(tag)) {
+    if !entry.tags.contains(tag) {
       entries.push(entry)
     }
   }

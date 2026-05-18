@@ -40,7 +40,7 @@ fn apply_schema_timestamps(
   current : Record?,
   row : Record,
 ) -> Record {
-  if not(schema.timestamps) {
+  if !schema.timestamps {
     return row
   }
   let mut fields = clone_record_fields(row.fields)
@@ -88,7 +88,7 @@ fn put_record_field(
       next.push(field)
     }
   }
-  if not(replaced) {
+  if !replaced {
     next.push((name, value))
   }
   next

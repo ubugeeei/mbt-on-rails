@@ -1,9 +1,9 @@
 ///|
 /// Returns the first request header value matching the supplied name.
 pub fn request_header(request : Request, name : String) -> String? {
-  let expected = ascii_lowercase(name.trim().to_string())
+  let expected = ascii_lowercase(name.trim().to_owned())
   for header in request.headers {
-    if ascii_lowercase(header.0.trim().to_string()) == expected {
+    if ascii_lowercase(header.0.trim().to_owned()) == expected {
       return Some(header.1)
     }
   }
@@ -15,7 +15,7 @@ pub fn request_header(request : Request, name : String) -> String? {
 pub fn request_cookies(request : Request) -> Array[(String, String)] {
   let cookies : Array[(String, String)] = []
   for header in request.headers {
-    if ascii_lowercase(header.0.trim().to_string()) != "cookie" {
+    if ascii_lowercase(header.0.trim().to_owned()) != "cookie" {
       continue
     }
     for entry in @auth.parse_cookie_header(header.1) {

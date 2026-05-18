@@ -216,7 +216,7 @@ pub fn Relation::reorder_by(
 pub fn Relation::reverse_order(self : Relation) -> Relation {
   let orderings : Array[OrderBy] = []
   for order in self.orderings {
-    orderings.push({ column: order.column, descending: not(order.descending) })
+    orderings.push({ column: order.column, descending: !order.descending })
   }
   { ..self, orderings, }
 }

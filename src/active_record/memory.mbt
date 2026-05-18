@@ -32,7 +32,7 @@ pub fn insert_record(db : MemoryDatabase, row : Record) -> MemoryDatabase {
       tables.push(table)
     }
   }
-  if not(inserted) {
+  if !inserted {
     tables.push({ name: row.table, rows: [row] })
   }
   { tables, }

@@ -72,7 +72,7 @@ pub fn template_helpers(
     let without_suffix = strip_suffix(relative_path, ".mbtv")
     let joined_parts = without_suffix
       .split("/")
-      .map(fn(part) { part.to_string() })
+      .map(fn(part) { part.to_owned() })
       .collect()
       .join("_")
     helpers.push({
@@ -450,7 +450,7 @@ fn push_action_entry_lines(
 
 ///|
 fn normalized_action_type(type_name : String) -> String {
-  match type_name.trim().to_string() {
+  match type_name.trim().to_owned() {
     "String" => "String"
     "Int" => "Int"
     "Integer" => "Int"
@@ -567,7 +567,7 @@ fn route_params(route_path : String) -> Array[RouteParamSpec] {
 
 ///|
 fn parse_action_input_fields(source : String) -> Array[ActionFieldSpec] {
-  let trimmed = source.trim().to_string()
+  let trimmed = source.trim().to_owned()
   if trimmed.length() < 2 ||
     unsafe_char_at(trimmed, 0) != '[' ||
     unsafe_char_at(trimmed, trimmed.length() - 1) != ']' {
@@ -591,7 +591,7 @@ fn parse_action_input_fields(source : String) -> Array[ActionFieldSpec] {
 
 ///|
 fn parse_action_input_field(source : String) -> ActionFieldSpec? {
-  let trimmed = source.trim().to_string()
+  let trimmed = source.trim().to_owned()
   if trimmed.length() < 2 ||
     unsafe_char_at(trimmed, 0) != '(' ||
     unsafe_char_at(trimmed, trimmed.length() - 1) != ')' {
@@ -838,7 +838,7 @@ fn positional_argument(arguments : Array[String], index : Int) -> String? {
 
 ///|
 fn decode_string_literal(source : String) -> String? {
-  let trimmed = source.trim().to_string()
+  let trimmed = source.trim().to_owned()
   if trimmed.length() < 2 ||
     unsafe_char_at(trimmed, 0) != '"' ||
     unsafe_char_at(trimmed, trimmed.length() - 1) != '"' {
@@ -1000,7 +1000,7 @@ fn has_identifier_at(source : String, index : Int, target : String) -> Bool {
   } else {
     is_identifier_char(unsafe_char_at(source, suffix_index))
   }
-  not(has_identifier_prefix || has_identifier_suffix)
+  !(has_identifier_prefix || has_identifier_suffix)
 }
 
 ///|
@@ -1015,12 +1015,12 @@ fn skip_whitespace(source : String, index : Int) -> Int {
 
 ///|
 fn trimmed_slice(source : String, start : Int, end : Int) -> String {
-  String::unsafe_substring(source, start~, end~).trim().to_string()
+  String::unsafe_substring(source, start~, end~).trim().to_owned()
 }
 
 ///|
 fn normalize_relative_path(path : String) -> String {
-  let mut normalized = path.trim().to_string()
+  let mut normalized = path.trim().to_owned()
   while normalized.has_prefix("./") {
     normalized = String::unsafe_substring(
       normalized,
@@ -1061,7 +1061,7 @@ fn snake_identifier(source : String) -> String {
       }
       wrote_underscore = false
       wrote_content = true
-    } else if not(wrote_underscore) && wrote_content {
+    } else if !wrote_underscore && wrote_content {
       builder.write_char('_')
       wrote_underscore = true
     }

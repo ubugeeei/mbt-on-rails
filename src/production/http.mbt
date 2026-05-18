@@ -93,7 +93,7 @@ fn all_checks_ok(checks : Array[HealthCheck]) -> Bool {
     return false
   }
   for check in checks {
-    if not(check.ok) {
+    if !check.ok {
       return false
     }
   }

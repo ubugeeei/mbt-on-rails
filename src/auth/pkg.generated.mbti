@@ -1,6 +1,10 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "ubugeeei/mbt_on_rails/src/auth"
 
+import {
+  "moonbitlang/core/debug",
+}
+
 // Values
 pub fn allowed(Identity?, PolicyRule, String?) -> Bool
 
@@ -135,13 +139,14 @@ pub enum AuthRequirement {
   Authenticated
   Role(String)
   Permission(String)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 
 pub enum CookieSameSite {
   SameSiteStrict
   SameSiteLax
   SameSiteNone
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
+pub impl Show for CookieSameSite
 
 pub struct EmailVerificationToken {
   token : String
@@ -178,20 +183,20 @@ pub enum RequestForgeryOutcome {
   NullSession
   ResetSession
   Rejected(String)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 
 pub enum RequestForgeryStrategy {
   ExceptionStrategy
   NullSessionStrategy
   ResetSessionStrategy
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 
 pub struct Session {
   id : String
   user_id : String
   csrf_token : String
   fresh : Bool
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 
 pub struct SessionStore {
   kind : SessionStoreKind
@@ -212,7 +217,7 @@ pub enum SessionStoreKind {
   CacheStore
   RedisStore
   DisabledStore
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 
 // Type aliases
 

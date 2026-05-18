@@ -8,7 +8,7 @@ pub enum ColumnType {
   Timestamp
   Json
   References(String)
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Describes one column in a model schema.

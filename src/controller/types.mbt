@@ -14,7 +14,7 @@ pub enum ActionStep {
   DeliverMail(String)
   TouchCache(String)
   SetFlash(String, String)
-} derive(Show)
+} derive(Debug)
 
 ///|
 /// Lists the response envelopes an action can negotiate.
@@ -23,7 +23,17 @@ pub enum ResponseFormat {
   JsonFormat
   TurboStreamFormat
   RedirectFormat
-} derive(Eq, Show)
+} derive(Eq, Debug)
+
+///|
+pub impl Show for ResponseFormat with to_string(self) {
+  match self {
+    HtmlFormat => "HtmlFormat"
+    JsonFormat => "JsonFormat"
+    TurboStreamFormat => "TurboStreamFormat"
+    RedirectFormat => "RedirectFormat"
+  }
+}
 
 ///|
 /// Declares a before-action filter for a controller.

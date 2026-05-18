@@ -1,6 +1,10 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "ubugeeei/mbt_on_rails/src/process"
 
+import {
+  "moonbitlang/core/debug",
+}
+
 // Values
 pub fn cable_process(String, String, Int, Array[String]) -> ProcessDefinition
 
@@ -43,7 +47,7 @@ pub enum ProcessRole {
   CableRole
   SchedulerRole
   ReleaseRole
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 
 pub struct ReleaseTask {
   name : String

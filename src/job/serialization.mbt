@@ -203,7 +203,7 @@ fn parse_json_scalar(source : String, start : Int) -> (String, Int)? {
   while index < source.length() {
     let ch = json_char_at(source, index)
     if ch == ',' || ch == '}' {
-      let value = builder.to_string().trim().to_string()
+      let value = builder.to_string().trim().to_owned()
       if value.length() == 0 {
         return None
       }

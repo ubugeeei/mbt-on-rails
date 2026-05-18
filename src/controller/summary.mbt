@@ -3,7 +3,7 @@
 pub fn controller_summary(controller : ControllerDefinition) -> String {
   let lines : Array[String] = []
   lines.push(controller.name + " [" + controller.layout_name + "]")
-  if not(controller.before_actions.is_empty()) {
+  if !controller.before_actions.is_empty() {
     let filters : Array[String] = []
     for filter in controller.before_actions {
       let target = match filter.action_name {
@@ -18,7 +18,7 @@ pub fn controller_summary(controller : ControllerDefinition) -> String {
     }
     lines.push("  before: " + filters.join(", "))
   }
-  if not(controller.around_actions.is_empty()) {
+  if !controller.around_actions.is_empty() {
     let callbacks : Array[String] = []
     for callback in controller.around_actions {
       let target = match callback.action_name {
@@ -29,7 +29,7 @@ pub fn controller_summary(controller : ControllerDefinition) -> String {
     }
     lines.push("  around: " + callbacks.join(", "))
   }
-  if not(controller.after_actions.is_empty()) {
+  if !controller.after_actions.is_empty() {
     let callbacks : Array[String] = []
     for callback in controller.after_actions {
       let target = match callback.action_name {

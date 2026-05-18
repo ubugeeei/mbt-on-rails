@@ -29,7 +29,16 @@ pub enum MigrationSafetyLevel {
   Safe
   Review
   Dangerous
-} derive(Eq, Show)
+} derive(Eq, Debug)
+
+///|
+pub impl Show for MigrationSafetyLevel with to_string(self) {
+  match self {
+    Safe => "Safe"
+    Review => "Review"
+    Dangerous => "Dangerous"
+  }
+}
 
 ///|
 pub struct MigrationSafetyIssue {

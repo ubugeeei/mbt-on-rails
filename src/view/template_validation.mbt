@@ -4,12 +4,12 @@ pub fn template_component_imports(source : String) -> Array[String] {
   let script = extract_between(source, "<script setup>", "</script>")
   let imports : Array[String] = []
   for line_view in script.split("\n") {
-    let line = code_line_without_comments_or_strings(line_view.to_string())
+    let line = code_line_without_comments_or_strings(line_view.to_owned())
       .trim()
-      .to_string()
+      .to_owned()
     if line.contains("component ") {
       let name = parse_component_name_after(line, "component ")
-      if name.length() > 0 && not(imports.contains(name)) {
+      if name.length() > 0 && !imports.contains(name) {
         imports.push(name)
       }
     }
@@ -26,7 +26,7 @@ pub fn template_component_usages(source : String) -> Array[String] {
   for i = 0; i < chars.length() - 1; i = i + 1 {
     if chars[i] == '<' && chars[i + 1] != '/' && is_upper_alpha(chars[i + 1]) {
       let name = collect_component_name(chars, i + 1)
-      if name.length() > 0 && not(usages.contains(name)) {
+      if name.length() > 0 && !usages.contains(name) {
         usages.push(name)
       }
     }
@@ -44,12 +44,12 @@ pub fn validate_template_component_imports(
   let usages = template_component_usages(source)
   let errors : Array[String] = []
   for usage in usages {
-    if not(imports.contains(usage)) {
+    if !imports.contains(usage) {
       errors.push(path + ": missing component import for <" + usage + ">")
     }
   }
   for imported in imports {
-    if not(usages.contains(imported)) {
+    if !usages.contains(imported) {
       errors.push(path + ": unused component import " + imported)
     }
   }
@@ -100,7 +100,7 @@ fn code_line_without_comments_or_strings(source : String) -> String {
 fn extract_between(source : String, start : String, end_ : String) -> String {
   let parts : Array[String] = source
     .split(start)
-    .map(fn(part) { part.to_string() })
+    .map(fn(part) { part.to_owned() })
     .collect()
   if parts.length() < 2 {
     return ""
@@ -108,7 +108,7 @@ fn extract_between(source : String, start : String, end_ : String) -> String {
   let tail = parts[1]
   let inner : Array[String] = tail
     .split(end_)
-    .map(fn(part) { part.to_string() })
+    .map(fn(part) { part.to_owned() })
     .collect()
   if inner.is_empty() {
     ""
@@ -121,7 +121,7 @@ fn extract_between(source : String, start : String, end_ : String) -> String {
 fn parse_component_name_after(line : String, marker : String) -> String {
   let parts : Array[String] = line
     .split(marker)
-    .map(fn(part) { part.to_string() })
+    .map(fn(part) { part.to_owned() })
     .collect()
   if parts.length() < 2 {
     return ""

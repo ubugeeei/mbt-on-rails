@@ -8,7 +8,7 @@ pub enum HydrationMode {
   Media(String)
   Only
   ServerDefer
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Lists the cache and rendering modes supported for a page.
@@ -17,7 +17,7 @@ pub enum DynamicMode {
   ForceDynamic
   ForceStatic
   Revalidate(Int)
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Stores one typed template ref handle in a Vapor Moon-compatible shape.
@@ -31,7 +31,7 @@ pub struct TemplateRef[T] {
 pub enum BoundaryKind {
   ServerBoundary
   ClientBoundary
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Declares one JSON-serializable prop accepted by a component.
@@ -171,7 +171,7 @@ pub enum FormFieldKind {
   TextArea
   HiddenInput
   CheckboxInput
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Describes one typed field used by a form builder.

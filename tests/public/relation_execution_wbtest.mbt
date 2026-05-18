@@ -76,13 +76,13 @@ test "execute_relation filters sorts projects distincts and windows in memory" {
   assert_eq(outcome.count(), 2)
   match outcome.first() {
     Some(row) => {
-      assert_eq(find_entry(row.fields, "id"), Some("3"))
-      assert_eq(find_entry(row.fields, "title"), Some("MoonBit Shipping"))
+      assert_true(find_entry(row.fields, "id") == Some("3"))
+      assert_true(find_entry(row.fields, "title") == Some("MoonBit Shipping"))
     }
     None => assert_true(false)
   }
   let records = outcome.records()
-  assert_eq(find_entry(records[1].fields, "id"), Some("5"))
+  assert_true(find_entry(records[1].fields, "id") == Some("5"))
 
   let distinct_titles = relation_for(schema)
     .where_eq("published", "true")
@@ -92,8 +92,8 @@ test "execute_relation filters sorts projects distincts and windows in memory" {
     .order_by("title")
     .execute(schema, db)
   assert_eq(distinct_titles.count(), 2)
-  assert_eq(
-    find_entry(distinct_titles.records()[0].fields, "title"),
+  assert_true(
+    find_entry(distinct_titles.records()[0].fields, "title") ==
     Some("MoonBit Launch"),
   )
 }
@@ -112,7 +112,7 @@ test "execute_relation surfaces unsupported features as explicit issues" {
 
   assert_eq(unsupported.records().length(), 0)
   assert_eq(unsupported.count(), 0)
-  assert_true(not(unsupported.exists()))
+  assert_true(!unsupported.exists())
   let issues = unsupported.issues()
   assert_eq(issues.length(), 3)
   assert_true(issues[0].message().contains("joins"))
@@ -158,7 +158,7 @@ test "execute_relation where_not_eq ignores missing values like sql nulls" {
   assert_eq(drafts.issues().length(), 0)
   assert_eq(drafts.count(), 1)
   match drafts.first() {
-    Some(row) => assert_eq(find_entry(row.fields, "id"), Some("4"))
+    Some(row) => assert_true(find_entry(row.fields, "id") == Some("4"))
     None => assert_true(false)
   }
 }
@@ -171,5 +171,5 @@ test "execute_relation treats empty where_in as no matching rows" {
 
   assert_true(outcome.issues().is_empty())
   assert_eq(outcome.count(), 0)
-  assert_true(not(outcome.exists()))
+  assert_true(!outcome.exists())
 }

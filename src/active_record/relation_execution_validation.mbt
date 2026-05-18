@@ -15,21 +15,21 @@ fn relation_execution_issues(
       ),
     )
   }
-  if not(relation.joins.is_empty()) {
+  if !relation.joins.is_empty() {
     issues.push(
       relation_execution_issue(
         "joins", "join execution is not implemented for the in-memory adapter",
       ),
     )
   }
-  if not(relation.groupings.is_empty()) {
+  if !relation.groupings.is_empty() {
     issues.push(
       relation_execution_issue(
         "group_by", "grouped relation execution is not implemented for the in-memory adapter",
       ),
     )
   }
-  if not(relation.having_clauses.is_empty()) {
+  if !relation.having_clauses.is_empty() {
     issues.push(
       relation_execution_issue(
         "having", "having-clause execution is not implemented for the in-memory adapter",
@@ -92,7 +92,7 @@ fn validate_predicate_columns(
 ///|
 fn validate_raw_predicate(
   schema : ModelSchema,
-  table_name : String,
+  _table_name : String,
   sql : String,
   issues : Array[RelationExecutionIssue],
 ) -> Unit {

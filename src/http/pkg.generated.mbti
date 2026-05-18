@@ -2,6 +2,7 @@
 package "ubugeeei/mbt_on_rails/src/http"
 
 import {
+  "moonbitlang/core/debug",
   "ubugeeei/mbt_on_rails/src/auth",
 }
 
@@ -128,7 +129,8 @@ pub enum HttpMethod {
   Delete
   Head
   Options
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
+pub impl Show for HttpMethod
 
 pub struct MatchedRoute {
   route : RouteSpec
@@ -182,7 +184,7 @@ pub enum RouteSegment {
   Param(String)
   CatchAll(String)
   OptionalCatchAll(String)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 
 pub struct RouteSpec {
   name : String

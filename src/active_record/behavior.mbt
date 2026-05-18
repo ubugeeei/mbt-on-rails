@@ -5,7 +5,17 @@ pub enum AssociationKind {
   HasMany
   HasOne
   HasAndBelongsToMany
-} derive(Eq, Show)
+} derive(Eq, Debug)
+
+///|
+pub impl Show for AssociationKind with to_string(self) {
+  match self {
+    BelongsTo => "BelongsTo"
+    HasMany => "HasMany"
+    HasOne => "HasOne"
+    HasAndBelongsToMany => "HasAndBelongsToMany"
+  }
+}
 
 ///|
 /// Describes one association declared on a model schema.
@@ -28,7 +38,7 @@ pub enum ValidationRule {
   Confirmation(String)
   Format(String)
   WrappedRule(@validation.FieldRule)
-} derive(Show)
+} derive(Debug)
 
 ///|
 /// Describes one validation on a model field.
@@ -48,7 +58,7 @@ pub enum ValidationErrorKind {
   NotIncluded
   ConfirmationMismatch(String)
   InvalidFormat(String)
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Captures one typed validation error for a model attribute.
@@ -76,7 +86,20 @@ pub enum LifecycleHook {
   AfterCreate
   BeforeDestroy
   AfterDestroy
-} derive(Eq, Show)
+} derive(Eq, Debug)
+
+///|
+pub impl Show for LifecycleHook with to_string(self) {
+  match self {
+    BeforeValidation => "BeforeValidation"
+    BeforeCreate => "BeforeCreate"
+    BeforeSave => "BeforeSave"
+    AfterSave => "AfterSave"
+    AfterCreate => "AfterCreate"
+    BeforeDestroy => "BeforeDestroy"
+    AfterDestroy => "AfterDestroy"
+  }
+}
 
 ///|
 /// Describes one callback attached to a model lifecycle hook.

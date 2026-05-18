@@ -149,9 +149,8 @@ test "memory validation reports rich errors across edge branches" {
     TooLong(limit) => assert_eq(limit, 5)
     _ => assert_true(false)
   }
-  assert_eq(
-    typed_missing.for_attribute("summary")[0].detail("maximum"),
-    Some("5"),
+  assert_true(
+    typed_missing.for_attribute("summary")[0].detail("maximum") == Some("5"),
   )
   assert_true(
     typed_missing
@@ -246,18 +245,18 @@ test "dirty tracking reports changed removed and added attributes" {
 
   let dirty = original.track_changes(current)
   assert_true(dirty.changed())
-  assert_eq(dirty.changed_fields(), ["title", "state", "slug"])
+  assert_true(dirty.changed_fields() == ["title", "state", "slug"])
   assert_true(dirty.attribute_changed("state"))
-  assert_eq(dirty.attribute_was("state"), Some("draft"))
-  assert_eq(dirty.attribute_was("summary"), Some("brief"))
+  assert_true(dirty.attribute_was("state") == Some("draft"))
+  assert_true(dirty.attribute_was("summary") == Some("brief"))
   assert_true(dirty.changes_summary().contains("title: Launch -> Shipped"))
   assert_true(dirty.changes_summary().contains("state: draft -> <unset>"))
   assert_true(dirty.changes_summary().contains("slug: <unset> -> launch"))
 
   match dirty.change_for("title") {
     Some(change) => {
-      assert_eq(change.before, Some("Launch"))
-      assert_eq(change.after, Some("Shipped"))
+      assert_true(change.before == Some("Launch"))
+      assert_true(change.after == Some("Shipped"))
     }
     None => assert_true(false)
   }
@@ -269,7 +268,7 @@ test "dirty tracking reports changed removed and added attributes" {
   let persisted = dirty.clear_changes_information()
   assert_false(persisted.changed())
   assert_eq(persisted.changed_fields().length(), 0)
-  assert_eq(persisted.attribute_was("slug"), Some("launch"))
+  assert_true(persisted.attribute_was("slug") == Some("launch"))
 
   let created = dirty_new_record(record("accounts", [("slug", "fresh")]))
   assert_true(created.changed())

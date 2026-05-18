@@ -221,7 +221,7 @@ fn render_component_placeholder_with_import(
       )
     None => ()
   }
-  if not(component.template_imports.is_empty()) {
+  if !component.template_imports.is_empty() {
     attrs.write_string(
       "data-mbor-template-imports='" +
       @support.escape_html(
@@ -267,7 +267,7 @@ fn render_component_placeholder_with_import(
   }
   let nested = render_component_children(component)
   "<section class=\"mbor-component\" " +
-  attrs.to_string().trim().to_string() +
+  attrs.to_string().trim().to_owned() +
   ">" +
   fallback +
   nested +
@@ -389,7 +389,7 @@ fn render_merge_props(
         replaced = true
       }
     }
-    if not(replaced) {
+    if !replaced {
       merged.push(entry)
     }
   }

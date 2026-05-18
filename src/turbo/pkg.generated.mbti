@@ -2,6 +2,7 @@
 package "ubugeeei/mbt_on_rails/src/turbo"
 
 import {
+  "moonbitlang/core/debug",
   "ubugeeei/mbt_on_rails/src/http",
 }
 
@@ -43,7 +44,7 @@ pub enum TurboStreamAction {
   Remove
   Before
   After
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 
 // Type aliases
 

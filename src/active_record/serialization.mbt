@@ -63,7 +63,7 @@ pub fn serialize_record_json(
 
 ///|
 fn cast_field(column : Column, value : String) -> AttributeValue? {
-  let normalized = value.trim().to_string()
+  let normalized = value.trim().to_owned()
   if column.nullable && normalized == "null" {
     return Some(NullAttribute)
   }

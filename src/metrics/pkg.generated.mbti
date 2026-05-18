@@ -1,6 +1,10 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "ubugeeei/mbt_on_rails/src/metrics"
 
+import {
+  "moonbitlang/core/debug",
+}
+
 // Values
 pub fn counter(String, Array[(String, String)], Int) -> MetricSample
 
@@ -26,7 +30,7 @@ pub fn with_metric(MetricsRegistry, MetricSample) -> MetricsRegistry
 pub enum MetricKind {
   CounterMetric
   GaugeMetric
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 
 pub struct MetricSample {
   name : String

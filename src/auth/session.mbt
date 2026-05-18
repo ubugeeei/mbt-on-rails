@@ -350,7 +350,7 @@ pub fn signed_cookie(
 pub fn parse_cookie_header(header : String) -> Array[(String, String)] {
   let entries : Array[(String, String)] = []
   for part in header.split(";") {
-    let current = part.trim().to_string()
+    let current = part.trim().to_owned()
     if current.length() == 0 {
       continue
     }
@@ -358,14 +358,14 @@ pub fn parse_cookie_header(header : String) -> Array[(String, String)] {
       Some(index) => {
         let key = String::unsafe_substring(current, start=0, end=index)
           .trim()
-          .to_string()
+          .to_owned()
         let value = String::unsafe_substring(
             current,
             start=index + 1,
             end=current.length(),
           )
           .trim()
-          .to_string()
+          .to_owned()
         entries.push((key, value))
       }
       None => ()
@@ -580,7 +580,7 @@ fn cookie_header_value(source : String) -> String {
       _ => builder.write_char(ch)
     }
   }
-  builder.to_string().trim().to_string()
+  builder.to_string().trim().to_owned()
 }
 
 ///|
