@@ -59,6 +59,12 @@ pub fn ok_json(String) -> Response
 
 pub fn ok_text(String) -> Response
 
+pub fn parse_forwarded_chain(String) -> Array[String]
+
+pub fn parse_forwarded_for(String, Array[String]) -> String?
+
+pub fn parse_forwarded_leftmost(String) -> String?
+
 pub fn parse_route_pattern(String) -> RoutePattern
 
 pub fn recognize(Array[RouteSpec], Request) -> MatchedRoute?
@@ -86,6 +92,8 @@ pub fn request_csrf_token(Request, @auth.AuthConfig) -> String?
 pub fn request_header(Request, String) -> String?
 
 pub fn request_session_id(Request, @auth.SessionStore) -> String?
+
+pub fn resolve_request_id(Request, String, String) -> String
 
 pub fn resources(String, String, ResourceOptions) -> Array[RouteSpec]
 

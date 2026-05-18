@@ -728,6 +728,12 @@ pub fn params(Array[(String, String)]) -> @params.Parameters
 
 pub fn parse_cookie_header(String) -> Array[(String, String)]
 
+pub fn parse_forwarded_chain(String) -> Array[String]
+
+pub fn parse_forwarded_for(String, Array[String]) -> String?
+
+pub fn parse_forwarded_leftmost(String) -> String?
+
 pub fn parse_route_pattern(String) -> @http.RoutePattern
 
 pub fn partial(local_name~ : String, component~ : @view.VaporComponentRef) -> @view.TemplateImport
@@ -904,6 +910,8 @@ pub fn request_forgery_reset_session() -> @auth.RequestForgeryStrategy
 pub fn request_header(@http.Request, String) -> String?
 
 pub fn request_session_id(@http.Request, @auth.SessionStore) -> String?
+
+pub fn resolve_request_id(@http.Request, String, String) -> String
 
 pub fn require_auth(@auth.AuthRequirement) -> @controller.ActionStep
 
