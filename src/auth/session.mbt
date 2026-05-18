@@ -232,7 +232,7 @@ pub fn verify_signed_cookie_value(
   signed_value : String,
   secret : String,
 ) -> String? {
-  match signed_value.find("--") {
+  match find_final_signature_delimiter(signed_value) {
     Some(index) => {
       let value = String::unsafe_substring(signed_value, start=0, end=index)
       let digest = String::unsafe_substring(
@@ -249,6 +249,19 @@ pub fn verify_signed_cookie_value(
     }
     None => None
   }
+}
+
+///|
+fn find_final_signature_delimiter(source : String) -> Int? {
+  let mut delimiter : Int? = None
+  let mut index = 0
+  while index + 2 <= source.length() {
+    if String::unsafe_substring(source, start=index, end=index + 2) == "--" {
+      delimiter = Some(index)
+    }
+    index += 1
+  }
+  delimiter
 }
 
 ///|
