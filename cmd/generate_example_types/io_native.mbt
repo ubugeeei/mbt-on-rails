@@ -55,18 +55,24 @@ extern "c" fn popen(command : Bytes, mode : Bytes) -> UInt64 = "popen"
 extern "c" fn pclose(stream : UInt64) -> Int = "pclose"
 
 ///|
+extern "c" fn abort_process() -> Unit = "abort"
+
+///|
 fn discover_templates(views_dir : String) -> Array[String] {
-  let command = "find " +
+  let command = "test -d " +
     shell_quote(views_dir) +
-    " -type f -name '*.mbtv' | sort"
+    " && find " +
+    shell_quote(views_dir) +
+    " -type f -name '*.mbtv'"
   let output = read_command_output(command)
   let templates : Array[String] = []
-  for line in output.split("\n").map(fn(part) { part.to_string() }).collect() {
+  for line in output.split("\n").map(fn(part) { part.to_owned() }).collect() {
     let trimmed = normalize_relative_path(line)
     if trimmed.length() > 0 {
       templates.push(trimmed)
     }
   }
+  templates.sort_by((left, right) => left.compare(right))
   templates
 }
 
@@ -74,10 +80,14 @@ fn discover_templates(views_dir : String) -> Array[String] {
 fn read_command_output(command : String) -> String {
   let stream = popen(c_string(command), c_string(SHELL_MODE))
   if stream == 0UL {
+    fatal_io("failed to run command: " + command)
     return ""
   }
   let output = read_stream_all(stream)
-  ignore(pclose(stream))
+  let status = pclose(stream)
+  if status != 0 {
+    fatal_io("command failed: " + command)
+  }
   output
 }
 
@@ -85,15 +95,37 @@ fn read_command_output(command : String) -> String {
 fn read_text_file(path : String) -> String {
   let stream = fopen(c_string(path), c_string(READ_MODE))
   if stream == 0UL {
+    fatal_io("failed to open file for reading: " + path)
     return ""
   }
-  ignore(fseek(stream, 0, SEEK_END))
+  if fseek(stream, 0, SEEK_END) != 0 {
+    ignore(fclose(stream))
+    fatal_io("failed to seek file: " + path)
+    return ""
+  }
   let size = ftell(stream)
-  ignore(fseek(stream, 0, SEEK_SET))
+  if size < 0 {
+    ignore(fclose(stream))
+    fatal_io("failed to measure file: " + path)
+    return ""
+  }
+  if fseek(stream, 0, SEEK_SET) != 0 {
+    ignore(fclose(stream))
+    fatal_io("failed to rewind file: " + path)
+    return ""
+  }
   let bytes = FixedArray::make(size, b'\x00')
   let buffer = bytes.unsafe_reinterpret_as_bytes()
-  ignore(fread(buffer, 1, size, stream))
-  ignore(fclose(stream))
+  let read_count = fread(buffer, 1, size, stream)
+  if read_count != size {
+    ignore(fclose(stream))
+    fatal_io("failed to read complete file: " + path)
+    return ""
+  }
+  if fclose(stream) != 0 {
+    fatal_io("failed to close file after reading: " + path)
+    return ""
+  }
   @utf8.decode_lossy(buffer)
 }
 
@@ -101,11 +133,19 @@ fn read_text_file(path : String) -> String {
 fn write_text_file(path : String, content : String) -> Unit {
   let stream = fopen(c_string(path), c_string(WRITE_MODE))
   if stream == 0UL {
+    fatal_io("failed to open file for writing: " + path)
     return
   }
   let encoded = @utf8.encode(content)
-  ignore(fwrite(encoded, 1, encoded.length(), stream))
-  ignore(fclose(stream))
+  let write_count = fwrite(encoded, 1, encoded.length(), stream)
+  if write_count != encoded.length() {
+    ignore(fclose(stream))
+    fatal_io("failed to write complete file: " + path)
+    return
+  }
+  if fclose(stream) != 0 {
+    fatal_io("failed to close file after writing: " + path)
+  }
 }
 
 ///|
@@ -146,4 +186,10 @@ fn shell_quote(input : String) -> String {
   }
   builder.write_char('\'')
   builder.to_string()
+}
+
+///|
+fn fatal_io(message : String) -> Unit {
+  println("generate_example_types: " + message)
+  abort_process()
 }

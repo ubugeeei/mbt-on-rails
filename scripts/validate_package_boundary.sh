@@ -6,7 +6,10 @@ moon package --list
 python3 - <<'PY'
 from pathlib import Path
 import zipfile
+import json
+import subprocess
 import sys
+import tempfile
 
 publish_dir = Path("_build/publish")
 packages = sorted(
@@ -62,7 +65,61 @@ if missing:
         print(f"  - {entry}", file=sys.stderr)
     sys.exit(1)
 
+with tempfile.TemporaryDirectory(prefix="mbor-package-consumer-") as tmp:
+    tmp_path = Path(tmp)
+    package_dir = tmp_path / "package"
+    consumer_dir = tmp_path / "consumer"
+    consumer_dir.mkdir()
+    with zipfile.ZipFile(package_path) as package:
+        package.extractall(package_dir)
+
+    (consumer_dir / "moon.mod.json").write_text(
+        json.dumps(
+            {
+                "name": "codex/mbt_on_rails_package_consumer",
+                "version": "0.1.0",
+                "readme": "README.mbt.md",
+                "repository": "",
+                "license": "Apache-2.0",
+                "keywords": [],
+                "description": "External consumer smoke test for the packaged mbt_on_rails artifact.",
+                "deps": {
+                    "ubugeeei/mbt_on_rails": {
+                        "path": "../package",
+                    }
+                },
+            },
+            indent=2,
+        )
+    )
+    (consumer_dir / "moon.pkg").write_text(
+        'import { "ubugeeei/mbt_on_rails" @mbor }\n'
+    )
+    (consumer_dir / "consumer.mbt").write_text(
+        "///|\n"
+        "pub fn smoke_path() -> String {\n"
+        "  @mbor.normalize_path(\"posts/42\")\n"
+        "}\n"
+        "\n"
+        "///|\n"
+        "pub fn smoke_response() -> @mbor.Response {\n"
+        "  @mbor.ok_json(\"{\\\"ok\\\":true}\")\n"
+        "}\n"
+    )
+    result = subprocess.run(
+        ["moon", "check"],
+        cwd=consumer_dir,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=False,
+    )
+    if result.returncode != 0:
+        print("Packaged artifact failed external consumer smoke check.", file=sys.stderr)
+        print(result.stdout, file=sys.stderr)
+        sys.exit(result.returncode)
+
 print(
-    f"Package boundary OK: {len(entries)} files/directories checked in {package_path.name}."
+    f"Package boundary OK: {len(entries)} files/directories checked in {package_path.name}; external consumer moon check passed."
 )
 PY

@@ -47,7 +47,7 @@ fn print_usage() -> Unit {
 
 ///|
 fn normalize_relative_path(path : String) -> String {
-  let mut normalized = path.trim().to_string()
+  let mut normalized = path.trim().to_owned()
   while normalized.has_prefix("./") {
     normalized = String::unsafe_substring(
       normalized,
