@@ -68,7 +68,10 @@ fn row_matches_predicate(
     Eq(column, value) =>
       compare_row_value(schema, table_name, row, column, value) == Some(0)
     NotEq(column, value) =>
-      compare_row_value(schema, table_name, row, column, value) != Some(0)
+      match compare_row_value(schema, table_name, row, column, value) {
+        Some(result) => result != 0
+        None => false
+      }
     Like(column, value) =>
       match record_value_for_column(row, column, table_name) {
         Some(current) => like_matches(current, value)
