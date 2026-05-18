@@ -11,6 +11,24 @@ pub fn accepted_json(String) -> Response
 
 pub fn all_http_methods() -> Array[HttpMethod]
 
+pub fn captured_http_server_adapter(Array[String], Array[Int]) -> HttpServerAdapter
+
+pub fn http_server_address(HttpServerAdapter) -> String?
+
+pub fn http_server_adapter(String, (String, (Request) -> Response) -> HttpServerStartOutcome, () -> HttpServerStopOutcome, () -> String?) -> HttpServerAdapter
+
+pub fn http_server_adapter_error_message(HttpServerAdapterError) -> String
+
+pub fn http_server_adapter_summary(HttpServerAdapter) -> String
+
+pub fn http_server_shutdown(HttpServerAdapter) -> HttpServerStopOutcome
+
+pub fn http_server_start(HttpServerAdapter, String, (Request) -> Response) -> HttpServerStartOutcome
+
+pub fn null_http_server_adapter() -> HttpServerAdapter
+
+pub fn record_captured_dispatch(Array[Int]) -> Unit
+
 pub fn append_request_header(Request, String, String) -> Request
 
 pub fn append_response_headers(Response, Array[(String, String)]) -> Response
@@ -207,6 +225,30 @@ pub struct RouteSpec {
   controller : String
   action : String
   page_name : String?
+}
+
+pub(all) struct HttpServerAdapter {
+  name : String
+  start : (String, (Request) -> Response) -> HttpServerStartOutcome
+  shutdown : () -> HttpServerStopOutcome
+  address : () -> String?
+}
+
+pub(all) enum HttpServerAdapterError {
+  HttpServerBindFailed(String)
+  HttpServerListenFailed(String)
+  HttpServerShutdownFailed(String)
+  HttpServerOtherError(String)
+}
+
+pub(all) enum HttpServerStartOutcome {
+  HttpServerStarted(String)
+  HttpServerStartFailed(HttpServerAdapterError)
+}
+
+pub(all) enum HttpServerStopOutcome {
+  HttpServerStopped
+  HttpServerStopFailed(HttpServerAdapterError)
 }
 
 // Type aliases
