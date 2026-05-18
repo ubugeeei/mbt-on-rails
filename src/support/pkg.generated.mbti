@@ -12,6 +12,8 @@ pub fn classify(String) -> String
 
 pub fn[T] clone_array(Array[T]) -> Array[T]
 
+pub fn constant_time_eq(String, String) -> Bool
+
 pub fn entries_to_json(Array[(String, String)]) -> String
 
 pub fn escape_html(String) -> String

@@ -224,6 +224,7 @@ pub using @mbor {
   compose_mail,
   compose_mail_with_notifications,
   config_summary,
+  constant_time_eq,
   controller,
   controller_action,
   controller_named,

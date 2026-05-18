@@ -18,6 +18,7 @@ pub using @support {
   append_entries,
   classify,
   clone_array,
+  constant_time_eq,
   entries_to_json,
   escape_html,
   find_entry,

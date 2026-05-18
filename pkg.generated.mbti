@@ -223,6 +223,8 @@ pub fn compose_mail_with_notifications(mailer~ : @mailer.MailerDefinition, actio
 
 pub fn config_summary(@production.DeploymentConfig) -> String
 
+pub fn constant_time_eq(String, String) -> Bool
+
 #label_migration(pattern, allow_positional=true)
 pub fn contains(pattern~ : String) -> @validation.FieldRule
 
