@@ -19,9 +19,10 @@ defaults:
     shell: bash
 
 jobs:
-  moonbit:
+  quality:
+    name: Quality
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 12
 
     steps:
       - name: Checkout code
@@ -36,18 +37,6 @@ jobs:
           moon fmt
           git diff --exit-code
 
-      - name: Build default target
-        run: moon build
-
-      - name: Build JavaScript target
-        run: moon build --target js
-
-      - name: Build WebAssembly GC target
-        run: moon build --target wasm-gc
-
-      - name: Build native target
-        run: moon build --target native
-
       - name: Run checks
         run: moon check
 
@@ -59,14 +48,73 @@ jobs:
           moon ide analyze > /tmp/moon-ide-analyze.txt
           test -s /tmp/moon-ide-analyze.txt
 
-      - name: Run tests
-        run: moon test
+  build:
+    name: Build (${{ matrix.target }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: default
+            command: moon build
+          - target: js
+            command: moon build --target js
+          - target: wasm-gc
+            command: moon build --target wasm-gc
+          - target: native
+            command: moon build --target native
 
-      - name: Run JavaScript target tests
-        run: moon test --target js
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
 
-      - name: Run WebAssembly GC target tests
-        run: moon test --target wasm-gc
+      - name: Set up MoonBit
+        uses: ./.github/actions/setup-moonbit
+
+      - name: Build ${{ matrix.target }}
+        env:
+          MOON_COMMAND: ${{ matrix.command }}
+        run: $MOON_COMMAND
+
+  test:
+    name: Test (${{ matrix.target }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: default
+            command: moon test
+          - target: js
+            command: moon test --target js
+          - target: wasm-gc
+            command: moon test --target wasm-gc
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Set up MoonBit
+        uses: ./.github/actions/setup-moonbit
+
+      - name: Test ${{ matrix.target }}
+        env:
+          MOON_COMMAND: ${{ matrix.command }}
+        run: $MOON_COMMAND
+
+  runtime:
+    name: Runtime examples
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Set up MoonBit
+        uses: ./.github/actions/setup-moonbit
 
       - name: Run production examples
         run: |
@@ -75,6 +123,18 @@ jobs:
 
       - name: Validate example template assets
         run: scripts/validate_template_assets.py
+
+  package:
+    name: Package artifact
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Set up MoonBit
+        uses: ./.github/actions/setup-moonbit
 
       - name: Validate package artifact
         run: scripts/validate_package_boundary.sh
@@ -86,3 +146,39 @@ jobs:
           path: _build/publish/*.zip
           if-no-files-found: error
           retention-days: 14
+
+  moonbit:
+    name: moonbit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs:
+      - quality
+      - build
+      - test
+      - runtime
+      - package
+    if: ${{ always() }}
+
+    steps:
+      - name: Summarize split checks
+        env:
+          NEEDS_JSON: ${{ toJson(needs) }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import sys
+
+          needs = json.loads(os.environ["NEEDS_JSON"])
+          failed = {
+              name: data["result"]
+              for name, data in needs.items()
+              if data["result"] != "success"
+          }
+          if failed:
+              for name, result in failed.items():
+                  print(f"{name}: {result}", file=sys.stderr)
+              sys.exit(1)
+
+          print("All split CI jobs passed.")
+          PY
