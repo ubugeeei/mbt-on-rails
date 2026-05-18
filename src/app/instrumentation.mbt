@@ -41,7 +41,7 @@ pub fn handle_request_with_notifications(
     None => ()
   }
 
-  match find_server_action(app.server_actions, request.path) {
+  match find_server_action(app.server_actions, request) {
     Some(action) => {
       let response = @middleware.apply_response_middleware(
         app.middlewares,

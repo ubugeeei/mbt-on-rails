@@ -42,6 +42,7 @@ fn print_example(app : @mbor.MbtOnRailsApp) -> Unit {
   }
   println("")
   println("Action Example: POST /_actions/notes.create")
+  let session_id = "sess_1"
   let action_response = @mbor.handle_request(
     app,
     @mbor.append_request_header(
@@ -49,12 +50,16 @@ fn print_example(app : @mbor.MbtOnRailsApp) -> Unit {
         verb=@mbor.http_post(),
         path="/_actions/notes.create",
         query=[],
-        form=[],
-        session_id=None,
+        form=[("title", "hello"), ("body", "body"), ("slug", "hello")],
+        session_id=Some(session_id),
         body="{\"title\":\"hello\"}",
       ),
       "x-csrf-token",
-      "token",
+      @mbor.sign_cookie_value(
+        "server_action:notes.create",
+        session_id,
+        app.auth.secret_key_base,
+      ),
     ),
   )
   println(@mbor.render_response_body(action_response.body))

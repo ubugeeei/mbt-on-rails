@@ -522,27 +522,116 @@ test "scaffold and demo app expose richer rails style surfaces" {
   assert_eq(page_response.status, 200)
   assert_true(render_response_body(page_response.body).contains("posts_show"))
 
+  let valid_action_token = sign_cookie_value(
+    "server_action:posts.create",
+    "sess_1",
+    demo.auth.secret_key_base,
+  )
+  let wrong_action_token = sign_cookie_value(
+    "server_action:posts.update",
+    "sess_1",
+    demo.auth.secret_key_base,
+  )
   let action_request = append_request_header(
     request(
       verb=http_post(),
       path="/_actions/posts.create",
       query=[],
-      form=[],
-      session_id=None,
+      form=[("title", "hello"), ("slug", "hello"), ("body", "body")],
+      session_id=Some("sess_1"),
       body="{\"title\":\"hello\"}",
     ),
     "x-csrf-token",
-    "token",
+    valid_action_token,
   )
   let action_response = handle_request(demo, action_request)
+  let arbitrary_csrf_response = handle_request(
+    demo,
+    append_request_header(
+      request(
+        verb=http_post(),
+        path="/_actions/posts.create",
+        query=[],
+        form=[("title", "hello"), ("slug", "hello"), ("body", "body")],
+        session_id=Some("sess_1"),
+        body="{\"title\":\"hello\"}",
+      ),
+      "x-csrf-token",
+      "token",
+    ),
+  )
+  let wrong_action_csrf_response = handle_request(
+    demo,
+    append_request_header(
+      request(
+        verb=http_post(),
+        path="/_actions/posts.create",
+        query=[],
+        form=[("title", "hello"), ("slug", "hello"), ("body", "body")],
+        session_id=Some("sess_1"),
+        body="{\"title\":\"hello\"}",
+      ),
+      "x-csrf-token",
+      wrong_action_token,
+    ),
+  )
+  let missing_session_response = handle_request(
+    demo,
+    append_request_header(
+      request(
+        verb=http_post(),
+        path="/_actions/posts.create",
+        query=[],
+        form=[("title", "hello"), ("slug", "hello"), ("body", "body")],
+        session_id=None,
+        body="{\"title\":\"hello\"}",
+      ),
+      "x-csrf-token",
+      valid_action_token,
+    ),
+  )
+  let empty_form_response = handle_request(
+    demo,
+    append_request_header(
+      request(
+        verb=http_post(),
+        path="/_actions/posts.create",
+        query=[],
+        form=[],
+        session_id=Some("sess_1"),
+        body="{\"title\":\"hello\"}",
+      ),
+      "x-csrf-token",
+      valid_action_token,
+    ),
+  )
+  let empty_form_no_input_response = handle_request(
+    demo,
+    append_request_header(
+      request(
+        verb=http_post(),
+        path="/_actions/sessions.destroy",
+        query=[],
+        form=[],
+        session_id=Some("sess_1"),
+        body="",
+      ),
+      "x-csrf-token",
+      sign_cookie_value(
+        "server_action:sessions.destroy",
+        "sess_1",
+        demo.auth.secret_key_base,
+      ),
+    ),
+  )
   let missing_csrf_response = handle_request(
     demo,
     request(
       verb=http_post(),
       path="/_actions/posts.create",
       query=[],
-      form=[],
-      session_id=None,
+      form=[("title", "hello"), ("slug", "hello"), ("body", "body")],
+      session_id=Some("sess_1"),
       body="{\"title\":\"hello\"}",
     ),
   )
@@ -565,11 +654,11 @@ test "scaffold and demo app expose richer rails style surfaces" {
         path="/_actions/posts.create",
         query=[],
         form=[("title", "hello")],
-        session_id=None,
+        session_id=Some("sess_1"),
         body="",
       ),
       "x-csrf-token",
-      "token",
+      valid_action_token,
     ),
   )
   let signed_in_sign_in_response = handle_request(
@@ -598,27 +687,107 @@ test "scaffold and demo app expose richer rails style surfaces" {
   assert_true(
     render_response_body(action_response.body).contains("posts.create"),
   )
+  assert_eq(arbitrary_csrf_response.status, 422)
+  assert_true(
+    render_response_body(arbitrary_csrf_response.body).contains(
+      "invalid_csrf_token",
+    ),
+  )
+  assert_eq(wrong_action_csrf_response.status, 422)
+  assert_true(
+    render_response_body(wrong_action_csrf_response.body).contains(
+      "invalid_csrf_token",
+    ),
+  )
+  assert_eq(missing_session_response.status, 422)
+  assert_true(
+    render_response_body(missing_session_response.body).contains(
+      "invalid_csrf_token",
+    ),
+  )
   assert_eq(missing_csrf_response.status, 422)
   assert_true(
     render_response_body(missing_csrf_response.body).contains(
       "invalid_csrf_token",
     ),
   )
-  assert_eq(wrong_method_response.status, 405)
-  assert_true(
-    find_entry(wrong_method_response.headers, "allow") == Some("POST"),
-  )
+  assert_eq(wrong_method_response.status, 404)
   assert_eq(missing_form_response.status, 422)
   assert_true(
     render_response_body(missing_form_response.body).contains(
       "missing action input",
     ),
   )
+  assert_eq(empty_form_response.status, 422)
+  assert_true(
+    render_response_body(empty_form_response.body).contains(
+      "missing action input",
+    ),
+  )
+  assert_eq(empty_form_no_input_response.status, 200)
   assert_eq(signed_in_sign_in_response.status, 403)
   assert_eq(sign_out_guest_response.status, 401)
   assert_true(demo.router_manifest().contains("\"route_name\": \"posts_show\""))
   assert_true(demo.schema_statements().length() >= 3)
   assert_true(
     render_response_body(page_response.body).contains("mbor-form-builders"),
+  )
+}
+
+///|
+test "server actions do not shadow normal get routes with the same path" {
+  let demo = app_named("collision")
+    .with_route(
+      route(
+        name="profile",
+        verb=http_get(),
+        path="/profile",
+        controller="ProfilesController",
+        action="show",
+        page_name=None,
+      ),
+    )
+    .with_server_action(
+      server_action(
+        name="profiles.update",
+        route="/profile",
+        input_fields=[],
+        output_type="ProfilePayload",
+        csrf_protected=false,
+      ),
+    )
+
+  let page_response = handle_request(
+    demo,
+    request(
+      verb=http_get(),
+      path="/profile",
+      query=[],
+      form=[],
+      session_id=None,
+      body="",
+    ),
+  )
+  let action_response = handle_request(
+    demo,
+    request(
+      verb=http_post(),
+      path="/profile",
+      query=[],
+      form=[],
+      session_id=None,
+      body="",
+    ),
+  )
+
+  assert_eq(page_response.status, 200)
+  assert_true(
+    render_response_body(page_response.body).contains(
+      "handled ProfilesController#show",
+    ),
+  )
+  assert_eq(action_response.status, 200)
+  assert_true(
+    render_response_body(action_response.body).contains("profiles.update"),
   )
 }
