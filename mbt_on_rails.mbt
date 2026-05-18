@@ -550,6 +550,7 @@ pub using @production {
   default_staging_config,
   default_test_config,
   deployment_config,
+  deployment_config_valid,
   health_response,
   health_check,
   json_api_document,
@@ -559,10 +560,13 @@ pub using @production {
   log_event,
   metrics_response,
   rate_limit_rule,
+  rate_limit_rule_valid,
   rate_limit_summary,
   rate_limited,
   readiness_response,
   render_health_json,
+  validate_deployment_config,
+  validate_rate_limit_rule,
 }
 
 ///|
@@ -605,6 +609,7 @@ pub using @secrets {
   type SecretVar,
   type SecretsConfig,
   dotenv_preview,
+  invalid_secret_names,
   masked_secret_summary,
   missing_secrets,
   secret_value,

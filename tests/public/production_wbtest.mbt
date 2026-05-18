@@ -56,6 +56,63 @@ test "metrics secrets and production http helpers are production friendly" {
 }
 
 ///|
+test "secrets validation reports invalid env names and sanitizes summaries" {
+  let secrets = secrets_config([
+    secret_var(
+      name="BAD-NAME",
+      value=Some("ok"),
+      required=true,
+      sensitive=false,
+    ),
+    secret_var(
+      name="PUBLIC_BANNER",
+      value=Some("example.com\nDATABASE_URL=oops\r"),
+      required=false,
+      sensitive=false,
+    ),
+  ])
+
+  assert_false(secrets_valid(secrets))
+  assert_eq(invalid_secret_names(secrets)[0], "BAD-NAME")
+  let summary = masked_secret_summary(secrets)
+  assert_true(summary.contains("PUBLIC_BANNER=example.com DATABASE_URL=oops"))
+  assert_false(summary.contains("\nDATABASE_URL=oops"))
+  assert_false(summary.contains("\r"))
+}
+
+///|
+test "production runtime validation flags unsafe config and rate limits" {
+  let base = default_production_config()
+  let config = deployment_config(
+    environment=base.environment,
+    host="https://example.com",
+    port=0,
+    force_ssl=true,
+    trust_proxy=true,
+    asset_host=Some("javascript:alert(1)"),
+    health_path="health",
+    ready_path="//ready",
+  )
+
+  let config_issues = validate_deployment_config(config)
+  assert_false(deployment_config_valid(config))
+  assert_true(config_issues.contains("host must be a hostname or IPv4 literal"))
+  assert_true(config_issues.contains("port must be between 1 and 65535"))
+  assert_true(config_issues.contains("health_path must be an absolute path"))
+  assert_true(config_issues.contains("ready_path must be an absolute path"))
+  assert_true(config_summary(config).contains("invalid="))
+
+  let rule = rate_limit_rule("", "api", 0, -1)
+  let rule_issues = validate_rate_limit_rule(rule)
+  assert_false(rate_limit_rule_valid(rule))
+  assert_true(rule_issues.contains("name must be present"))
+  assert_true(rule_issues.contains("path_prefix must be an absolute path"))
+  assert_true(rule_issues.contains("limit must be greater than 0"))
+  assert_true(rule_issues.contains("window_seconds must be greater than 0"))
+  assert_true(rate_limit_summary(rule).contains("invalid="))
+}
+
+///|
 test "prometheus rendering emits one type line per metric name" {
   let registry = with_metric(
     with_metric(

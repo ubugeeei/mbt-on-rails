@@ -26,6 +26,8 @@ pub fn default_test_config() -> DeploymentConfig
 #label_migration(trust_proxy, allow_positional=true)
 pub fn deployment_config(environment~ : Environment, host~ : String, port~ : Int, force_ssl~ : Bool, trust_proxy~ : Bool, asset_host~ : String?, health_path~ : String, ready_path~ : String) -> DeploymentConfig
 
+pub fn deployment_config_valid(DeploymentConfig) -> Bool
+
 #label_migration(detail, allow_positional=true)
 #label_migration(name, allow_positional=true)
 #label_migration(ok, allow_positional=true)
@@ -47,6 +49,8 @@ pub fn metrics_response(String) -> @http.Response
 
 pub fn rate_limit_rule(String, String, Int, Int) -> RateLimitRule
 
+pub fn rate_limit_rule_valid(RateLimitRule) -> Bool
+
 pub fn rate_limit_summary(RateLimitRule) -> String
 
 pub fn rate_limited(RateLimitRule, Int) -> Bool
@@ -54,6 +58,10 @@ pub fn rate_limited(RateLimitRule, Int) -> Bool
 pub fn readiness_response(Array[HealthCheck]) -> @http.Response
 
 pub fn render_health_json(Array[HealthCheck]) -> String
+
+pub fn validate_deployment_config(DeploymentConfig) -> Array[String]
+
+pub fn validate_rate_limit_rule(RateLimitRule) -> Array[String]
 
 // Errors
 
