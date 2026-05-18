@@ -82,10 +82,14 @@ pub fn issue_password_reset(
   user_id : String,
   email : String,
   requested_at : String,
+  entropy? : String? = None,
+  secret? : String? = None,
 ) -> PasswordResetToken {
+  let seed = token_grant_seed(
+    "password_reset", user_id, email, requested_at, entropy, secret,
+  )
   {
-    token: "reset_" +
-    @support.hash_string(user_id + "::" + email + "::" + requested_at),
+    token: "reset_" + token_digest("password_reset", seed),
     user_id,
     email,
     expires_at: requested_at + "+15m",
@@ -98,14 +102,42 @@ pub fn issue_email_verification(
   user_id : String,
   email : String,
   requested_at : String,
+  entropy? : String? = None,
+  secret? : String? = None,
 ) -> EmailVerificationToken {
+  let seed = token_grant_seed(
+    "email_verification", user_id, email, requested_at, entropy, secret,
+  )
   {
-    token: "verify_" +
-    @support.hash_string(user_id + "::" + email + "::" + requested_at),
+    token: "verify_" + token_digest("email_verification", seed),
     user_id,
     email,
     expires_at: requested_at + "+24h",
   }
+}
+
+///|
+fn token_grant_seed(
+  purpose : String,
+  user_id : String,
+  email : String,
+  requested_at : String,
+  entropy : String?,
+  secret : String?,
+) -> String {
+  purpose +
+  "::user=" +
+  user_id +
+  "::email=" +
+  email +
+  "::requested_at=" +
+  requested_at +
+  "::entropy=" +
+  optional_seed_part(entropy) +
+  "::secret=" +
+  optional_seed_part(secret) +
+  "::nonce=" +
+  session_nonce()
 }
 
 ///|
@@ -154,6 +186,7 @@ pub fn cookie_session_store(
   renew? : Bool = false,
   signing_secret? : String? = None,
 ) -> SessionStore {
+  let secure = secure || same_site == SameSiteNone
   {
     kind: CookieStore,
     key,
@@ -182,6 +215,7 @@ pub fn cache_session_store(
   domain? : String? = None,
   renew? : Bool = false,
 ) -> SessionStore {
+  let secure = secure || same_site == SameSiteNone
   {
     kind: CacheStore,
     key,
@@ -210,6 +244,7 @@ pub fn redis_session_store(
   domain? : String? = None,
   renew? : Bool = false,
 ) -> SessionStore {
+  let secure = secure || same_site == SameSiteNone
   {
     kind: RedisStore,
     key,
@@ -331,6 +366,7 @@ pub fn signed_cookie(
   max_age_seconds? : Int? = None,
   expires_at? : String? = None,
 ) -> AuthCookie {
+  let secure = secure || same_site == SameSiteNone
   {
     name,
     value: sign_cookie_value(name, value, secret),
@@ -462,6 +498,7 @@ pub fn session_cookie_with_store(
   store~ : SessionStore,
   session~ : Session,
 ) -> AuthCookie {
+  let secure = store.secure || store.same_site == SameSiteNone
   let value = if store.signed {
     match store.signing_secret {
       Some(secret) => sign_cookie_value(store.key, session.id, secret)
@@ -476,7 +513,7 @@ pub fn session_cookie_with_store(
     path: store.path,
     domain: store.domain,
     http_only: store.http_only,
-    secure: store.secure,
+    secure,
     same_site: store.same_site,
     signed: store.signed,
     max_age_seconds: store.expire_after_seconds,
@@ -502,7 +539,7 @@ pub fn cookie_header(cookie : AuthCookie) -> String {
   if cookie.http_only {
     parts.push("HttpOnly")
   }
-  if cookie.secure {
+  if cookie.secure || cookie.same_site == SameSiteNone {
     parts.push("Secure")
   }
   match cookie.max_age_seconds {
