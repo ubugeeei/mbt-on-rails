@@ -29,14 +29,6 @@ pub fn after_save(String) -> Callback
 
 pub fn attribute_cast_error(String, String, String?, String) -> AttributeCastError
 
-pub fn bind_bool(Bool) -> RelationBind
-
-pub fn bind_int(Int64) -> RelationBind
-
-pub fn bind_null() -> RelationBind
-
-pub fn bind_text(String) -> RelationBind
-
 pub fn attribute_type_name(Column) -> String
 
 pub fn before_create(String) -> Callback
@@ -53,6 +45,14 @@ pub fn begin_transaction(MemoryDatabase) -> MemoryTransaction
 #label_migration(name, allow_positional=true)
 #label_migration(target, allow_positional=true)
 pub fn belongs_to(name~ : String, target~ : String, foreign_key~ : String) -> Association
+
+pub fn bind_bool(Bool) -> RelationBind
+
+pub fn bind_int(Int64) -> RelationBind
+
+pub fn bind_null() -> RelationBind
+
+pub fn bind_text(String) -> RelationBind
 
 pub fn boolean_column(String) -> Column
 
@@ -198,13 +198,13 @@ pub fn substitute_relation_binds(String, Array[RelationBind]) -> String
 
 pub fn text_column(String) -> Column
 
-pub fn tx_handle(String, String) -> TxHandle
-
 pub fn timestamp_column(String) -> Column
 
 pub fn transaction_insert(MemoryTransaction, Record) -> MemoryTransaction
 
 pub fn transaction_save(ModelSchema, MemoryTransaction, Record) -> TransactionSaveOutcome
+
+pub fn tx_handle(String, String) -> TxHandle
 
 pub fn typed_field(String, AttributeValue) -> TypedField
 

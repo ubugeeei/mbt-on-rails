@@ -82,14 +82,6 @@ pub fn after_only(String) -> @controller.AfterAction
 
 pub fn after_save(String) -> @active_record.Callback
 
-pub fn bind_bool(Bool) -> @active_record.RelationBind
-
-pub fn bind_int(Int64) -> @active_record.RelationBind
-
-pub fn bind_null() -> @active_record.RelationBind
-
-pub fn bind_text(String) -> @active_record.RelationBind
-
 pub fn all_http_methods() -> Array[@http.HttpMethod]
 
 pub fn allowed(@auth.Identity?, @auth.PolicyRule, String?) -> Bool
@@ -168,6 +160,14 @@ pub fn begin_transaction(@active_record.MemoryDatabase) -> @active_record.Memory
 #label_migration(name, allow_positional=true)
 #label_migration(target, allow_positional=true)
 pub fn belongs_to(name~ : String, target~ : String, foreign_key~ : String) -> @active_record.Association
+
+pub fn bind_bool(Bool) -> @active_record.RelationBind
+
+pub fn bind_int(Int64) -> @active_record.RelationBind
+
+pub fn bind_null() -> @active_record.RelationBind
+
+pub fn bind_text(String) -> @active_record.RelationBind
 
 pub fn boolean_column(String) -> @active_record.Column
 
@@ -482,15 +482,15 @@ pub fn has_one(name~ : String, target~ : String, foreign_key~ : String) -> @acti
 
 pub fn hash_string(String) -> String
 
+pub fn having_raw(@active_record.Relation, String) -> @active_record.Relation
+
+pub fn having_with_binds(@active_record.Relation, String, Array[@active_record.RelationBind]) -> @active_record.Relation
+
 pub fn hex_encode_bytes(Array[UInt]) -> String
 
 pub fn hmac_sha256_bytes(Array[UInt], Array[UInt]) -> Array[UInt]
 
 pub fn hmac_sha256_hex(String, String) -> String
-
-pub fn having_raw(@active_record.Relation, String) -> @active_record.Relation
-
-pub fn having_with_binds(@active_record.Relation, String, Array[@active_record.RelationBind]) -> @active_record.Relation
 
 #label_migration(detail, allow_positional=true)
 #label_migration(name, allow_positional=true)
@@ -677,18 +677,6 @@ pub fn frame_options_same_origin() -> @middleware.FrameOptionsMode
 pub fn hsts_middleware(Int, Bool, Bool) -> @middleware.Middleware
 
 pub fn referrer_policy_middleware(String) -> @middleware.Middleware
-
-pub fn content_security_policy_middleware(@middleware.ContentSecurityPolicy) -> @middleware.Middleware
-
-pub fn content_security_policy_value(@middleware.ContentSecurityPolicy) -> String
-
-pub fn cors_config(String, Array[@http.HttpMethod], Array[String], Bool, Int) -> @middleware.CorsConfig
-
-pub fn strict_content_security_policy() -> @middleware.ContentSecurityPolicy
-
-pub fn cors_middleware(@middleware.CorsConfig) -> Array[@middleware.Middleware]
-
-pub fn default_security_headers_bundle() -> Array[@middleware.Middleware]
 
 pub fn migration(String, String, Array[@migration.MigrationStep]) -> @migration.Migration
 
@@ -1013,10 +1001,6 @@ pub fn schema_dump(Array[@active_record.ModelSchema]) -> String
 
 pub fn schema_sql(Array[@migration.Migration]) -> Array[String]
 
-pub fn sha256_bytes(Array[UInt]) -> Array[UInt]
-
-pub fn sha256_hex(String) -> String
-
 #label_migration(name, allow_positional=true)
 #label_migration(relation, allow_positional=true)
 pub fn scope(name~ : String, relation~ : @active_record.Relation) -> @active_record.ScopeDefinition
@@ -1121,8 +1105,6 @@ pub fn string_field(name~ : String) -> @validation.FieldSchema
 
 pub fn substitute_relation_binds(String, Array[@active_record.RelationBind]) -> String
 
-pub fn tx_handle(String, String) -> @active_record.TxHandle
-
 pub fn suspense_boundary(name~ : String, fallback_html~ : String, children~ : Array[@view.VaporNode]) -> @view.VaporNode
 
 pub fn tag(name~ : String, attrs? : Array[(String, String)]) -> String
@@ -1157,6 +1139,8 @@ pub fn transaction_save(@active_record.ModelSchema, @active_record.MemoryTransac
 pub fn turbo_stream(@turbo.TurboStreamAction, String, String) -> @turbo.TurboStream
 
 pub fn turbo_stream_format() -> @controller.ResponseFormat
+
+pub fn tx_handle(String, String) -> @active_record.TxHandle
 
 pub fn typed_field(String, @active_record.AttributeValue) -> @active_record.TypedField
 

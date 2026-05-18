@@ -48,13 +48,13 @@ pub fn notifications() -> Notifications
 
 pub fn remove_query_string(String) -> String
 
-pub fn singularize(String) -> String
-
-pub fn split_path(String) -> Array[String]
-
 pub fn sha256_bytes(Array[UInt]) -> Array[UInt]
 
 pub fn sha256_hex(String) -> String
+
+pub fn singularize(String) -> String
+
+pub fn split_path(String) -> Array[String]
 
 pub fn sql_literal(String) -> String
 
