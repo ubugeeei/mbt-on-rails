@@ -174,6 +174,21 @@ fn validate_constraint_statement(
 }
 
 ///|
+fn validate_foreign_key_constraint_statement(
+  table_name : String,
+  column_name : String,
+  target_table : String,
+) -> String {
+  validate_constraint_statement(
+    table_name,
+    foreign_key_constraint_name(table_name, column_name),
+  ) +
+  " /* references " +
+  target_table +
+  "(id) */"
+}
+
+///|
 fn drop_constraint_statement(
   table_name : String,
   constraint_name : String,

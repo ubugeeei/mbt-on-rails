@@ -145,6 +145,42 @@ test "execute_relation supports basic raw equality predicates in memory" {
 }
 
 ///|
+test "execute_relation applies SQL LIKE wildcard semantics in memory" {
+  let schema = relation_execution_schema()
+  let db = relation_execution_db()
+
+  let any_length = relation_for(schema)
+    .where_like("title", "%MoonBit%")
+    .execute(schema, db)
+  assert_eq(any_length.issues().length(), 0)
+  assert_eq(any_length.count(), 4)
+
+  let one_character = relation_for(schema)
+    .where_like("title", "MoonBit _aunch")
+    .execute(schema, db)
+  assert_eq(one_character.issues().length(), 0)
+  assert_eq(one_character.count(), 2)
+
+  let mixed_wildcards = relation_for(schema)
+    .where_like("title", "MoonBit L_un%")
+    .execute(schema, db)
+  assert_eq(mixed_wildcards.issues().length(), 0)
+  assert_eq(mixed_wildcards.count(), 2)
+
+  let non_matching = relation_for(schema)
+    .where_like("title", "MoonBit __aunch")
+    .execute(schema, db)
+  assert_eq(non_matching.issues().length(), 0)
+  assert_eq(non_matching.count(), 0)
+
+  let backslash_is_literal = relation_for(schema)
+    .where_like("title", "MoonBit \\_aunch")
+    .execute(schema, db)
+  assert_eq(backslash_is_literal.issues().length(), 0)
+  assert_eq(backslash_is_literal.count(), 0)
+}
+
+///|
 test "execute_relation where_not_eq ignores missing values like sql nulls" {
   let schema = relation_execution_schema()
   let db = relation_execution_db().insert_record(

@@ -36,7 +36,9 @@ test "phased constraint migrations stay safe and render explicit validation SQL"
     up_sql.contains("ALTER TABLE posts VALIDATE CONSTRAINT posts_slug_present"),
   )
   assert_true(
-    up_sql.contains("ALTER TABLE posts VALIDATE CONSTRAINT fk_posts_author_id"),
+    up_sql.contains(
+      "ALTER TABLE posts VALIDATE CONSTRAINT fk_posts_author_id /* references users(id) */",
+    ),
   )
   assert_true(
     down_sql.contains("ALTER TABLE posts DROP CONSTRAINT posts_slug_present"),
@@ -44,6 +46,31 @@ test "phased constraint migrations stay safe and render explicit validation SQL"
   assert_true(
     down_sql.contains("ALTER TABLE posts DROP CONSTRAINT fk_posts_author_id"),
   )
+}
+
+///|
+test "validate_foreign_key renders the intended target table" {
+  let users_validation = migration_plan(
+    "20260327030103", "validate_post_author",
+  ).validate_foreign_key("posts", "author_id", "users")
+  let accounts_validation = migration_plan(
+    "20260327030104", "validate_post_account",
+  ).validate_foreign_key("posts", "author_id", "accounts")
+
+  let users_sql = migration_up_sql(users_validation)
+  let accounts_sql = migration_up_sql(accounts_validation)
+
+  assert_true(
+    users_sql.contains(
+      "ALTER TABLE posts VALIDATE CONSTRAINT fk_posts_author_id /* references users(id) */",
+    ),
+  )
+  assert_true(
+    accounts_sql.contains(
+      "ALTER TABLE posts VALIDATE CONSTRAINT fk_posts_author_id /* references accounts(id) */",
+    ),
+  )
+  assert_true(users_sql[0] != accounts_sql[0])
 }
 
 ///|
