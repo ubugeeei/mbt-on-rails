@@ -13,6 +13,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -20,23 +24,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
 
       - name: Set up MoonBit
-        run: |
-          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
-          echo "$HOME/.moon/bin" >> $GITHUB_PATH
-
-      - name: Show toolchain versions
-        run: moon version --all
-
-      - name: Update dependencies
-        run: moon update
+        uses: ./.github/actions/setup-moonbit
 
       - name: Check formatting and interfaces
         run: |
@@ -63,9 +54,57 @@ jobs:
       - name: Validate package boundary
         run: scripts/validate_package_boundary.sh
 
+      - name: Generate checksums
+        run: |
+          cd _build/publish
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum *.zip > SHA256SUMS
+          else
+            LC_ALL=C shasum -a 256 *.zip > SHA256SUMS
+          fi
+
       - name: Upload package artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: moon-package-${{ github.ref_name }}
-          path: _build/publish/*.zip
+          name: moon-package-${{ github.run_id }}
+          path: |
+            _build/publish/*.zip
+            _build/publish/SHA256SUMS
           if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download package artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: moon-package-${{ github.run_id }}
+          path: dist
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag_name="${GITHUB_REF_NAME}"
+          shopt -s nullglob
+          assets=(dist/*.zip dist/SHA256SUMS)
+          if (( ${#assets[@]} < 2 )); then
+            echo "Expected a package zip and SHA256SUMS under dist." >&2
+            exit 1
+          fi
+
+          if gh release view "$tag_name" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$tag_name" "${assets[@]}" --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create "$tag_name" "${assets[@]}" \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "$tag_name" \
+              --generate-notes
+          fi

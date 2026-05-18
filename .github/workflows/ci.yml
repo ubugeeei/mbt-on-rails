@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -10,8 +11,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   moonbit:
@@ -20,23 +25,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
 
       - name: Set up MoonBit
-        run: |
-          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
-          echo "$HOME/.moon/bin" >> $GITHUB_PATH
-
-      - name: Show toolchain versions
-        run: moon version --all
-
-      - name: Update dependencies
-        run: moon update
+        uses: ./.github/actions/setup-moonbit
 
       - name: Check formatting and interfaces
         run: |
@@ -88,8 +80,9 @@ jobs:
         run: scripts/validate_package_boundary.sh
 
       - name: Upload package artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: moon-package
+          name: moon-package-${{ github.run_id }}
           path: _build/publish/*.zip
           if-no-files-found: error
+          retention-days: 14
