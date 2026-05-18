@@ -386,6 +386,7 @@ pub using @mbor {
   integer_column,
   invoke_server_action_step,
   is_safe_internal_redirect,
+  rotate_session,
   issue_email_verification,
   issue_password_reset,
   issue_session,
