@@ -1,12 +1,18 @@
 ///|
 test "parse_forwarded_chain splits and trims while dropping empty hops" {
-  assert_eq(parse_forwarded_chain(""), [])
-  assert_eq(parse_forwarded_chain("203.0.113.10"), ["203.0.113.10"])
-  assert_eq(
-    parse_forwarded_chain("203.0.113.10, 198.51.100.7, 10.0.0.1"),
-    ["203.0.113.10", "198.51.100.7", "10.0.0.1"],
-  )
-  assert_eq(parse_forwarded_chain("a, , b"), ["a", "b"])
+  assert_eq(parse_forwarded_chain("").length(), 0)
+  let single = parse_forwarded_chain("203.0.113.10")
+  assert_eq(single.length(), 1)
+  assert_eq(single[0], "203.0.113.10")
+  let triple = parse_forwarded_chain("203.0.113.10, 198.51.100.7, 10.0.0.1")
+  assert_eq(triple.length(), 3)
+  assert_eq(triple[0], "203.0.113.10")
+  assert_eq(triple[1], "198.51.100.7")
+  assert_eq(triple[2], "10.0.0.1")
+  let trimmed = parse_forwarded_chain("a, , b")
+  assert_eq(trimmed.length(), 2)
+  assert_eq(trimmed[0], "a")
+  assert_eq(trimmed[1], "b")
 }
 
 ///|
@@ -83,20 +89,14 @@ test "resolve_request_id sanitises injection-shaped header values" {
     body="",
   )
   let injected = append_request_header(
-    req,
-    "x-request-id",
-    "ok\r\nset-cookie: forged=1",
+    req, "x-request-id", "ok\r\nset-cookie: forged=1",
   )
   let resolved = resolve_request_id(injected, "x-request-id", "fallback")
   assert_false(resolved.contains("\r"))
   assert_false(resolved.contains("\n"))
   assert_false(resolved.contains(":"))
   assert_true(resolved.has_prefix("ok"))
-  let only_unsafe = append_request_header(
-    req,
-    "x-request-id",
-    "////",
-  )
+  let only_unsafe = append_request_header(req, "x-request-id", "////")
   assert_eq(
     resolve_request_id(only_unsafe, "x-request-id", "fallback-id"),
     "fallback-id",

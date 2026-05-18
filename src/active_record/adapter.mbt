@@ -4,7 +4,7 @@
 /// Each variant carries a human-readable message so callers can surface
 /// it through their existing logging / instrumentation without needing
 /// to know what concrete driver they are talking to.
-pub enum AdapterError {
+pub(all) enum AdapterError {
   ConnectionFailed(String)
   SyntaxError(String)
   IntegrityViolation(String)
@@ -26,7 +26,7 @@ pub fn adapter_error_message(error : AdapterError) -> String {
 
 ///|
 /// Result of a successful query.
-pub struct QueryResult {
+pub(all) struct QueryResult {
   columns : Array[String]
   rows : Array[Record]
   affected_rows : Int
@@ -46,7 +46,7 @@ pub fn query_result(
 
 ///|
 /// Outcome of an `execute` call.
-pub enum QueryOutcome {
+pub(all) enum QueryOutcome {
   QuerySucceeded(QueryResult)
   QueryFailed(AdapterError)
 }
@@ -57,7 +57,7 @@ pub enum QueryOutcome {
 /// across calls; `adapter_name` is the name of the originating
 /// adapter, so a handle accidentally passed to the wrong adapter
 /// can be rejected cleanly.
-pub struct TxHandle {
+pub(all) struct TxHandle {
   id : String
   adapter_name : String
 }
@@ -73,14 +73,14 @@ pub fn tx_handle(id : String, adapter_name : String) -> TxHandle {
 
 ///|
 /// Outcome of `begin`.
-pub enum TransactionBeginOutcome {
+pub(all) enum TransactionBeginOutcome {
   TransactionStarted(TxHandle)
   TransactionBeginFailed(AdapterError)
 }
 
 ///|
 /// Outcome of `commit` / `rollback` / `close`.
-pub enum TransactionCloseOutcome {
+pub(all) enum TransactionCloseOutcome {
   TransactionClosed
   TransactionCloseFailed(AdapterError)
 }
@@ -93,7 +93,7 @@ pub enum TransactionCloseOutcome {
 /// uniformly. The function-valued fields let callers compose adapters
 /// at construction time (decorate with logging, swap in a fake during
 /// tests, etc.) without needing trait dispatch.
-pub struct DatabaseAdapter {
+pub(all) struct DatabaseAdapter {
   name : String
   execute : (String, Array[RelationBind]) -> QueryOutcome
   begin : () -> TransactionBeginOutcome
@@ -122,7 +122,10 @@ pub fn database_adapter(
 /// verify the surrounding orchestration handles errors correctly
 /// without standing up a real driver.
 pub fn null_database_adapter() -> DatabaseAdapter {
-  let fail_query = fn(_sql : String, _binds : Array[RelationBind]) -> QueryOutcome {
+  let fail_query = fn(
+    _sql : String,
+    _binds : Array[RelationBind],
+  ) -> QueryOutcome {
     QueryFailed(ConnectionFailed("null adapter is offline"))
   }
   let fail_begin = fn() -> TransactionBeginOutcome {

@@ -6,7 +6,7 @@
 /// operation; callers surface the reason through the typed outcome
 /// returned by `save_record_with_callbacks` /
 /// `destroy_record_with_callbacks`.
-pub enum CallbackOutcome {
+pub(all) enum CallbackOutcome {
   Continue(Record)
   Halt(String)
 }
@@ -31,7 +31,7 @@ pub fn run_record_callbacks(
 
 ///|
 /// Outcome of `save_record_with_callbacks`.
-pub enum SaveWithCallbacksOutcome {
+pub(all) enum SaveWithCallbacksOutcome {
   SavedAfterCallbacks(MemoryDatabase, Record)
   SaveValidationFailed(ValidationErrors)
   SaveCallbackHalted(String)
@@ -67,7 +67,7 @@ pub fn save_record_with_callbacks(
 
 ///|
 /// Outcome of `destroy_record_with_callbacks`.
-pub enum DestroyWithCallbacksOutcome {
+pub(all) enum DestroyWithCallbacksOutcome {
   DestroyedAfterCallbacks(MemoryDatabase, Record)
   DestroyTargetMissing(MemoryDatabase)
   DestroyCallbackHalted(String)
