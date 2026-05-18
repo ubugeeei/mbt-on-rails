@@ -25,7 +25,7 @@ pub fn link_to(
   attrs? : Array[(String, String)] = [],
 ) -> String {
   let final_attrs = @support.clone_array(attrs)
-  final_attrs.insert(0, ("href", href))
+  final_attrs.insert(0, ("href", sanitize_link_url(href)))
   content_tag(name="a", content=label, attrs=final_attrs)
 }
 
@@ -46,7 +46,7 @@ pub fn button_to(
   }
   let resolved_form_attrs = @support.clone_array(form_attrs)
   resolved_form_attrs.insert(0, ("method", effective_form_method))
-  resolved_form_attrs.insert(0, ("action", action))
+  resolved_form_attrs.insert(0, ("action", sanitize_form_action_url(action)))
 
   let button_attrs = @support.clone_array(attrs)
   button_attrs.insert(0, ("type", "submit"))
@@ -80,7 +80,7 @@ pub fn image_tag(
 ) -> String {
   let final_attrs = @support.clone_array(attrs)
   final_attrs.insert(0, ("alt", alt))
-  final_attrs.insert(0, ("src", src))
+  final_attrs.insert(0, ("src", sanitize_image_src_url(src)))
   tag(name="img", attrs=final_attrs)
 }
 
@@ -163,19 +163,228 @@ fn render_html_attrs(attrs : Array[(String, String)]) -> String {
   }
   let parts : Array[String] = []
   for attr in attrs {
-    if is_valid_html_name(attr.0) {
-      parts.push(
-        @support.escape_html(attr.0) +
-        "=\"" +
-        @support.escape_html(attr.1) +
-        "\"",
-      )
+    let attr_name = attr.0
+    if is_valid_html_name(attr_name) && is_safe_html_attr_name(attr_name) {
+      match sanitize_html_attr_value(attr_name, attr.1) {
+        Some(value) =>
+          parts.push(
+            @support.escape_html(attr_name) +
+            "=\"" +
+            @support.escape_html(value) +
+            "\"",
+          )
+        None => ()
+      }
     }
   }
   if parts.is_empty() {
     return ""
   }
   " " + parts.join(" ")
+}
+
+///|
+fn render_safe_fallback_html(html : String) -> String {
+  @support.escape_html(html)
+}
+
+///|
+fn sanitize_html_attr_value(name : String, value : String) -> String? {
+  let normalized_name = ascii_lowercase(name)
+  if normalized_name == "href" || normalized_name == "xlink:href" {
+    return Some(sanitize_link_url(value))
+  }
+  if normalized_name == "action" || normalized_name == "formaction" {
+    return Some(sanitize_form_action_url(value))
+  }
+  if normalized_name == "src" || normalized_name == "poster" {
+    return Some(sanitize_image_src_url(value))
+  }
+  if normalized_name == "srcset" {
+    return sanitize_image_srcset(value)
+  }
+  Some(value)
+}
+
+///|
+fn is_safe_html_attr_name(name : String) -> Bool {
+  let normalized = ascii_lowercase(name)
+  if normalized == "srcdoc" {
+    return false
+  }
+  !(normalized.length() > 2 && normalized.has_prefix("on"))
+}
+
+///|
+fn sanitize_link_url(url : String) -> String {
+  let cleaned = clean_url_value(url)
+  if is_allowed_link_url(cleaned) {
+    cleaned
+  } else {
+    "#"
+  }
+}
+
+///|
+fn sanitize_form_action_url(url : String) -> String {
+  let cleaned = clean_url_value(url)
+  if is_allowed_fetch_url(cleaned) {
+    cleaned
+  } else {
+    "#"
+  }
+}
+
+///|
+fn sanitize_image_src_url(url : String) -> String {
+  let cleaned = clean_url_value(url)
+  if is_allowed_image_url(cleaned) {
+    cleaned
+  } else {
+    "about:blank"
+  }
+}
+
+///|
+fn sanitize_stylesheet_url(url : String) -> String? {
+  let cleaned = clean_url_value(url)
+  if is_allowed_fetch_url(cleaned) {
+    Some(cleaned)
+  } else {
+    None
+  }
+}
+
+///|
+fn sanitize_script_url(url : String) -> String? {
+  let cleaned = clean_url_value(url)
+  if is_allowed_fetch_url(cleaned) {
+    Some(cleaned)
+  } else {
+    None
+  }
+}
+
+///|
+fn sanitize_image_srcset(value : String) -> String? {
+  let compact = ascii_lowercase(clean_url_value(value))
+  if compact.contains("javascript:") ||
+    compact.contains("vbscript:") ||
+    compact.contains("data:text/html") ||
+    compact.contains("data:application/xhtml") ||
+    compact.contains("data:image/svg") {
+    None
+  } else {
+    Some(value)
+  }
+}
+
+///|
+fn is_allowed_link_url(url : String) -> Bool {
+  if url.length() == 0 {
+    return false
+  }
+  match url_scheme(url) {
+    Some(scheme) =>
+      scheme == "http" ||
+      scheme == "https" ||
+      scheme == "mailto" ||
+      scheme == "tel"
+    None => true
+  }
+}
+
+///|
+fn is_allowed_fetch_url(url : String) -> Bool {
+  if url.length() == 0 {
+    return false
+  }
+  match url_scheme(url) {
+    Some(scheme) => scheme == "http" || scheme == "https"
+    None => true
+  }
+}
+
+///|
+fn is_allowed_image_url(url : String) -> Bool {
+  if url.length() == 0 {
+    return false
+  }
+  match url_scheme(url) {
+    Some(scheme) =>
+      if scheme == "data" {
+        is_safe_image_data_url(url)
+      } else {
+        scheme == "http" || scheme == "https"
+      }
+    None => true
+  }
+}
+
+///|
+fn is_safe_image_data_url(url : String) -> Bool {
+  let normalized = ascii_lowercase(url)
+  normalized.has_prefix("data:image/png;") ||
+  normalized.has_prefix("data:image/png,") ||
+  normalized.has_prefix("data:image/jpeg;") ||
+  normalized.has_prefix("data:image/jpeg,") ||
+  normalized.has_prefix("data:image/jpg;") ||
+  normalized.has_prefix("data:image/jpg,") ||
+  normalized.has_prefix("data:image/gif;") ||
+  normalized.has_prefix("data:image/gif,") ||
+  normalized.has_prefix("data:image/webp;") ||
+  normalized.has_prefix("data:image/webp,") ||
+  normalized.has_prefix("data:image/avif;") ||
+  normalized.has_prefix("data:image/avif,") ||
+  normalized.has_prefix("data:image/bmp;") ||
+  normalized.has_prefix("data:image/bmp,") ||
+  normalized.has_prefix("data:image/x-icon;") ||
+  normalized.has_prefix("data:image/x-icon,") ||
+  normalized.has_prefix("data:image/vnd.microsoft.icon;") ||
+  normalized.has_prefix("data:image/vnd.microsoft.icon,")
+}
+
+///|
+fn url_scheme(url : String) -> String? {
+  let scheme = StringBuilder::new()
+  let mut index = 0
+  for ch in url {
+    if ch == ':' {
+      if index == 0 {
+        return None
+      }
+      return Some(ascii_lowercase(scheme.to_string()))
+    }
+    if ch == '/' || ch == '?' || ch == '#' {
+      return None
+    }
+    let valid = if index == 0 {
+      is_ascii_alpha(ch)
+    } else {
+      is_ascii_alpha(ch) ||
+      is_ascii_digit(ch) ||
+      ch == '+' ||
+      ch == '-' ||
+      ch == '.'
+    }
+    if !valid {
+      return None
+    }
+    scheme.write_char(ch)
+    index += 1
+  }
+  None
+}
+
+///|
+fn clean_url_value(source : String) -> String {
+  let builder = StringBuilder::new()
+  for ch in source {
+    if ch.to_int() > 0x20 {
+      builder.write_char(ch)
+    }
+  }
+  builder.to_string()
 }
 
 ///|
@@ -208,12 +417,22 @@ fn is_valid_html_name(name : String) -> Bool {
       ch == ':' ||
       ch == '.'
     }
-    if not(valid) {
+    if !valid {
       return false
     }
     index += 1
   }
   true
+}
+
+///|
+fn is_ascii_alpha(ch : Char) -> Bool {
+  (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')
+}
+
+///|
+fn is_ascii_digit(ch : Char) -> Bool {
+  ch >= '0' && ch <= '9'
 }
 
 ///|
@@ -264,7 +483,7 @@ fn sanitize_dom_token(source : String) -> String {
       wrote_underscore = false
       continue
     }
-    if not(wrote_underscore) {
+    if !wrote_underscore {
       builder.write_char('_')
       wrote_underscore = true
     }

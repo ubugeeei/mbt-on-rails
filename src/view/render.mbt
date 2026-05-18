@@ -58,43 +58,41 @@ pub fn render_page(
     )
   }
   for style_url in page.assets.style_urls {
-    head_bits.push(
-      "<link rel=\"stylesheet\" href=\"" +
-      @support.escape_html(style_url) +
-      "\">",
-    )
+    match sanitize_stylesheet_url(style_url) {
+      Some(safe_url) =>
+        head_bits.push(
+          "<link rel=\"stylesheet\" href=\"" +
+          @support.escape_html(safe_url) +
+          "\">",
+        )
+      None => ()
+    }
   }
 
   let script_bits : Array[String] = []
+  script_bits.push(render_json_script("mbor-data", data_json))
   script_bits.push(
-    "<script type=\"application/json\" id=\"mbor-data\">" +
-    @support.escape_html(data_json) +
-    "</script>",
+    render_json_script("mbor-actions", render_server_action_manifest(actions)),
   )
   script_bits.push(
-    "<script type=\"application/json\" id=\"mbor-actions\">" +
-    @support.escape_html(render_server_action_manifest(actions)) +
-    "</script>",
+    render_json_script("mbor-components", component_manifest_json),
   )
   script_bits.push(
-    "<script type=\"application/json\" id=\"mbor-components\">" +
-    @support.escape_html(component_manifest_json) +
-    "</script>",
+    render_json_script("mbor-forms", render_form_manifest(page.forms)),
   )
   script_bits.push(
-    "<script type=\"application/json\" id=\"mbor-forms\">" +
-    @support.escape_html(render_form_manifest(page.forms)) +
-    "</script>",
-  )
-  script_bits.push(
-    "<script type=\"application/json\" id=\"mbor-form-builders\">" +
-    @support.escape_html(form_builder_manifest_json) +
-    "</script>",
+    render_json_script("mbor-form-builders", form_builder_manifest_json),
   )
   for script_url in page.assets.script_urls {
-    script_bits.push(
-      "<script src=\"" + @support.escape_html(script_url) + "\" defer></script>",
-    )
+    match sanitize_script_url(script_url) {
+      Some(safe_url) =>
+        script_bits.push(
+          "<script src=\"" +
+          @support.escape_html(safe_url) +
+          "\" defer></script>",
+        )
+      None => ()
+    }
   }
 
   let html = "<!doctype html><html><head>" +
@@ -111,6 +109,29 @@ pub fn render_page(
     form_builder_manifest_json,
     router_manifest_entry: render_page_manifest_entry(page),
   }
+}
+
+///|
+fn render_json_script(id : String, payload : String) -> String {
+  "<script type=\"application/json\" id=\"" +
+  @support.escape_html(id) +
+  "\">" +
+  escape_json_script_payload(payload) +
+  "</script>"
+}
+
+///|
+fn escape_json_script_payload(payload : String) -> String {
+  let builder = StringBuilder::new()
+  for ch in payload {
+    match ch {
+      '<' => builder.write_string("\\u003c")
+      '>' => builder.write_string("\\u003e")
+      '&' => builder.write_string("\\u0026")
+      _ => builder.write_char(ch)
+    }
+  }
+  builder.to_string()
 }
 
 ///|
@@ -238,7 +259,10 @@ fn render_component_placeholder_with_import(
     None => ()
   }
   let fallback = match component.fallback_html {
-    Some(html) => "<template data-mbor-fallback>" + html + "</template>"
+    Some(html) =>
+      "<template data-mbor-fallback>" +
+      render_safe_fallback_html(html) +
+      "</template>"
     None => ""
   }
   let nested = render_component_children(component)
@@ -287,7 +311,7 @@ fn render_tree_node(parent : VaporComponentRef, node : VaporNode) -> String {
       "<div class=\"mbor-suspense\" data-mbor-suspense=\"" +
       @support.escape_html(boundary.name) +
       "\"><template data-mbor-suspense-fallback>" +
-      boundary.fallback_html +
+      render_safe_fallback_html(boundary.fallback_html) +
       "</template>" +
       children.join("") +
       "</div>"
