@@ -72,12 +72,17 @@ fn metric_kind(
 /// Renders metrics in Prometheus exposition format.
 pub fn render_prometheus(registry : MetricsRegistry) -> String {
   let lines : Array[String] = []
+  let described_names : Array[String] = []
   for sample in registry.samples {
-    let kind = match sample.kind {
-      CounterMetric => "counter"
-      GaugeMetric => "gauge"
+    let metric_name = prometheus_metric_name(sample.name)
+    if !described_names.contains(metric_name) {
+      let kind = match sample.kind {
+        CounterMetric => "counter"
+        GaugeMetric => "gauge"
+      }
+      lines.push("# TYPE " + metric_name + " " + kind)
+      described_names.push(metric_name)
     }
-    lines.push("# TYPE " + prometheus_metric_name(sample.name) + " " + kind)
     lines.push(render_sample(sample))
   }
   lines.join("\n")

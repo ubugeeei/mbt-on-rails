@@ -56,6 +56,22 @@ test "metrics secrets and production http helpers are production friendly" {
 }
 
 ///|
+test "prometheus rendering emits one type line per metric name" {
+  let registry = with_metric(
+    with_metric(
+      metrics_registry(),
+      counter("http_requests_total", [("controller", "PostsController")], 5),
+    ),
+    counter("http_requests_total", [("controller", "CommentsController")], 3),
+  )
+
+  assert_eq(
+    render_prometheus(registry),
+    "# TYPE http_requests_total counter\nhttp_requests_total{controller=\"PostsController\"} 5\nhttp_requests_total{controller=\"CommentsController\"} 3",
+  )
+}
+
+///|
 test "deployment helpers describe production process topology" {
   let processes = [
     web_process("web", "moon run cmd/main", 2, ["PORT", "DATABASE_URL"]),
