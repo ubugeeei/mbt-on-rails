@@ -170,9 +170,9 @@ test "job adapters and serialized jobs preserve queue contracts" {
 
   match deserialize_payload(serialized.payload_json) {
     Some(payload) => {
-      assert_eq(find_entry(payload, "id"), Some("42"))
-      assert_eq(find_entry(payload, "published"), Some("true"))
-      assert_eq(find_entry(payload, "title"), Some("MoonBit \"Rails\""))
+      assert_true(find_entry(payload, "id") == Some("42"))
+      assert_true(find_entry(payload, "published") == Some("true"))
+      assert_true(find_entry(payload, "title") == Some("MoonBit \"Rails\""))
     }
     None => assert_true(false)
   }
@@ -180,11 +180,10 @@ test "job adapters and serialized jobs preserve queue contracts" {
   match restore_enqueued_job(serialized) {
     Some(restored) => {
       assert_eq(restored.queue, "solid:default")
-      assert_eq(restored.unique_key, Some("search:index"))
+      assert_true(restored.unique_key == Some("search:index"))
       assert_eq(restored.argument_types[1].1, "Bool")
-      assert_eq(
-        find_entry(restored.payload, "title"),
-        Some("MoonBit \"Rails\""),
+      assert_true(
+        find_entry(restored.payload, "title") == Some("MoonBit \"Rails\""),
       )
     }
     None => assert_true(false)
@@ -201,15 +200,15 @@ test "job payload serialization escapes and parses JSON control characters" {
   )
 
   match deserialize_payload(payload_json) {
-    Some(payload) => assert_eq(find_entry(payload, "controls"), Some(controls))
+    Some(payload) =>
+      assert_true(find_entry(payload, "controls") == Some(controls))
     None => assert_true(false)
   }
 
   match deserialize_payload("{\"controls\": \"x\\u0008\\u000Cy\\u001Fz\"}") {
     Some(payload) =>
-      assert_eq(
-        find_entry(payload, "controls"),
-        Some("x\u{0008}\u{000C}y\u{001F}z"),
+      assert_true(
+        find_entry(payload, "controls") == Some("x\u{0008}\u{000C}y\u{001F}z"),
       )
     None => assert_true(false)
   }

@@ -85,7 +85,7 @@ test "cookie stores and forgery strategies stay explicit and type safe" {
   let disabled = disabled_session_store()
 
   assert_true(session_store_summary(store).contains("store=cookie"))
-  assert_eq(remember_store.expire_after_seconds, Some(60 * 60 * 24 * 30))
+  assert_true(remember_store.expire_after_seconds == Some(60 * 60 * 24 * 30))
   assert_true(session_store_summary(cache_store).contains("store=cache"))
   assert_eq(redis_store.same_site, cookie_same_site_none())
   assert_true(session_store_summary(disabled).contains("store=disabled"))
@@ -134,14 +134,13 @@ test "cookie stores and forgery strategies stay explicit and type safe" {
     Some(value) => assert_eq(value, delimited_value)
     None => assert_true(false)
   }
-  assert_eq(
-    verify_signed_cookie_value("preview", signed.value, "wrong-secret"),
-    None,
+  assert_true(
+    verify_signed_cookie_value("preview", signed.value, "wrong-secret") == None,
   )
 
   let parsed = parse_cookie_header("preview=one; session=two; theme=dark")
-  assert_eq(find_cookie(parsed, "session"), Some("two"))
-  assert_eq(find_cookie(parsed, "missing"), None)
+  assert_true(find_cookie(parsed, "session") == Some("two"))
+  assert_true(find_cookie(parsed, "missing") == None)
   assert_true(
     sign_cookie_value("preview", "token-1", config.secret_key_base).contains(
       "--",
@@ -164,9 +163,8 @@ test "cookie stores and forgery strategies stay explicit and type safe" {
     "cookie",
     "_unsafe_session=" + session.id,
   )
-  assert_eq(
-    request_session_id(unsigned_signed_request, unsigned_signed_store),
-    None,
+  assert_true(
+    request_session_id(unsigned_signed_request, unsigned_signed_store) == None,
   )
 
   assert_eq(forgery_strategy_summary(request_forgery_exception()), "exception")

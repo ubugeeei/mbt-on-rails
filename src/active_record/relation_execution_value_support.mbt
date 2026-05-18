@@ -57,7 +57,7 @@ fn record_value_for_column(
 
 ///|
 fn simple_select_column(source : String, table_name : String) -> String? {
-  let trimmed = source.trim().to_string()
+  let trimmed = source.trim().to_owned()
   if trimmed == "*" || trimmed == table_name + ".*" {
     return Some("*")
   }
@@ -66,7 +66,7 @@ fn simple_select_column(source : String, table_name : String) -> String? {
 
 ///|
 fn normalized_column_name(source : String, table_name : String) -> String? {
-  let trimmed = source.trim().to_string()
+  let trimmed = source.trim().to_owned()
   if trimmed.contains("(") || trimmed.contains(")") || trimmed.contains(" ") {
     return None
   }
@@ -135,7 +135,7 @@ fn compare_boolean_strings(left : String, right : String) -> Int {
     (Some(left), Some(right)) =>
       if left == right {
         0
-      } else if not(left) && right {
+      } else if !left && right {
         -1
       } else {
         1
@@ -169,7 +169,7 @@ fn like_matches(value : String, pattern : String) -> Bool {
 
 ///|
 fn relation_parse_integer_literal(source : String) -> Int? {
-  let trimmed = source.trim().to_string()
+  let trimmed = source.trim().to_owned()
   if trimmed.length() == 0 {
     return None
   }
@@ -197,7 +197,7 @@ fn relation_parse_integer_literal(source : String) -> Int? {
 
 ///|
 fn relation_parse_boolean_literal(source : String) -> Bool? {
-  match source.trim().to_string() {
+  match source.trim().to_owned() {
     "true" => Some(true)
     "false" => Some(false)
     "1" => Some(true)

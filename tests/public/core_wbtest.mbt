@@ -219,10 +219,10 @@ test "declarative controller and app builders preserve inferred metadata" {
 
   match controller_action(controller, "create") {
     Some(action) => {
-      assert_eq(action.page_name, None)
+      assert_true(action.page_name == None)
       assert_true(action.mutation)
       assert_true(action.transactional)
-      assert_eq(action.allowed_params, ["email", "password"])
+      assert_true(action.allowed_params == ["email", "password"])
       assert_eq(action.formats.length(), 2)
     }
     None => assert_true(false)
@@ -257,7 +257,7 @@ test "restful controller can derive strong params for arbitrary resources" {
 
   match controller_action(controller, "create") {
     Some(action) => {
-      assert_eq(action.allowed_params, ["body", "post_id"])
+      assert_true(action.allowed_params == ["body", "post_id"])
       assert_eq(action.steps.length(), 8)
     }
     None => assert_true(false)

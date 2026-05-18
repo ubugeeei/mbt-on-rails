@@ -40,8 +40,7 @@ fn validate_schema_constraints(
 ) -> ValidationErrors {
   let mut errors = validation_errors(model_name=schema.name)
   for column in schema.columns {
-    if not(column.nullable) &&
-      @support.find_entry(row.fields, column.name) is None {
+    if !column.nullable && @support.find_entry(row.fields, column.name) is None {
       errors = errors.add(
         validation_error(
           attribute=column.name,
@@ -54,7 +53,7 @@ fn validate_schema_constraints(
   }
   for field in row.fields {
     match find_column(schema, field.0) {
-      Some(column) =>
+      Some(_) =>
         match cast_record(schema, record(row.table, [field])) {
           CastedRecord(_) => ()
           CastRecordFailed(cast_errors) =>
@@ -177,7 +176,7 @@ fn matching_unique_conflicts(
 ) -> Array[Record] {
   let conflicts : Array[Record] = []
   for current in find_records(db, schema.table, attribute, value) {
-    if not(same_primary_key(schema, current, row)) {
+    if !same_primary_key(schema, current, row) {
       conflicts.push(current)
     }
   }
@@ -188,7 +187,7 @@ fn matching_unique_conflicts(
 fn effective_validations(schema : ModelSchema) -> Array[Validation] {
   let validations = @support.clone_array(schema.validations)
   for column in schema.columns {
-    if column.unique && not(has_uniqueness_validation(validations, column.name)) {
+    if column.unique && !has_uniqueness_validation(validations, column.name) {
       validations.push(validates_uniqueness(field=column.name))
     }
   }

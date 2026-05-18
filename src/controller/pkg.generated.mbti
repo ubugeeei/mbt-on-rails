@@ -2,6 +2,7 @@
 package "ubugeeei/mbt_on_rails/src/controller"
 
 import {
+  "moonbitlang/core/debug",
   "ubugeeei/mbt_on_rails/src/auth",
 }
 
@@ -124,7 +125,7 @@ pub enum ActionStep {
   DeliverMail(String)
   TouchCache(String)
   SetFlash(String, String)
-} derive(Show)
+} derive(@debug.Debug)
 
 pub struct AfterAction {
   action_name : String?
@@ -167,7 +168,8 @@ pub enum ResponseFormat {
   JsonFormat
   TurboStreamFormat
   RedirectFormat
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
+pub impl Show for ResponseFormat
 
 // Type aliases
 

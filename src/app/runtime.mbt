@@ -154,7 +154,7 @@ fn server_action_contract_response(
   if action.csrf_protected {
     match @http.request_csrf_token(request, app.auth) {
       Some(token) =>
-        if token.trim().to_string().length() == 0 {
+        if token.trim().to_owned().length() == 0 {
           return Some(
             @http.unprocessable_entity_response(message="invalid_csrf_token"),
           )
@@ -166,7 +166,7 @@ fn server_action_contract_response(
     }
   }
   let missing = missing_action_inputs(action, request)
-  if not(missing.is_empty()) {
+  if !missing.is_empty() {
     return Some(
       @http.unprocessable_entity_response(
         message="missing action input: " + missing.join(", "),

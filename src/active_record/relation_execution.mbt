@@ -3,7 +3,7 @@
 pub struct RelationExecutionIssue {
   feature : String
   detail : String
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Represents the result of executing one relation in memory.
@@ -35,7 +35,7 @@ pub fn execute_relation(
     return ExecutedRecords([])
   }
   let issues = relation_execution_issues(schema, relation)
-  if not(issues.is_empty()) {
+  if !issues.is_empty() {
     return RelationExecutionFailed(issues)
   }
   ExecutedRecords(

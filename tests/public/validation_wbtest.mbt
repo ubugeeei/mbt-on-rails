@@ -22,7 +22,7 @@ test "validation library composes valibot-like object schemas" {
     MinLength(limit) => assert_eq(limit, 8)
     _ => assert_true(false)
   }
-  assert_eq(report.for_path("password")[0].detail("minimum"), Some("8"))
+  assert_true(report.for_path("password")[0].detail("minimum") == Some("8"))
 }
 
 ///|
@@ -44,8 +44,8 @@ test "validator objects can be reused with interpolated message templates" {
     .full_messages()
     .contains("password needs at least 8 chars via password_strength"),
   )
-  assert_eq(
-    report.for_path("password")[0].detail("validator"),
+  assert_true(
+    report.for_path("password")[0].detail("validator") ==
     Some("password_strength"),
   )
 }
@@ -62,8 +62,8 @@ test "same_as fails when the comparison field is missing" {
   assert_true(
     report.full_messages().contains("password must match password_confirmation"),
   )
-  assert_eq(
-    report.for_path("password")[0].detail("other_field"),
+  assert_true(
+    report.for_path("password")[0].detail("other_field") ==
     Some("password_confirmation"),
   )
 
@@ -139,8 +139,7 @@ test "active record validations can reuse validator objects and interpolate mess
   )
 
   assert_true(errors.full_messages().contains("email must include @ for email"))
-  assert_eq(
-    errors.for_attribute("email")[0].detail("validator"),
-    Some("email_like"),
+  assert_true(
+    errors.for_attribute("email")[0].detail("validator") == Some("email_like"),
   )
 }

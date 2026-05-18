@@ -5,7 +5,7 @@ pub enum Environment {
   Test
   Staging
   Production
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Captures deployment-time configuration that affects runtime behavior.

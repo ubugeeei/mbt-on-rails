@@ -6,7 +6,7 @@ pub enum ProcessRole {
   CableRole
   SchedulerRole
   ReleaseRole
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Describes one long-running process entry.

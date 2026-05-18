@@ -6,7 +6,7 @@ pub enum AuthRequirement {
   Authenticated
   Role(String)
   Permission(String)
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Represents the authenticated user attached to a request.
@@ -25,7 +25,7 @@ pub struct Session {
   user_id : String
   csrf_token : String
   fresh : Bool
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Lists the cookie SameSite policies supported by the auth helpers.
@@ -33,7 +33,16 @@ pub enum CookieSameSite {
   SameSiteStrict
   SameSiteLax
   SameSiteNone
-} derive(Eq, Show)
+} derive(Eq, Debug)
+
+///|
+pub impl Show for CookieSameSite with to_string(self) {
+  match self {
+    SameSiteStrict => "SameSiteStrict"
+    SameSiteLax => "SameSiteLax"
+    SameSiteNone => "SameSiteNone"
+  }
+}
 
 ///|
 /// Lists the session backends modeled by the auth layer.
@@ -42,7 +51,7 @@ pub enum SessionStoreKind {
   CacheStore
   RedisStore
   DisabledStore
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Lists the request forgery strategies supported by the auth helpers.
@@ -50,7 +59,7 @@ pub enum RequestForgeryStrategy {
   ExceptionStrategy
   NullSessionStrategy
   ResetSessionStrategy
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Represents the result of a request forgery check.
@@ -59,7 +68,7 @@ pub enum RequestForgeryOutcome {
   NullSession
   ResetSession
   Rejected(String)
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Declares policy checks for resource-oriented authorization.

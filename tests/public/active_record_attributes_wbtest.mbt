@@ -54,9 +54,9 @@ test "cast_record maps schema-backed fields into typed values" {
         _ => assert_true(false)
       }
       let roundtrip = current.to_record()
-      assert_eq(find_entry(roundtrip.fields, "views"), Some("42"))
-      assert_eq(find_entry(roundtrip.fields, "published"), Some("true"))
-      assert_eq(find_entry(roundtrip.fields, "deleted_at"), None)
+      assert_true(find_entry(roundtrip.fields, "views") == Some("42"))
+      assert_true(find_entry(roundtrip.fields, "published") == Some("true"))
+      assert_true(find_entry(roundtrip.fields, "deleted_at") == None)
     }
     CastRecordFailed(_) => assert_true(false)
   }

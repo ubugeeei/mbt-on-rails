@@ -1,6 +1,10 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "ubugeeei/mbt_on_rails/src/validation"
 
+import {
+  "moonbitlang/core/debug",
+}
+
 // Values
 #label_migration(pattern, allow_positional=true)
 pub fn contains(pattern~ : String) -> FieldRule
@@ -47,7 +51,7 @@ pub struct FieldRule {
   kind : RuleKind
   message : String?
   validator_name : String?
-} derive(Show)
+} derive(@debug.Debug)
 pub fn FieldRule::named(Self, String) -> Self
 pub fn FieldRule::with_message(Self, String) -> Self
 pub fn FieldRule::with_message_template(Self, String) -> Self
@@ -78,7 +82,7 @@ pub enum RuleKind {
   IncludedIn(Array[String])
   SameAs(String)
   Contains(String)
-} derive(Show)
+} derive(@debug.Debug)
 
 pub struct ValidationIssue {
   path : String

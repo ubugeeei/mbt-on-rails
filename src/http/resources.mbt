@@ -226,7 +226,7 @@ pub fn namespace_routes(
   scope_name : String,
   routes : Array[RouteSpec],
 ) -> Array[RouteSpec] {
-  let clean = scope_name.trim().to_string()
+  let clean = scope_name.trim().to_owned()
   if clean.length() == 0 {
     return routes
   }

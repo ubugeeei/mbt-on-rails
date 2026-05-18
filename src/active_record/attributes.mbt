@@ -7,21 +7,21 @@ pub enum AttributeValue {
   TimestampAttribute(String)
   JsonAttribute(String)
   NullAttribute
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Stores one typed field in stable record order.
 pub struct TypedField {
   name : String
   value : AttributeValue
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Stores one typed record payload produced from a string-backed record.
 pub struct TypedRecord {
   table : String
   fields : Array[TypedField]
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Describes one type-casting failure while mapping record fields to a schema.
@@ -30,21 +30,21 @@ pub struct AttributeCastError {
   expected_type : String
   value : String?
   detail : String
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Represents the result of casting one string-backed record.
 pub enum CastRecordOutcome {
   CastedRecord(TypedRecord)
   CastRecordFailed(Array[AttributeCastError])
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Represents the result of rendering one typed JSON document from a record.
 pub enum SerializeRecordOutcome {
   SerializedRecordJson(String)
   SerializeRecordFailed(Array[AttributeCastError])
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub fn CastRecordOutcome::typed_record(
@@ -187,7 +187,7 @@ pub fn AttributeCastError::message(self : AttributeCastError) -> String {
 
 ///|
 fn json_attribute_literal(source : String) -> String {
-  let trimmed = source.trim().to_string()
+  let trimmed = source.trim().to_owned()
   if trimmed.length() == 0 {
     return @support.json_string("")
   }

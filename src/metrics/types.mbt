@@ -3,7 +3,7 @@
 pub enum MetricKind {
   CounterMetric
   GaugeMetric
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Represents one named metric sample.

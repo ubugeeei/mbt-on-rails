@@ -52,7 +52,7 @@ pub fn match_route(
         for index in path_index..<path_segments.length() {
           rest.push(path_segments[index])
         }
-        if not(rest.is_empty()) {
+        if !rest.is_empty() {
           params.push((name, @support.join_path_segments(rest)))
         }
         path_index = path_segments.length()
@@ -89,7 +89,7 @@ pub fn build_path(
             for
               item in value
               .split("/")
-              .map(fn(part) { part.to_string() })
+              .map(fn(part) { part.to_owned() })
               .collect() {
               if item.length() > 0 {
                 pieces.push(item)
@@ -103,7 +103,7 @@ pub fn build_path(
             for
               item in value
               .split("/")
-              .map(fn(part) { part.to_string() })
+              .map(fn(part) { part.to_owned() })
               .collect() {
               if item.length() > 0 {
                 pieces.push(item)

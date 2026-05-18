@@ -94,15 +94,15 @@ pub fn is_numeric_literal(source : String) -> Bool {
       index = index + 1
       continue
     }
-    if ch == '.' && not(seen_dot) && not(seen_exp) && int_digits > 0 {
+    if ch == '.' && !seen_dot && !seen_exp && int_digits > 0 {
       seen_dot = true
       index = index + 1
       continue
     }
     if (ch == 'e' || ch == 'E') &&
-      not(seen_exp) &&
+      !seen_exp &&
       int_digits > 0 &&
-      (not(seen_dot) || frac_digits > 0) {
+      (!seen_dot || frac_digits > 0) {
       seen_exp = true
       allow_exp_sign = true
       index = index + 1

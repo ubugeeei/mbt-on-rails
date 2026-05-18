@@ -2,6 +2,7 @@
 package "ubugeeei/mbt_on_rails/src/view"
 
 import {
+  "moonbitlang/core/debug",
   "ubugeeei/mbt_on_rails/src/support",
 }
 
@@ -239,7 +240,7 @@ pub struct AssetManifest {
 pub enum BoundaryKind {
   ServerBoundary
   ClientBoundary
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 
 pub struct ComponentContract {
   boundary : BoundaryKind
@@ -259,7 +260,7 @@ pub enum DynamicMode {
   ForceDynamic
   ForceStatic
   Revalidate(Int)
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 
 pub struct EmitContract {
   name : String
@@ -301,7 +302,7 @@ pub enum FormFieldKind {
   TextArea
   HiddenInput
   CheckboxInput
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 
 pub enum HydrationMode {
   Manual
@@ -311,7 +312,7 @@ pub enum HydrationMode {
   Media(String)
   Only
   ServerDefer
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 
 pub struct LayoutModule {
   name : String

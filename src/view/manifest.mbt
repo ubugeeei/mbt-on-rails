@@ -37,7 +37,7 @@ pub fn render_bundle_plan(page : PageModule) -> String {
   collect_component_source(page.component, sources)
   for layout in page.layouts {
     collect_component_source(layout.component, sources)
-    if not(sources.contains(layout.file_path.as_string())) {
+    if !sources.contains(layout.file_path.as_string()) {
       sources.push(layout.file_path.as_string())
     }
   }
@@ -400,7 +400,7 @@ fn collect_component_source(
   sources : Array[String],
 ) -> Unit {
   let source = component.source_path.as_string()
-  if not(sources.contains(source)) {
+  if !sources.contains(source) {
     sources.push(source)
   }
   for imported in component.template_imports {

@@ -8,7 +8,20 @@ pub enum HttpMethod {
   Delete
   Head
   Options
-} derive(Eq, Show)
+} derive(Eq, Debug)
+
+///|
+pub impl Show for HttpMethod with to_string(self) {
+  match self {
+    Get => "Get"
+    Post => "Post"
+    Put => "Put"
+    Patch => "Patch"
+    Delete => "Delete"
+    Head => "Head"
+    Options => "Options"
+  }
+}
 
 ///|
 /// Represents one segment in a route pattern.
@@ -17,7 +30,7 @@ pub enum RouteSegment {
   Param(String)
   CatchAll(String)
   OptionalCatchAll(String)
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Stores the parsed form of a route pattern.

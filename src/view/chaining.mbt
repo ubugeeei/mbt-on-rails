@@ -107,7 +107,7 @@ pub fn PageModule::with_form_builder(
   builder : FormBuilder,
 ) -> PageModule {
   let forms = @support.clone_array(self.forms)
-  if not(forms.any(fn(current) { current.name == builder.binding.name })) {
+  if !forms.any(fn(current) { current.name == builder.binding.name }) {
     forms.push(builder.binding)
   }
   let form_builders = @support.clone_array(self.form_builders)

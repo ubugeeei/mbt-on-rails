@@ -30,7 +30,7 @@ pub enum JobAdapterKind {
   AsyncAdapter
   TestAdapter
   SolidQueueAdapter
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Captures the delivery contract for one job adapter.
@@ -73,14 +73,14 @@ pub struct DrainedJobs {
 pub enum RetryWait {
   FixedSeconds(Int)
   PolynomiallyLonger
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Describes how a failure handler reacts to a matching exception name.
 pub enum FailureDisposition {
   RetryJob
   DiscardJob
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Describes one retry/discard policy attached to a job definition.

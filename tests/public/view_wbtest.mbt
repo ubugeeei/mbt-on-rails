@@ -127,7 +127,7 @@ test "rendered page includes islands forms and route tree data" {
       "\"kind\": \"textarea\"",
     ),
   )
-  assert_eq(validate_page_tree(page), [])
+  assert_true(validate_page_tree(page) == [])
   assert_true(
     rendered.component_manifest_json.contains("\"local_name\": \"PostHero\""),
   )
@@ -489,7 +489,9 @@ test "scaffold and demo app expose richer rails style surfaces" {
   assert_eq(scaffold.routes.length(), 8)
   assert_eq(scaffold.pages.length(), 4)
   assert_eq(scaffold.server_actions.length(), 3)
-  assert_eq(scaffold.controller.actions[3].allowed_params, ["body", "post_id"])
+  assert_true(
+    scaffold.controller.actions[3].allowed_params == ["body", "post_id"],
+  )
   assert_eq(scaffold.pages[0].forms.length(), 1)
   assert_eq(scaffold.pages[0].client_islands.length(), 1)
   assert_eq(scaffold.pages[1].forms.length(), 2)
@@ -603,7 +605,9 @@ test "scaffold and demo app expose richer rails style surfaces" {
     ),
   )
   assert_eq(wrong_method_response.status, 405)
-  assert_eq(find_entry(wrong_method_response.headers, "allow"), Some("POST"))
+  assert_true(
+    find_entry(wrong_method_response.headers, "allow") == Some("POST"),
+  )
   assert_eq(missing_form_response.status, 422)
   assert_true(
     render_response_body(missing_form_response.body).contains(

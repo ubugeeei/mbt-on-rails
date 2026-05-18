@@ -23,7 +23,7 @@ fn apply_relation_to_rows(
       filtered.push(row)
     }
   }
-  if not(relation.orderings.is_empty()) {
+  if !relation.orderings.is_empty() {
     filtered.sort_by(fn(left, right) {
       compare_rows_for_order(
         schema,
@@ -50,7 +50,7 @@ fn row_matches_relation(
   row : Record,
 ) -> Bool {
   for predicate in relation.predicates {
-    if not(row_matches_predicate(schema, relation.table, row, predicate)) {
+    if !row_matches_predicate(schema, relation.table, row, predicate) {
       return false
     }
   }
@@ -133,15 +133,15 @@ fn parse_simple_raw_predicate_with_operator(
   sql : String,
   operator : String,
 ) -> (String, String, String)? {
-  let parts = sql.split(operator).map(fn(part) { part.to_string() }).collect()
+  let parts = sql.split(operator).map(fn(part) { part.to_owned() }).collect()
   if parts.length() != 2 {
     return None
   }
-  let column = parts[0].trim().to_string()
+  let column = parts[0].trim().to_owned()
   if column.length() == 0 {
     return None
   }
-  let raw_value = parts[1].trim().to_string()
+  let raw_value = parts[1].trim().to_owned()
   if raw_value.length() == 0 {
     return None
   }
@@ -151,7 +151,7 @@ fn parse_simple_raw_predicate_with_operator(
 
 ///|
 fn normalize_raw_literal(value : String) -> String {
-  let trimmed = value.trim().to_string()
+  let trimmed = value.trim().to_owned()
   if trimmed.length() >= 2 && trimmed.has_prefix("'") && trimmed.has_suffix("'") {
     return String::unsafe_substring(trimmed, start=1, end=trimmed.length() - 1)
   }
@@ -211,7 +211,7 @@ fn distinct_relation_rows(rows : Array[Record]) -> Array[Record] {
   let distinct : Array[Record] = []
   for row in rows {
     let signature = row.table + ":" + @support.entries_to_json(row.fields)
-    if not(seen.contains(signature)) {
+    if !seen.contains(signature) {
       seen.push(signature)
       distinct.push(row)
     }

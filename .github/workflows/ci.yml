@@ -38,7 +38,7 @@ jobs:
           git diff --exit-code
 
       - name: Run checks
-        run: moon check
+        run: scripts/check_moon_warnings.sh
 
       - name: Run IDE semantic smoke checks
         run: |

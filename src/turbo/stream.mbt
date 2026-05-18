@@ -8,7 +8,7 @@ pub enum TurboStreamAction {
   Remove
   Before
   After
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Represents one Turbo Stream message.

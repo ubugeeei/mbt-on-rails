@@ -194,7 +194,7 @@ pub fn schema_dump(models : Array[ModelSchema]) -> String {
 
 ///|
 fn quote_sql_identifier(source : String) -> String {
-  let trimmed = source.trim().to_string()
+  let trimmed = source.trim().to_owned()
   if is_safe_sql_identifier(trimmed) {
     return trimmed
   }
@@ -203,17 +203,17 @@ fn quote_sql_identifier(source : String) -> String {
 
 ///|
 fn quote_sql_identifier_path(source : String) -> String {
-  let trimmed = source.trim().to_string()
+  let trimmed = source.trim().to_owned()
   if trimmed == "*" {
     return "*"
   }
-  let parts = trimmed.split(".").map(fn(part) { part.to_string() }).collect()
+  let parts = trimmed.split(".").map(fn(part) { part.to_owned() }).collect()
   if parts.length() <= 1 {
     return quote_sql_identifier(trimmed)
   }
   let quoted : Array[String] = []
   for part in parts {
-    let segment = part.trim().to_string()
+    let segment = part.trim().to_owned()
     if segment == "*" {
       quoted.push("*")
     } else {
@@ -229,12 +229,12 @@ fn is_safe_sql_identifier(source : String) -> Bool {
     return false
   }
   let chars = source.to_array()
-  if not(is_sql_identifier_start(chars[0])) {
+  if !is_sql_identifier_start(chars[0]) {
     return false
   }
   let mut index = 1
   while index < chars.length() {
-    if not(is_sql_identifier_continue(chars[index])) {
+    if !is_sql_identifier_continue(chars[index]) {
       return false
     }
     index += 1

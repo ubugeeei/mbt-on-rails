@@ -38,11 +38,11 @@ test "orm migration example builders keep relation migration and validation stab
       ),
     )
   assert_eq(executed.count(), 1)
-  assert_eq(
-    match executed.first() {
+  assert_true(
+    (match executed.first() {
       Some(row) => @mbor.find_entry(row.fields, "title")
       None => None
-    },
+    }) ==
     Some("MoonBit Launch"),
   )
 
@@ -109,7 +109,7 @@ test "orm migration example builders keep relation migration and validation stab
   let serialized = @mbor.record("posts", [("author_id", "oops")]).serialize_json(
     schema,
   )
-  assert_eq(serialized.json(), None)
+  assert_true(serialized.json() == None)
   let errors = serialized.errors()
   assert_eq(errors.length(), 1)
   assert_true(

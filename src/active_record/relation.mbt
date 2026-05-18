@@ -8,7 +8,7 @@ pub enum Predicate {
   Lt(String, String)
   InList(String, Array[String])
   Raw(String)
-} derive(Show)
+} derive(Debug)
 
 ///|
 /// Describes one `ORDER BY` clause.
@@ -203,7 +203,7 @@ pub fn reorder_by(
 pub fn reverse_order(relation : Relation) -> Relation {
   let orderings : Array[OrderBy] = []
   for order in relation.orderings {
-    orderings.push({ column: order.column, descending: not(order.descending) })
+    orderings.push({ column: order.column, descending: !order.descending })
   }
   { ..relation, orderings, }
 }
@@ -287,7 +287,7 @@ pub fn relation_to_sql(relation : Relation) -> String {
   sb.write_string(selects_to_sql(relation.selects))
   sb.write_string(" FROM ")
   sb.write_string(quote_sql_identifier_path(relation.table))
-  if not(relation.joins.is_empty()) {
+  if !relation.joins.is_empty() {
     sb.write_char(' ')
     sb.write_string(relation.joins.join(" "))
   }
@@ -298,19 +298,19 @@ pub fn relation_to_sql(relation : Relation) -> String {
   for predicate in relation.predicates {
     clauses.push(predicate_to_sql(predicate))
   }
-  if not(clauses.is_empty()) {
+  if !clauses.is_empty() {
     sb.write_string(" WHERE ")
     sb.write_string(clauses.join(" AND "))
   }
-  if not(relation.groupings.is_empty()) {
+  if !relation.groupings.is_empty() {
     sb.write_string(" GROUP BY ")
     sb.write_string(identifier_list_to_sql(relation.groupings))
   }
-  if not(relation.having_clauses.is_empty()) {
+  if !relation.having_clauses.is_empty() {
     sb.write_string(" HAVING ")
     sb.write_string(relation.having_clauses.join(" AND "))
   }
-  if not(relation.orderings.is_empty()) {
+  if !relation.orderings.is_empty() {
     let parts : Array[String] = []
     for order in relation.orderings {
       let suffix = if order.descending { "DESC" } else { "ASC" }
@@ -382,7 +382,7 @@ fn selects_to_sql(selects : Array[String]) -> String {
 
 ///|
 fn select_to_sql(select : String) -> String {
-  let trimmed = select.trim().to_string()
+  let trimmed = select.trim().to_owned()
   match select_alias_parts(trimmed) {
     Some((expression, alias_name)) =>
       select_expression_to_sql(expression) +
@@ -421,13 +421,13 @@ fn select_alias_parts_with_separator(
 ) -> (String, String)? {
   let parts = select
     .split(separator)
-    .map(fn(part) { part.to_string() })
+    .map(fn(part) { part.to_owned() })
     .collect()
   if parts.length() != 2 {
     return None
   }
-  let expression = parts[0].trim().to_string()
-  let alias_name = parts[1].trim().to_string()
+  let expression = parts[0].trim().to_owned()
+  let alias_name = parts[1].trim().to_owned()
   if expression.length() == 0 || alias_name.length() == 0 {
     return None
   }

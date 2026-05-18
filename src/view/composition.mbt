@@ -186,7 +186,7 @@ fn validate_props(
     Some(contract) => {
       for prop in props {
         let known = contract.props.any(fn(current) { current.name == prop.0 })
-        if not(known) {
+        if !known {
           errors.push(
             parent_name +
             " passes undeclared prop " +
@@ -198,7 +198,7 @@ fn validate_props(
       }
       for contract_prop in contract.props {
         if contract_prop.required &&
-          not(props.any(fn(current) { current.0 == contract_prop.name })) {
+          !props.any(fn(current) { current.0 == contract_prop.name }) {
           errors.push(
             parent_name +
             " is missing required prop " +
@@ -240,7 +240,7 @@ fn merge_props(
         replaced = true
       }
     }
-    if not(replaced) {
+    if !replaced {
       merged.push(entry)
     }
   }
@@ -251,11 +251,11 @@ fn merge_props(
 fn is_client_boundary(component : VaporComponentRef) -> Bool {
   match component.contract {
     Some(contract) => contract.boundary == ClientBoundary
-    None => not(component.is_server_component)
+    None => !component.is_server_component
   }
 }
 
 ///|
 fn is_server_boundary(component : VaporComponentRef) -> Bool {
-  not(is_client_boundary(component))
+  !is_client_boundary(component)
 }

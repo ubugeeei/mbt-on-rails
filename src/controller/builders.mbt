@@ -246,7 +246,7 @@ pub fn ActionDefinition::respond_to(
   format : ResponseFormat,
 ) -> ActionDefinition {
   let formats = @support.clone_array(self.formats)
-  if not(formats.contains(format)) {
+  if !formats.contains(format) {
     formats.push(format)
   }
   { ..self, formats, }

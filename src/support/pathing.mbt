@@ -10,7 +10,7 @@ pub fn remove_query_string(path : String) -> String {
 ///|
 /// Normalizes a path to a leading-slash, no-trailing-slash form.
 pub fn normalize_path(path : String) -> String {
-  let raw = remove_query_string(path).trim().to_string()
+  let raw = remove_query_string(path).trim().to_owned()
   if raw.length() == 0 || raw == "/" {
     return "/"
   }
@@ -39,8 +39,8 @@ pub fn split_path(path : String) -> Array[String] {
     end=normalized.length(),
   )
   let parts : Array[String] = []
-  for part in trimmed.split("/").map(fn(part) { part.to_string() }).collect() {
-    let clean = part.trim().to_string()
+  for part in trimmed.split("/").map(fn(part) { part.to_owned() }).collect() {
+    let clean = part.trim().to_owned()
     if clean.length() > 0 {
       parts.push(clean)
     }

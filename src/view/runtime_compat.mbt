@@ -19,10 +19,10 @@ pub fn props_to_json(entries : Array[(String, String)]) -> String {
 ///|
 /// Scopes CSS selectors to the supplied Vapor Moon scope id.
 pub fn scope_css(css : String, scope_id : String) -> String {
-  let chunks = css.split("}").map(fn(part) { part.to_string() }).collect()
+  let chunks = css.split("}").map(fn(part) { part.to_owned() }).collect()
   let scoped : Array[String] = []
   for chunk in chunks {
-    let trimmed = chunk.trim().to_string()
+    let trimmed = chunk.trim().to_owned()
     if trimmed.length() == 0 {
       continue
     }
@@ -30,21 +30,21 @@ pub fn scope_css(css : String, scope_id : String) -> String {
       Some(index) => {
         let selector = String::unsafe_substring(trimmed, start=0, end=index)
           .trim()
-          .to_string()
+          .to_owned()
         let body = String::unsafe_substring(
             trimmed,
             start=index + 1,
             end=trimmed.length(),
           )
           .trim()
-          .to_string()
+          .to_owned()
         if selector.has_prefix("@") {
           scoped.push(selector + " { " + body + " }")
         } else {
           let selectors = selector
             .split(",")
             .map(fn(part) {
-              "[data-vm-scope=\"" + scope_id + "\"] " + part.trim().to_string()
+              "[data-vm-scope=\"" + scope_id + "\"] " + part.trim().to_owned()
             })
             .collect()
           scoped.push(selectors.join(", ") + " { " + body + " }")
@@ -77,7 +77,7 @@ pub fn show_style(visible : Bool, base : String) -> String {
 pub fn merge_class_names(parts : Array[String]) -> String {
   let merged : Array[String] = []
   for part in parts {
-    let trimmed = part.trim().to_string()
+    let trimmed = part.trim().to_owned()
     if trimmed.length() > 0 {
       merged.push(trimmed)
     }
@@ -140,5 +140,5 @@ fn sanitize_component_name(component_name : String) -> String {
 
 ///|
 fn normalize_style(source : String) -> String {
-  source.trim().to_string()
+  source.trim().to_owned()
 }

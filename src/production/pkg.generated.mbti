@@ -2,6 +2,7 @@
 package "ubugeeei/mbt_on_rails/src/production"
 
 import {
+  "moonbitlang/core/debug",
   "ubugeeei/mbt_on_rails/src/http",
 }
 
@@ -82,7 +83,7 @@ pub enum Environment {
   Test
   Staging
   Production
-} derive(Eq, Show)
+} derive(Eq, @debug.Debug)
 
 pub struct HealthCheck {
   name : String

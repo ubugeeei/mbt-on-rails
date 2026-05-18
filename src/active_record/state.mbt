@@ -59,7 +59,7 @@ pub fn dirty_new_record(row : Record) -> DirtyRecord {
 ///|
 /// Returns whether any attribute changed between the two snapshots.
 pub fn DirtyRecord::changed(self : DirtyRecord) -> Bool {
-  not(self.changes.is_empty())
+  !self.changes.is_empty()
 }
 
 ///|
@@ -305,7 +305,7 @@ fn diff_record_fields(
   for attribute in ordered_field_names(original, current) {
     let before = @support.find_entry(original, attribute)
     let after = @support.find_entry(current, attribute)
-    if not(optional_string_eq(before, after)) {
+    if !optional_string_eq(before, after) {
       changes.push({ attribute, before, after })
     }
   }
@@ -319,12 +319,12 @@ fn ordered_field_names(
 ) -> Array[String] {
   let names : Array[String] = []
   for field in original {
-    if not(names.contains(field.0)) {
+    if !names.contains(field.0) {
       names.push(field.0)
     }
   }
   for field in current {
-    if not(names.contains(field.0)) {
+    if !names.contains(field.0) {
       names.push(field.0)
     }
   }

@@ -72,13 +72,13 @@ test "save_record updates matching primary keys and preserves existing fields" {
         find_records(saved_db, "articles", "slug", "launch").length(),
         1,
       )
-      assert_eq(find_entry(saved.fields, "title"), Some("Launch"))
-      assert_eq(find_entry(saved.fields, "state"), Some("published"))
+      assert_true(find_entry(saved.fields, "title") == Some("Launch"))
+      assert_true(find_entry(saved.fields, "state") == Some("published"))
       match find_record_by_primary_key(schema, saved_db, "1") {
         Some(current) => {
-          assert_eq(find_entry(current.fields, "title"), Some("Launch"))
-          assert_eq(find_entry(current.fields, "slug"), Some("launch"))
-          assert_eq(find_entry(current.fields, "state"), Some("published"))
+          assert_true(find_entry(current.fields, "title") == Some("Launch"))
+          assert_true(find_entry(current.fields, "slug") == Some("launch"))
+          assert_true(find_entry(current.fields, "state") == Some("published"))
         }
         None => assert_true(false)
       }
@@ -110,14 +110,12 @@ test "save_record applies defaults and timestamp fields" {
       record("posts", [("id", "1"), ("title", "Launch"), ("slug", "launch")]),
     ) {
     Saved(_, created) => {
-      assert_eq(find_entry(created.fields, "state"), Some("draft"))
-      assert_eq(
-        find_entry(created.fields, "created_at"),
-        Some("CURRENT_TIMESTAMP"),
+      assert_true(find_entry(created.fields, "state") == Some("draft"))
+      assert_true(
+        find_entry(created.fields, "created_at") == Some("CURRENT_TIMESTAMP"),
       )
-      assert_eq(
-        find_entry(created.fields, "updated_at"),
-        Some("CURRENT_TIMESTAMP"),
+      assert_true(
+        find_entry(created.fields, "updated_at") == Some("CURRENT_TIMESTAMP"),
       )
     }
     ValidationFailed(_) => assert_true(false)
@@ -141,15 +139,13 @@ test "save_record applies defaults and timestamp fields" {
       record("posts", [("id", "1"), ("title", "Shipped")]),
     ) {
     Saved(_, updated) => {
-      assert_eq(find_entry(updated.fields, "slug"), Some("launch"))
-      assert_eq(find_entry(updated.fields, "state"), Some("draft"))
-      assert_eq(
-        find_entry(updated.fields, "created_at"),
-        Some("2026-03-01T00:00:00Z"),
+      assert_true(find_entry(updated.fields, "slug") == Some("launch"))
+      assert_true(find_entry(updated.fields, "state") == Some("draft"))
+      assert_true(
+        find_entry(updated.fields, "created_at") == Some("2026-03-01T00:00:00Z"),
       )
-      assert_eq(
-        find_entry(updated.fields, "updated_at"),
-        Some("CURRENT_TIMESTAMP"),
+      assert_true(
+        find_entry(updated.fields, "updated_at") == Some("CURRENT_TIMESTAMP"),
       )
     }
     ValidationFailed(_) => assert_true(false)
@@ -194,7 +190,9 @@ test "save_record enforces schema-required fields and typed values" {
       assert_true(errors.full_messages().contains("views must match Int"))
       assert_true(errors.full_messages().contains("published must match Bool"))
       assert_true(errors.full_messages().contains("account_id must match Int"))
-      assert_eq(errors.for_attribute("views")[0].detail("value"), Some("many"))
+      assert_true(
+        errors.for_attribute("views")[0].detail("value") == Some("many"),
+      )
     }
   }
 }
@@ -215,8 +213,8 @@ test "save_record validates schema constraints after merging update payloads" {
   match
     save_record(schema, db, record("metrics", [("id", "1"), ("views", "11")])) {
     Saved(_, saved) => {
-      assert_eq(find_entry(saved.fields, "name"), Some("Launch"))
-      assert_eq(find_entry(saved.fields, "views"), Some("11"))
+      assert_true(find_entry(saved.fields, "name") == Some("Launch"))
+      assert_true(find_entry(saved.fields, "views") == Some("11"))
     }
     ValidationFailed(_) => assert_true(false)
   }
@@ -260,11 +258,12 @@ test "save_record rejects rows whose table does not match the schema" {
       assert_true(
         errors.full_messages().contains("record table must match schema table"),
       )
-      assert_eq(
-        errors.for_attribute("base")[0].detail("expected"),
-        Some("articles"),
+      assert_true(
+        errors.for_attribute("base")[0].detail("expected") == Some("articles"),
       )
-      assert_eq(errors.for_attribute("base")[0].detail("actual"), Some("users"))
+      assert_true(
+        errors.for_attribute("base")[0].detail("actual") == Some("users"),
+      )
     }
   }
 
@@ -282,7 +281,7 @@ test "save_record rejects rows whose table does not match the schema" {
   }
   match find_record_by_primary_key(schema, db, "1") {
     Some(current) =>
-      assert_eq(find_entry(current.fields, "state"), Some("draft"))
+      assert_true(find_entry(current.fields, "state") == Some("draft"))
     None => assert_true(false)
   }
 }
@@ -322,15 +321,15 @@ test "destroy_record removes rows or writes deleted_at tombstones" {
             find_records(after_soft_delete, "audit_entries", "id", "9").length(),
             1,
           )
-          assert_eq(
-            find_entry(tombstone.fields, "deleted_at"),
+          assert_true(
+            find_entry(tombstone.fields, "deleted_at") ==
             Some("2026-03-27T00:00:00Z"),
           )
           match
             find_record_by_primary_key(soft_schema, after_soft_delete, "9") {
             Some(current) =>
-              assert_eq(
-                find_entry(current.fields, "deleted_at"),
+              assert_true(
+                find_entry(current.fields, "deleted_at") ==
                 Some("2026-03-27T00:00:00Z"),
               )
             None => assert_true(false)
