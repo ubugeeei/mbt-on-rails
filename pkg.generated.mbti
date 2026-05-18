@@ -183,6 +183,8 @@ pub fn cable_summary(Array[@cable.CableChannel]) -> String
 
 pub fn cache_delete(@cache.CacheStore, String) -> @cache.CacheStore
 
+pub fn captured_websocket_adapter(Array[Int], Array[Int]) -> @cable.WebSocketAdapter
+
 pub fn cache_delete_tag(@cache.CacheStore, String) -> @cache.CacheStore
 
 pub fn cache_delete_tag_with_notifications(store~ : @cache.CacheStore, tag~ : String, notifications~ : @support.Notifications) -> (@cache.CacheStore, @support.Notifications)
@@ -740,6 +742,8 @@ pub fn notifications() -> @support.Notifications
 
 pub fn null_database_adapter() -> @active_record.DatabaseAdapter
 
+pub fn null_websocket_adapter() -> @cable.WebSocketAdapter
+
 pub fn nullable(@active_record.Column) -> @active_record.Column
 
 #label_migration(name, allow_positional=true)
@@ -1281,6 +1285,20 @@ pub fn verify_password(String, String, String) -> Bool
 pub fn verify_signed_cookie_value(String, String, String) -> String?
 
 pub fn web_process(String, String, Int, Array[String]) -> @process.ProcessDefinition
+
+pub fn websocket_adapter(String, (@cable.CableBroadcast) -> @cable.WebSocketBroadcastOutcome, (String, String) -> @cable.WebSocketSubscriptionOutcome, (String, String) -> @cable.WebSocketSubscriptionOutcome, () -> @cable.WebSocketSubscriptionOutcome) -> @cable.WebSocketAdapter
+
+pub fn websocket_adapter_error_message(@cable.WebSocketAdapterError) -> String
+
+pub fn websocket_adapter_summary(@cable.WebSocketAdapter) -> String
+
+pub fn websocket_broadcast(@cable.WebSocketAdapter, @cable.CableBroadcast) -> @cable.WebSocketBroadcastOutcome
+
+pub fn websocket_close(@cable.WebSocketAdapter) -> @cable.WebSocketSubscriptionOutcome
+
+pub fn websocket_subscribe(@cable.WebSocketAdapter, String, String) -> @cable.WebSocketSubscriptionOutcome
+
+pub fn websocket_unsubscribe(@cable.WebSocketAdapter, String, String) -> @cable.WebSocketSubscriptionOutcome
 
 pub fn where_eq(@active_record.Relation, String, String) -> @active_record.Relation
 

@@ -433,11 +433,24 @@ pub using @migration {
 pub using @cable {
   type CableBroadcast,
   type CableChannel,
+  type WebSocketAdapter,
+  type WebSocketAdapterError,
+  type WebSocketBroadcastOutcome,
+  type WebSocketSubscriptionOutcome,
   broadcast_summary,
   broadcast_turbo,
   cable_broadcast,
   cable_channel,
   cable_summary,
+  captured_websocket_adapter,
+  null_websocket_adapter,
+  websocket_adapter,
+  websocket_adapter_error_message,
+  websocket_adapter_summary,
+  websocket_broadcast,
+  websocket_close,
+  websocket_subscribe,
+  websocket_unsubscribe,
 }
 
 ///|
