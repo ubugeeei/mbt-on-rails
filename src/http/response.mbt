@@ -5,7 +5,7 @@ pub fn typed_text_response(
   content_type : String,
   body : String,
 ) -> Response {
-  { status, headers: [("content-type", content_type)], body: Text(body) }
+  response_with_headers(status, [("content-type", content_type)], Text(body))
 }
 
 ///|
@@ -17,21 +17,21 @@ pub fn text_response(status : Int, body : String) -> Response {
 ///|
 /// Builds a `200 OK` HTML response.
 pub fn ok_html(body : String) -> Response {
-  {
-    status: 200,
-    headers: [("content-type", "text/html; charset=utf-8")],
-    body: Html(body),
-  }
+  response_with_headers(
+    200,
+    [("content-type", "text/html; charset=utf-8")],
+    Html(body),
+  )
 }
 
 ///|
 /// Builds a JSON response for an arbitrary status.
 pub fn json_response(status : Int, body : String) -> Response {
-  {
+  response_with_headers(
     status,
-    headers: [("content-type", "application/json; charset=utf-8")],
-    body: Json(body),
-  }
+    [("content-type", "application/json; charset=utf-8")],
+    Json(body),
+  )
 }
 
 ///|
@@ -59,11 +59,11 @@ pub fn accepted_json(body : String) -> Response {
 ///|
 /// Builds a `200 OK` plain text response.
 pub fn ok_text(body : String) -> Response {
-  {
-    status: 200,
-    headers: [("content-type", "text/plain; charset=utf-8")],
-    body: Text(body),
-  }
+  response_with_headers(
+    200,
+    [("content-type", "text/plain; charset=utf-8")],
+    Text(body),
+  )
 }
 
 ///|
@@ -81,11 +81,11 @@ pub fn see_other_response(location : String) -> Response {
 ///|
 /// Builds a `404 Not Found` response.
 pub fn not_found_response() -> Response {
-  {
-    status: 404,
-    headers: [("content-type", "text/plain; charset=utf-8")],
-    body: Text("Not Found"),
-  }
+  response_with_headers(
+    404,
+    [("content-type", "text/plain; charset=utf-8")],
+    Text("Not Found"),
+  )
 }
 
 ///|
@@ -120,9 +120,12 @@ pub fn append_response_headers(
   response : Response,
   extra_headers : Array[(String, String)],
 ) -> Response {
-  let headers = @support.clone_array(response.headers)
+  let headers : Array[(String, String)] = []
+  for header in response.headers {
+    headers.push(sanitize_response_header(header))
+  }
   for header in extra_headers {
-    headers.push(header)
+    headers.push(sanitize_response_header(header))
   }
   { status: response.status, headers, body: response.body }
 }
@@ -171,5 +174,84 @@ pub fn render_response_body(body : ResponseBody) -> String {
 
 ///|
 fn redirect_with_status(status : Int, location : String) -> Response {
-  { status, headers: [("location", location)], body: Redirect(location) }
+  let safe_location = sanitize_header_value(location)
+  response_with_headers(
+    status,
+    [("location", safe_location)],
+    Redirect(safe_location),
+  )
+}
+
+///|
+fn response_with_headers(
+  status : Int,
+  headers : Array[(String, String)],
+  body : ResponseBody,
+) -> Response {
+  let safe_headers : Array[(String, String)] = []
+  for header in headers {
+    safe_headers.push(sanitize_response_header(header))
+  }
+  { status, headers: safe_headers, body }
+}
+
+///|
+fn sanitize_response_header(header : (String, String)) -> (String, String) {
+  (sanitize_header_name(header.0), sanitize_header_value(header.1))
+}
+
+///|
+fn sanitize_header_name(source : String) -> String {
+  let builder = StringBuilder::new()
+  for ch in source.trim().to_owned() {
+    match ch {
+      '\n' | '\r' => break
+      _ =>
+        if is_header_name_char(ch) {
+          builder.write_char(ch)
+        } else {
+          builder.write_char('_')
+        }
+    }
+  }
+  let rendered = builder.to_string()
+  if rendered.length() == 0 {
+    "_"
+  } else {
+    rendered
+  }
+}
+
+///|
+fn sanitize_header_value(source : String) -> String {
+  let builder = StringBuilder::new()
+  for ch in source {
+    match ch {
+      '\n' | '\r' => break
+      _ => builder.write_char(ch)
+    }
+  }
+  builder.to_string().trim().to_owned()
+}
+
+///|
+fn is_header_name_char(ch : Char) -> Bool {
+  (ch >= 'A' && ch <= 'Z') ||
+  (ch >= 'a' && ch <= 'z') ||
+  (ch >= '0' && ch <= '9') ||
+  ch == '!' ||
+  ch == '#' ||
+  ch == '$' ||
+  ch == '%' ||
+  ch == '&' ||
+  ch == '\'' ||
+  ch == '*' ||
+  ch == '+' ||
+  ch == '-' ||
+  ch == '.' ||
+  ch == '^' ||
+  ch == '_' ||
+  ch == '`' ||
+  ch == '|' ||
+  ch == '~'
 }

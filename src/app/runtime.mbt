@@ -5,16 +5,15 @@ pub fn handle_request(
   incoming : @http.Request,
 ) -> @http.Response {
   let prepared = prepare_request_for_auth(incoming, app.auth)
-  let request_result = @middleware.apply_request_middleware(
+  let request_result = @middleware.apply_request_middleware_with_reached(
     app.middlewares,
     prepared,
   )
   let request = prepare_request_for_auth(request_result.0, app.auth)
   match request_result.1 {
     Some(response) =>
-      return @middleware.apply_response_middleware(
-        app.middlewares,
-        request,
+      return @middleware.apply_reached_response_middleware(
+        request_result.2,
         response,
       )
     None => ()
