@@ -165,9 +165,20 @@ fn parse_json_string(source : String, start : Int) -> (String, Int)? {
       match escaped {
         '"' => builder.write_char('"')
         '\\' => builder.write_char('\\')
+        'b' => builder.write_char('\b')
+        'f' => builder.write_char('\u{000C}')
         'n' => builder.write_char('\n')
         'r' => builder.write_char('\r')
         't' => builder.write_char('\t')
+        'u' =>
+          match parse_json_unicode_escape(source, index + 2) {
+            Some(decoded) => {
+              builder.write_char(decoded.0)
+              index = decoded.1
+              continue
+            }
+            None => return None
+          }
         _ => return None
       }
       index += 2
@@ -207,4 +218,38 @@ fn parse_json_scalar(source : String, start : Int) -> (String, Int)? {
 ///|
 fn json_char_at(source : String, index : Int) -> Char {
   source.unsafe_get(index).unsafe_to_char()
+}
+
+///|
+fn parse_json_unicode_escape(source : String, start : Int) -> (Char, Int)? {
+  if start + 4 > source.length() {
+    return None
+  }
+  let mut code = 0
+  let mut index = start
+  while index < start + 4 {
+    match hex_value(json_char_at(source, index)) {
+      Some(value) => code = code * 16 + value
+      None => return None
+    }
+    index += 1
+  }
+  match code.to_char() {
+    Some(ch) => Some((ch, index))
+    None => None
+  }
+}
+
+///|
+fn hex_value(ch : Char) -> Int? {
+  if ch >= '0' && ch <= '9' {
+    return Some(ch.to_int() - '0'.to_int())
+  }
+  if ch >= 'a' && ch <= 'f' {
+    return Some(ch.to_int() - 'a'.to_int() + 10)
+  }
+  if ch >= 'A' && ch <= 'F' {
+    return Some(ch.to_int() - 'A'.to_int() + 10)
+  }
+  None
 }
