@@ -9,7 +9,7 @@
 pub enum CallbackOutcome {
   Continue(Record)
   Halt(String)
-} derive(Debug)
+}
 
 ///|
 /// Runs a sequence of record callbacks, threading the record through
@@ -35,7 +35,7 @@ pub enum SaveWithCallbacksOutcome {
   SavedAfterCallbacks(MemoryDatabase, Record)
   SaveValidationFailed(ValidationErrors)
   SaveCallbackHalted(String)
-} derive(Debug)
+}
 
 ///|
 /// Runs the `before_save` callbacks, persists with `save_record`, and
@@ -71,7 +71,7 @@ pub enum DestroyWithCallbacksOutcome {
   DestroyedAfterCallbacks(MemoryDatabase, Record)
   DestroyTargetMissing(MemoryDatabase)
   DestroyCallbackHalted(String)
-} derive(Debug)
+}
 
 ///|
 /// Runs `before_destroy`, performs the destroy via `destroy_record`,

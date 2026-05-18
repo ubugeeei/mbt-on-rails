@@ -29,6 +29,14 @@ pub fn after_save(String) -> Callback
 
 pub fn attribute_cast_error(String, String, String?, String) -> AttributeCastError
 
+pub fn bind_bool(Bool) -> RelationBind
+
+pub fn bind_int(Int64) -> RelationBind
+
+pub fn bind_null() -> RelationBind
+
+pub fn bind_text(String) -> RelationBind
+
 pub fn attribute_type_name(Column) -> String
 
 pub fn before_create(String) -> Callback
@@ -189,6 +197,8 @@ pub fn string_column(String) -> Column
 pub fn substitute_relation_binds(String, Array[RelationBind]) -> String
 
 pub fn text_column(String) -> Column
+
+pub fn tx_handle(String, String) -> TxHandle
 
 pub fn timestamp_column(String) -> Column
 
@@ -365,12 +375,12 @@ pub enum AdapterError {
   IntegrityViolation(String)
   AdapterTimeout(String)
   OtherAdapterError(String)
-} derive(@debug.Debug)
+}
 
 pub enum CallbackOutcome {
   Continue(Record)
   Halt(String)
-} derive(@debug.Debug)
+}
 
 pub struct DatabaseAdapter {
   name : String
@@ -390,7 +400,7 @@ pub enum DestroyWithCallbacksOutcome {
   DestroyedAfterCallbacks(MemoryDatabase, Record)
   DestroyTargetMissing(MemoryDatabase)
   DestroyCallbackHalted(String)
-} derive(@debug.Debug)
+}
 
 pub struct DirtyFieldChange {
   attribute : String
@@ -543,7 +553,7 @@ pub enum RelationBind {
 pub enum QueryOutcome {
   QuerySucceeded(QueryResult)
   QueryFailed(AdapterError)
-} derive(@debug.Debug)
+}
 
 pub struct QueryResult {
   columns : Array[String]
@@ -577,7 +587,7 @@ pub enum SaveWithCallbacksOutcome {
   SavedAfterCallbacks(MemoryDatabase, Record)
   SaveValidationFailed(ValidationErrors)
   SaveCallbackHalted(String)
-} derive(@debug.Debug)
+}
 
 pub struct ScopeDefinition {
   name : String
@@ -594,12 +604,12 @@ pub fn SerializeRecordOutcome::json(Self) -> String?
 pub enum TransactionBeginOutcome {
   TransactionStarted(TxHandle)
   TransactionBeginFailed(AdapterError)
-} derive(@debug.Debug)
+}
 
 pub enum TransactionCloseOutcome {
   TransactionClosed
   TransactionCloseFailed(AdapterError)
-} derive(@debug.Debug)
+}
 
 pub enum TransactionSaveOutcome {
   TransactionSaved(MemoryTransaction, Record)

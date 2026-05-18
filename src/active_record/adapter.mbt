@@ -10,7 +10,7 @@ pub enum AdapterError {
   IntegrityViolation(String)
   AdapterTimeout(String)
   OtherAdapterError(String)
-} derive(Debug)
+}
 
 ///|
 /// Renders one adapter error as a CLI-friendly message.
@@ -49,7 +49,7 @@ pub fn query_result(
 pub enum QueryOutcome {
   QuerySucceeded(QueryResult)
   QueryFailed(AdapterError)
-} derive(Debug)
+}
 
 ///|
 /// Opaque-ish handle returned by `begin` and consumed by
@@ -63,18 +63,27 @@ pub struct TxHandle {
 }
 
 ///|
+/// Builds a transaction handle. Drivers usually call this when they
+/// open a connection-level transaction so the handle can later be
+/// matched against the originating adapter in `adapter_commit` /
+/// `adapter_rollback`.
+pub fn tx_handle(id : String, adapter_name : String) -> TxHandle {
+  { id, adapter_name }
+}
+
+///|
 /// Outcome of `begin`.
 pub enum TransactionBeginOutcome {
   TransactionStarted(TxHandle)
   TransactionBeginFailed(AdapterError)
-} derive(Debug)
+}
 
 ///|
 /// Outcome of `commit` / `rollback` / `close`.
 pub enum TransactionCloseOutcome {
   TransactionClosed
   TransactionCloseFailed(AdapterError)
-} derive(Debug)
+}
 
 ///|
 /// A pluggable contract for a real or simulated database.

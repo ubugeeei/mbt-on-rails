@@ -23,6 +23,30 @@ pub enum RelationBind {
 } derive(Debug)
 
 ///|
+/// Constructor helper for a text bind.
+pub fn bind_text(value : String) -> RelationBind {
+  BindText(value)
+}
+
+///|
+/// Constructor helper for an integer bind.
+pub fn bind_int(value : Int64) -> RelationBind {
+  BindInt(value)
+}
+
+///|
+/// Constructor helper for a boolean bind.
+pub fn bind_bool(value : Bool) -> RelationBind {
+  BindBool(value)
+}
+
+///|
+/// Constructor helper for the SQL NULL bind.
+pub fn bind_null() -> RelationBind {
+  BindNull
+}
+
+///|
 /// Renders one bind as a SQL literal that is safe to substitute into a
 /// query template. String values are quoted with single quotes and have
 /// internal quotes doubled per SQL convention.

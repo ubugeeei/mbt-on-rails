@@ -82,6 +82,14 @@ pub fn after_only(String) -> @controller.AfterAction
 
 pub fn after_save(String) -> @active_record.Callback
 
+pub fn bind_bool(Bool) -> @active_record.RelationBind
+
+pub fn bind_int(Int64) -> @active_record.RelationBind
+
+pub fn bind_null() -> @active_record.RelationBind
+
+pub fn bind_text(String) -> @active_record.RelationBind
+
 pub fn all_http_methods() -> Array[@http.HttpMethod]
 
 pub fn allowed(@auth.Identity?, @auth.PolicyRule, String?) -> Bool
@@ -668,6 +676,8 @@ pub fn content_security_policy_middleware(@middleware.ContentSecurityPolicy) -> 
 
 pub fn content_security_policy_value(@middleware.ContentSecurityPolicy) -> String
 
+pub fn cors_config(String, Array[@http.HttpMethod], Array[String], Bool, Int) -> @middleware.CorsConfig
+
 pub fn strict_content_security_policy() -> @middleware.ContentSecurityPolicy
 
 pub fn cors_middleware(@middleware.CorsConfig) -> Array[@middleware.Middleware]
@@ -1100,6 +1110,8 @@ pub fn string_column(String) -> @active_record.Column
 pub fn string_field(name~ : String) -> @validation.FieldSchema
 
 pub fn substitute_relation_binds(String, Array[@active_record.RelationBind]) -> String
+
+pub fn tx_handle(String, String) -> @active_record.TxHandle
 
 pub fn suspense_boundary(name~ : String, fallback_html~ : String, children~ : Array[@view.VaporNode]) -> @view.VaporNode
 

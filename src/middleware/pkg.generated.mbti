@@ -18,6 +18,8 @@ pub fn content_security_policy_middleware(ContentSecurityPolicy) -> Middleware
 
 pub fn content_security_policy_value(ContentSecurityPolicy) -> String
 
+pub fn cors_config(String, Array[@http.HttpMethod], Array[String], Bool, Int) -> CorsConfig
+
 pub fn cors_middleware(CorsConfig) -> Array[Middleware]
 
 pub fn default_security_headers_bundle() -> Array[Middleware]

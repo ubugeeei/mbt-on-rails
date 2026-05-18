@@ -186,6 +186,25 @@ pub struct CorsConfig {
 }
 
 ///|
+/// Builds a CORS config from its fields, in the same shape every other
+/// builder in the framework uses.
+pub fn cors_config(
+  allowed_origin : String,
+  allowed_methods : Array[@http.HttpMethod],
+  allowed_headers : Array[String],
+  allow_credentials : Bool,
+  max_age_seconds : Int,
+) -> CorsConfig {
+  {
+    allowed_origin,
+    allowed_methods,
+    allowed_headers,
+    allow_credentials,
+    max_age_seconds,
+  }
+}
+
+///|
 /// Builds the preflight + response header middleware pair for CORS.
 ///
 /// The first middleware halts any matching `OPTIONS` request with a
@@ -211,11 +230,10 @@ pub fn cors_middleware(config : CorsConfig) -> Array[Middleware] {
   if config.allow_credentials {
     preflight_headers.push(("access-control-allow-credentials", "true"))
   }
-  let preflight_response : @http.Response = {
-    status: 204,
-    headers: preflight_headers,
-    body: Empty,
-  }
+  let preflight_response = @http.append_response_headers(
+    @http.no_content_response(),
+    preflight_headers,
+  )
   let preflight_layer = middleware(
     "cors-preflight",
     None,
@@ -259,8 +277,8 @@ pub fn default_security_headers_bundle() -> Array[Middleware] {
 }
 
 ///|
-fn http_method_name(method : @http.HttpMethod) -> String {
-  match method {
+fn http_method_name(verb : @http.HttpMethod) -> String {
+  match verb {
     Get => "GET"
     Post => "POST"
     Put => "PUT"
