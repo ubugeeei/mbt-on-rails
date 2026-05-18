@@ -83,3 +83,56 @@ test "validated constraint adds and removals are flagged for review" {
     ),
   )
 }
+
+///|
+test "inline null backfills are flagged before tightening nullability" {
+  let reviewed = migration_plan("20260327030201", "tighten_post_published").change_null(
+    "posts",
+    "published",
+    false,
+    backfill_value=Some("false"),
+  )
+
+  let issues = analyze_migration(reviewed)
+  let summary = migration_safety_summary(reviewed)
+  let up_sql = migration_up_sql(reviewed)
+
+  assert_eq(migration_risk_level(reviewed).to_string(), "Review")
+  assert_eq(issues.length(), 1)
+  assert_true(summary.contains("inline backfill before NOT NULL"))
+  assert_true(
+    up_sql.contains(
+      "UPDATE posts SET published = 'false' WHERE published IS NULL",
+    ),
+  )
+  assert_true(
+    up_sql.contains("ALTER TABLE posts ALTER COLUMN published SET NOT NULL"),
+  )
+}
+
+///|
+test "add_reference surfaces blocking index and inline foreign key risks" {
+  let reviewed = migration_plan("20260327030202", "add_post_author_reference").add_reference(
+    "posts",
+    "author_id",
+    "users",
+    nullable=true,
+  )
+
+  let issues = analyze_migration(reviewed)
+  let summary = migration_safety_summary(reviewed)
+  let up_sql = migration_up_sql(reviewed)
+
+  assert_eq(migration_risk_level(reviewed).to_string(), "Review")
+  assert_eq(issues.length(), 2)
+  assert_true(summary.contains("non-concurrent index creation"))
+  assert_true(summary.contains("inline foreign key creation"))
+  assert_true(
+    up_sql.contains(
+      "ALTER TABLE posts ADD COLUMN author_id BIGINT NULL REFERENCES users(id)",
+    ),
+  )
+  assert_true(
+    up_sql.contains("CREATE INDEX idx_posts_author_id ON posts (author_id)"),
+  )
+}

@@ -64,12 +64,17 @@ fn step_safety_issues(
   match step {
     AddColumn(table_name, column) =>
       add_column_issues(table_name, column, step_index)
-    AddReference(table_name, column_name, _, nullable, _, default_value) =>
-      if nullable || default_value is Some(_) {
-        []
-      } else {
-        [phased_reference_issue(step_index, table_name, column_name)]
-      }
+    AddReference(
+      table_name,
+      column_name,
+      target_table,
+      nullable,
+      _,
+      default_value
+    ) =>
+      add_reference_issues(
+        step_index, table_name, column_name, target_table, nullable, default_value,
+      )
     AddTimestamps(table_name, nullable) =>
       if nullable {
         []
@@ -88,10 +93,18 @@ fn step_safety_issues(
       [rename_column_issue(step_index, table_name, from_, to_)]
     ChangeColumnDefault(_, _, _, _) => []
     ChangeColumnNull(table_name, column_name, nullable, backfill_value) =>
-      if nullable || backfill_value is Some(_) {
+      if nullable {
         []
       } else {
-        [tighten_null_issue(step_index, table_name, column_name)]
+        match backfill_value {
+          Some(_) =>
+            [
+              inline_backfill_tighten_null_issue(
+                step_index, table_name, column_name,
+              ),
+            ]
+          None => [tighten_null_issue(step_index, table_name, column_name)]
+        }
       }
     RenameTable(from_, to_) => [rename_table_issue(step_index, from_, to_)]
     DropTable(table_name) => [drop_table_issue(step_index, table_name)]

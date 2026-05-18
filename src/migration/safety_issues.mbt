@@ -43,6 +43,50 @@ fn phased_reference_issue(
 }
 
 ///|
+fn add_reference_issues(
+  step_index : Int,
+  table_name : String,
+  column_name : String,
+  target_table : String,
+  nullable : Bool,
+  default_value : String?,
+) -> Array[MigrationSafetyIssue] {
+  let issues : Array[MigrationSafetyIssue] = []
+  if !nullable && default_value is None {
+    issues.push(phased_reference_issue(step_index, table_name, column_name))
+  }
+  issues.push(blocking_index_issue(step_index, table_name, column_name))
+  issues.push(
+    inline_reference_foreign_key_issue(
+      step_index, table_name, column_name, target_table,
+    ),
+  )
+  issues
+}
+
+///|
+fn inline_reference_foreign_key_issue(
+  step_index : Int,
+  table_name : String,
+  column_name : String,
+  target_table : String,
+) -> MigrationSafetyIssue {
+  migration_safety_issue(
+    step_index,
+    Review,
+    "inline foreign key creation",
+    "Adding `" +
+    table_name +
+    "." +
+    column_name +
+    "` with an inline `REFERENCES " +
+    target_table +
+    "(id)` constraint can validate existing rows and take locks during deploys.",
+    "Prefer adding the column as nullable, backfilling it separately, then using `add_foreign_key(..., validate=false)` and `validate_foreign_key_step(...)`.",
+  )
+}
+
+///|
 fn non_nullable_timestamps_issue(
   step_index : Int,
   table_name : String,
@@ -152,7 +196,26 @@ fn tighten_null_issue(
     "." +
     column_name +
     "` to NOT NULL without filling existing NULL rows can fail mid-deploy.",
-    "Pass `backfill_value=Some(...)` or run an explicit backfill before `change_null_step(..., false)`.",
+    "Backfill existing NULL rows in a separate operational phase before scheduling the NOT NULL change.",
+  )
+}
+
+///|
+fn inline_backfill_tighten_null_issue(
+  step_index : Int,
+  table_name : String,
+  column_name : String,
+) -> MigrationSafetyIssue {
+  migration_safety_issue(
+    step_index,
+    Review,
+    "inline backfill before NOT NULL",
+    "Updating `" +
+    table_name +
+    "." +
+    column_name +
+    "` inside the same migration before `SET NOT NULL` can lock or rewrite many rows.",
+    "Backfill in small batches ahead of the migration, then tighten nullability in an isolated reviewed step.",
   )
 }
 

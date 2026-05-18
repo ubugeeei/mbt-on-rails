@@ -62,11 +62,16 @@ test "orm migration example builders keep relation migration and validation stab
   let phased_up = @mbor.migration_up_sql(phased)
   let phased_down = @mbor.migration_down_sql(phased)
   let constraint_up = @mbor.migration_up_sql(constraints)
-  assert_true(@mbor.migration_safe(phased))
-  assert_eq(@mbor.migration_risk_level(phased).to_string(), "Safe")
+  assert_false(@mbor.migration_safe(phased))
+  assert_eq(@mbor.migration_risk_level(phased).to_string(), "Review")
   assert_true(
     @mbor.migration_safety_summary(phased).contains(
-      "backfill_post_published [safe]",
+      "backfill_post_published [review]",
+    ),
+  )
+  assert_true(
+    @mbor.migration_safety_summary(phased).contains(
+      "inline backfill before NOT NULL",
     ),
   )
   assert_true(
