@@ -40,7 +40,7 @@ pub fn cache_fetch(
   tags : Array[String],
   now : String?,
 ) -> CacheFetchResult {
-  match cache_read(store, key, now) {
+  match cache_read_version(store, key, version, now) {
     Some(value) => { store, value, hit: true }
     None => {
       let updated = cache_write(store, key, fallback, version, expires_at, tags)
@@ -99,6 +99,36 @@ fn entry_fresh(entry : CacheEntry, now : String?) -> Bool {
       match now {
         None => true
         Some(current) => lexicographic_lt(current, expires_at)
+      }
+  }
+}
+
+///|
+/// Reads one cache entry when its version matches the requested version.
+fn cache_read_version(
+  store : CacheStore,
+  key : String,
+  version : String?,
+  now : String?,
+) -> String? {
+  for entry in store.entries {
+    if entry.key == key &&
+      entry_version_matches(entry, version) &&
+      entry_fresh(entry, now) {
+      return Some(entry.value)
+    }
+  }
+  None
+}
+
+///|
+fn entry_version_matches(entry : CacheEntry, version : String?) -> Bool {
+  match version {
+    None => true
+    Some(expected) =>
+      match entry.version {
+        Some(actual) => actual == expected
+        None => false
       }
   }
 }

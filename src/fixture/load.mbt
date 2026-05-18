@@ -6,7 +6,9 @@ pub fn load_fixture_set(
 ) -> @orm.MemoryDatabase {
   let mut current = database
   for row in fixtures.rows {
-    current = @orm.insert_record(current, row.record)
+    if row.record.table == fixtures.table {
+      current = @orm.insert_record(current, row.record)
+    }
   }
   current
 }

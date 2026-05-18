@@ -50,6 +50,14 @@ test "middleware fixtures seeds and turbo streams behave like rails runtime help
   assert_eq(find_records(seeded, "users", "id", "1").length(), 1)
   assert_eq(find_records(seeded, "users", "id", "2").length(), 1)
 
+  let mixed_fixtures = fixture_set("users", "users", [
+    fixture_row("valid", record("users", [("id", "3")])),
+    fixture_row("wrong_table", record("admins", [("id", "4")])),
+  ])
+  let mixed_seeded = load_fixture_set(empty_memory_database(), mixed_fixtures)
+  assert_eq(find_records(mixed_seeded, "users", "id", "3").length(), 1)
+  assert_eq(find_records(mixed_seeded, "admins", "id", "4").length(), 0)
+
   let turbo = ok_turbo_stream([
     append_stream("posts", "<li>New</li>"),
     remove_stream("stale_post"),

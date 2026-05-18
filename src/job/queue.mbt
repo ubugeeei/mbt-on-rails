@@ -16,6 +16,11 @@ pub fn enqueue_at(
   payload : Array[(String, String)],
   run_at : String,
 ) -> JobQueue {
+  if !valid_scheduled_timestamp(run_at) ||
+    !valid_job_payload(definition.argument_types, payload) ||
+    duplicate_unique_job(queue, definition) {
+    return queue
+  }
   let jobs = @support.clone_array(queue.jobs)
   jobs.push(enqueued_job(definition~, payload~, run_at~, attempts=0))
   { ..queue, jobs, }
@@ -45,6 +50,10 @@ pub fn drain_ready(queue : JobQueue, now : String) -> DrainedJobs {
 ///|
 /// Produces a retried job when the retry budget is not exhausted.
 pub fn retry_job(job : EnqueuedJob, next_run_at : String) -> EnqueuedJob? {
+  if !valid_scheduled_timestamp(next_run_at) ||
+    !valid_job_payload(job.argument_types, job.payload) {
+    return None
+  }
   if job.attempts + 1 > job.retry_limit {
     return None
   }
@@ -106,6 +115,104 @@ fn lexicographic_lte(left : String, right : String) -> Bool {
     }
   }
   left_chars.length() <= right_chars.length()
+}
+
+///|
+fn valid_scheduled_timestamp(run_at : String) -> Bool {
+  run_at.length() == 0 || parse_utc_timestamp(run_at) is Some(_)
+}
+
+///|
+fn duplicate_unique_job(queue : JobQueue, definition : JobDefinition) -> Bool {
+  match definition.unique_key {
+    None => false
+    Some(unique_key) => {
+      for current in queue.jobs {
+        if current.unique_key == Some(unique_key) {
+          return true
+        }
+      }
+      false
+    }
+  }
+}
+
+///|
+fn valid_job_payload(
+  argument_types : Array[(String, String)],
+  payload : Array[(String, String)],
+) -> Bool {
+  for argument in argument_types {
+    match @support.find_entry(payload, argument.0) {
+      Some(value) =>
+        if !value_matches_argument_type(value, argument.1) {
+          return false
+        }
+      None => return false
+    }
+  }
+  true
+}
+
+///|
+fn value_matches_argument_type(value : String, argument_type : String) -> Bool {
+  match argument_type {
+    "String" => true
+    "Bool" => value == "true" || value == "false"
+    "Int" => valid_int_value(value)
+    "Float" => valid_float_value(value)
+    _ => value.length() > 0
+  }
+}
+
+///|
+fn valid_int_value(value : String) -> Bool {
+  if value.length() == 0 {
+    return false
+  }
+  let mut index = 0
+  if unsafe_char_at(value, 0) == '-' {
+    if value.length() == 1 {
+      return false
+    }
+    index = 1
+  }
+  while index < value.length() {
+    let ch = unsafe_char_at(value, index)
+    if ch < '0' || ch > '9' {
+      return false
+    }
+    index += 1
+  }
+  true
+}
+
+///|
+fn valid_float_value(value : String) -> Bool {
+  if value.length() == 0 {
+    return false
+  }
+  let mut index = 0
+  let mut saw_digit = false
+  let mut saw_dot = false
+  if unsafe_char_at(value, 0) == '-' {
+    if value.length() == 1 {
+      return false
+    }
+    index = 1
+  }
+  while index < value.length() {
+    let ch = unsafe_char_at(value, index)
+    if ch >= '0' && ch <= '9' {
+      saw_digit = true
+    } else if ch == '.' && !saw_dot {
+      saw_dot = true
+    } else {
+      return false
+    }
+    index += 1
+  }
+  saw_digit
 }
 
 ///|

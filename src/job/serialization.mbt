@@ -74,16 +74,23 @@ pub fn serialize_job(
 ///|
 /// Restores one enqueued job from a serialized envelope.
 pub fn restore_enqueued_job(serialized : SerializedJob) -> EnqueuedJob? {
+  if !valid_scheduled_timestamp(serialized.run_at) {
+    return None
+  }
   match deserialize_payload(serialized.payload_json) {
     Some(payload) =>
-      Some(
-        enqueued_job(
-          definition=serialized.definition,
-          payload~,
-          run_at=serialized.run_at,
-          attempts=serialized.attempts,
-        ),
-      )
+      if valid_job_payload(serialized.definition.argument_types, payload) {
+        Some(
+          enqueued_job(
+            definition=serialized.definition,
+            payload~,
+            run_at=serialized.run_at,
+            attempts=serialized.attempts,
+          ),
+        )
+      } else {
+        None
+      }
     None => None
   }
 }

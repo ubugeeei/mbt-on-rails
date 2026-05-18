@@ -215,6 +215,111 @@ test "job payload serialization escapes and parses JSON control characters" {
 }
 
 ///|
+test "cache fetch misses on version mismatch" {
+  let store = cache_write(
+    cache_store("pages"),
+    cache_key(["posts", "index"]),
+    "stale",
+    Some("v1"),
+    None,
+    ["posts"],
+  )
+  let fetched = cache_fetch(
+    store,
+    cache_key(["posts", "index"]),
+    "fresh",
+    Some("v2"),
+    None,
+    ["posts"],
+    None,
+  )
+
+  assert_false(fetched.hit)
+  assert_eq(fetched.value, "fresh")
+  match cache_read(fetched.store, cache_key(["posts", "index"]), None) {
+    Some(value) => assert_eq(value, "fresh")
+    None => assert_true(false)
+  }
+}
+
+///|
+test "job enqueue rejects malformed schedules duplicate unique keys and bad payloads" {
+  let definition = job(
+    name="SearchIndexJob",
+    queue="default",
+    argument_types=[("id", "Int"), ("published", "Bool")],
+    retry_limit=2,
+    unique_key=Some("search:42"),
+  )
+
+  let invalid_time = enqueue_at(
+    job_queue(name="default"),
+    definition,
+    [("id", "42"), ("published", "true")],
+    "not-a-timestamp",
+  )
+  assert_eq(invalid_time.jobs.length(), 0)
+
+  let invalid_payload = enqueue_now(job_queue(name="default"), definition, [
+    ("id", "forty-two"),
+    ("published", "sometimes"),
+  ])
+  assert_eq(invalid_payload.jobs.length(), 0)
+
+  let first = enqueue_now(job_queue(name="default"), definition, [
+    ("id", "42"),
+    ("published", "true"),
+  ])
+  let duplicate = enqueue_now(first, definition, [
+    ("id", "43"),
+    ("published", "false"),
+  ])
+  assert_eq(duplicate.jobs.length(), 1)
+
+  match retry_job(duplicate.jobs[0], "2026-99-26T09:00:00Z") {
+    Some(_) => assert_true(false)
+    None => assert_true(true)
+  }
+}
+
+///|
+test "serialized jobs reject malformed schedules and payloads" {
+  let adapter = test_adapter()
+  let definition = job(name="SearchIndexJob", queue="default", argument_types=[
+    ("id", "Int"),
+    ("published", "Bool"),
+  ])
+
+  match
+    restore_enqueued_job(
+      serialized_job(
+        adapter~,
+        definition~,
+        payload_json="{\"id\": \"42\", \"published\": \"true\"}",
+        run_at="2026-99-26T09:00:00Z",
+        attempts=0,
+      ),
+    ) {
+    Some(_) => assert_true(false)
+    None => assert_true(true)
+  }
+
+  match
+    restore_enqueued_job(
+      serialized_job(
+        adapter~,
+        definition~,
+        payload_json="{\"id\": \"oops\", \"published\": \"maybe\"}",
+        run_at="",
+        attempts=0,
+      ),
+    ) {
+    Some(_) => assert_true(false)
+    None => assert_true(true)
+  }
+}
+
+///|
 test "component contracts surface server client boundaries in manifests" {
   let action = server_action(
     name="posts.create",
