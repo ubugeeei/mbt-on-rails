@@ -38,7 +38,7 @@ The examples and `.mbtv` pages in this repository are meant to be read alongside
 ```bash
 moon test
 moon run examples/resource_app
-moon run examples/demo_blog
+moon run cmd/main
 moon run examples/rails_ops
 moon run examples/production_api
 ```
