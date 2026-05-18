@@ -6,12 +6,16 @@ pub fn digest_password(password : String, salt : String) -> String {
 
 ///|
 /// Checks whether the supplied password matches a stored digest.
+///
+/// Uses a constant-time comparison so an attacker cannot probe the digest
+/// one byte at a time. The digest itself is still a demo construction —
+/// see issue #88 for replacing it with a real password hash.
 pub fn verify_password(
   password : String,
   salt : String,
   digest : String,
 ) -> Bool {
-  digest_password(password, salt) == digest
+  @support.constant_time_eq(digest_password(password, salt), digest)
 }
 
 ///|
@@ -142,11 +146,15 @@ fn token_grant_seed(
 
 ///|
 /// Returns whether the provided CSRF token matches the active session.
+///
+/// Uses a constant-time comparison so a request that only differs from
+/// the expected token in the last byte does not finish faster than one
+/// that diverges in the first byte.
 pub fn csrf_valid(session : Session?, provided : String?) -> Bool {
   match session {
     Some(current) =>
       match provided {
-        Some(token) => current.csrf_token == token
+        Some(token) => @support.constant_time_eq(current.csrf_token, token)
         None => false
       }
     None => false
@@ -302,12 +310,18 @@ pub fn session_store_for_config(
 
 ///|
 /// Signs one cookie value using the supplied secret.
+///
+/// The signature is `HMAC-SHA-256(secret, name || "::" || value)` rendered as
+/// a lowercase hex string. The resulting cookie is encoded as
+/// `value--<hex-tag>` so verifiers can locate the delimiter even when the
+/// value itself contains literal `--` sequences (only the final `--`
+/// counts).
 pub fn sign_cookie_value(
   name : String,
   value : String,
   secret : String,
 ) -> String {
-  value + "--" + @support.hash_string(secret + "::" + name + "::" + value)
+  value + "--" + @support.hmac_sha256_hex(secret, name + "::" + value)
 }
 
 ///|
@@ -325,8 +339,8 @@ pub fn verify_signed_cookie_value(
         start=index + 2,
         end=signed_value.length(),
       )
-      let expected = @support.hash_string(secret + "::" + name + "::" + value)
-      if digest == expected {
+      let expected = @support.hmac_sha256_hex(secret, name + "::" + value)
+      if @support.constant_time_eq(digest, expected) {
         Some(value)
       } else {
         None

@@ -11,6 +11,85 @@ pub enum Predicate {
 } derive(Debug)
 
 ///|
+/// Typed bind values used to fill `?` placeholders in `where_with_binds`
+/// and `having_with_binds`. Every variant renders through a SQL-literal
+/// path that quotes and escapes its payload — at no point is a caller
+/// value concatenated into the template as a raw fragment.
+pub enum RelationBind {
+  BindText(String)
+  BindInt(Int64)
+  BindBool(Bool)
+  BindNull
+} derive(Debug)
+
+///|
+/// Constructor helper for a text bind.
+pub fn bind_text(value : String) -> RelationBind {
+  BindText(value)
+}
+
+///|
+/// Constructor helper for an integer bind.
+pub fn bind_int(value : Int64) -> RelationBind {
+  BindInt(value)
+}
+
+///|
+/// Constructor helper for a boolean bind.
+pub fn bind_bool(value : Bool) -> RelationBind {
+  BindBool(value)
+}
+
+///|
+/// Constructor helper for the SQL NULL bind.
+pub fn bind_null() -> RelationBind {
+  BindNull
+}
+
+///|
+/// Renders one bind as a SQL literal that is safe to substitute into a
+/// query template. String values are quoted with single quotes and have
+/// internal quotes doubled per SQL convention.
+pub fn render_relation_bind(bind : RelationBind) -> String {
+  match bind {
+    BindText(value) => "'" + @support.escape_sql_string(value) + "'"
+    BindInt(value) => value.to_string()
+    BindBool(value) => if value { "TRUE" } else { "FALSE" }
+    BindNull => "NULL"
+  }
+}
+
+///|
+/// Substitutes every `?` in `sql_template` with the rendered form of the
+/// next bind. Missing binds expand to `NULL` and surplus binds are
+/// silently dropped — neither outcome can produce SQL injection because
+/// `render_relation_bind` already quotes and casts every value.
+pub fn substitute_relation_binds(
+  sql_template : String,
+  binds : Array[RelationBind],
+) -> String {
+  let chars = sql_template.to_array()
+  let builder = StringBuilder::new()
+  let mut bind_index = 0
+  let mut index = 0
+  while index < chars.length() {
+    let ch = chars[index]
+    if ch == '?' {
+      if bind_index < binds.length() {
+        builder.write_string(render_relation_bind(binds[bind_index]))
+        bind_index = bind_index + 1
+      } else {
+        builder.write_string("NULL")
+      }
+    } else {
+      builder.write_char(ch)
+    }
+    index = index + 1
+  }
+  builder.to_string()
+}
+
+///|
 /// Describes one `ORDER BY` clause.
 pub struct OrderBy {
   column : String
@@ -136,10 +215,38 @@ pub fn where_in(
 
 ///|
 /// Adds a raw SQL predicate to a relation.
+///
+/// **Unsafe**: the SQL string is emitted verbatim. Reach for
+/// `where_with_binds` instead and treat caller-supplied values as data.
 pub fn where_raw(relation : Relation, sql : String) -> Relation {
   let predicates = @support.clone_array(relation.predicates)
   predicates.push(Raw(sql))
   { ..relation, predicates, }
+}
+
+///|
+/// Explicit alias for `where_raw` whose name flags that the caller
+/// vouches for the SQL fragment.
+pub fn unsafe_where_raw(relation : Relation, sql : String) -> Relation {
+  where_raw(relation, sql)
+}
+
+///|
+/// Adds a SQL predicate built from a template plus typed binds.
+///
+/// Each `?` in `sql_template` is replaced by the SQL literal form of the
+/// next entry in `binds` (string values are quoted and SQL-escaped via
+/// `@support.escape_sql_string`). Extra placeholders without a bind
+/// become `NULL`; surplus binds are ignored. The substituted SQL is then
+/// added as a raw predicate, so callers retain the expressive power of
+/// `where_raw` without ever concatenating user input into the SQL string.
+pub fn where_with_binds(
+  relation : Relation,
+  sql_template : String,
+  binds : Array[RelationBind],
+) -> Relation {
+  let rendered = substitute_relation_binds(sql_template, binds)
+  where_raw(relation, rendered)
 }
 
 ///|
@@ -176,10 +283,21 @@ pub fn offset_by(relation : Relation, count : Int) -> Relation {
 
 ///|
 /// Appends a raw join clause to a relation.
+///
+/// **Unsafe**: the SQL fragment is emitted verbatim. Prefer building
+/// join SQL through validated identifiers, or call
+/// `unsafe_join_relation` to make the intent explicit at the call site.
 pub fn join_relation(relation : Relation, join_sql : String) -> Relation {
   let joins = @support.clone_array(relation.joins)
   joins.push(join_sql)
   { ..relation, joins, }
+}
+
+///|
+/// Explicit alias for `join_relation` whose name flags that the caller
+/// vouches for the SQL fragment.
+pub fn unsafe_join_relation(relation : Relation, join_sql : String) -> Relation {
+  join_relation(relation, join_sql)
 }
 
 ///|
@@ -220,10 +338,35 @@ pub fn group_by(relation : Relation, columns : Array[String]) -> Relation {
 
 ///|
 /// Adds one raw `HAVING` clause to a relation.
+///
+/// **Unsafe**: the SQL fragment is emitted verbatim. Reach for
+/// `having_with_binds` whenever the fragment includes caller-supplied
+/// values.
 pub fn having_raw(relation : Relation, sql : String) -> Relation {
   let having_clauses = @support.clone_array(relation.having_clauses)
   having_clauses.push(sql)
   { ..relation, having_clauses, }
+}
+
+///|
+/// Explicit alias for `having_raw` whose name flags that the caller
+/// vouches for the SQL fragment.
+pub fn unsafe_having_raw(relation : Relation, sql : String) -> Relation {
+  having_raw(relation, sql)
+}
+
+///|
+/// Adds a `HAVING` clause built from a template plus typed binds.
+///
+/// `?` placeholders are substituted with safely rendered literals, in
+/// the same way as `where_with_binds`.
+pub fn having_with_binds(
+  relation : Relation,
+  sql_template : String,
+  binds : Array[RelationBind],
+) -> Relation {
+  let rendered = substitute_relation_binds(sql_template, binds)
+  having_raw(relation, rendered)
 }
 
 ///|

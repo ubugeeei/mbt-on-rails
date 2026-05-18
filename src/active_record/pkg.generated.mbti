@@ -7,6 +7,20 @@ import {
 }
 
 // Values
+pub fn adapter_begin(DatabaseAdapter) -> TransactionBeginOutcome
+
+pub fn adapter_close(DatabaseAdapter) -> TransactionCloseOutcome
+
+pub fn adapter_commit(DatabaseAdapter, TxHandle) -> TransactionCloseOutcome
+
+pub fn adapter_error_message(AdapterError) -> String
+
+pub fn adapter_execute(DatabaseAdapter, String, Array[RelationBind]) -> QueryOutcome
+
+pub fn adapter_rollback(DatabaseAdapter, TxHandle) -> TransactionCloseOutcome
+
+pub fn adapter_summary(DatabaseAdapter) -> String
+
 pub fn after_create(String) -> Callback
 
 pub fn after_destroy(String) -> Callback
@@ -14,6 +28,14 @@ pub fn after_destroy(String) -> Callback
 pub fn after_save(String) -> Callback
 
 pub fn attribute_cast_error(String, String, String?, String) -> AttributeCastError
+
+pub fn bind_bool(Bool) -> RelationBind
+
+pub fn bind_int(Int64) -> RelationBind
+
+pub fn bind_null() -> RelationBind
+
+pub fn bind_text(String) -> RelationBind
 
 pub fn attribute_type_name(Column) -> String
 
@@ -46,9 +68,13 @@ pub fn create_savepoint(MemoryTransaction, String) -> MemoryTransaction
 
 pub fn create_table_sql(ModelSchema) -> String
 
+pub fn database_adapter(String, (String, Array[RelationBind]) -> QueryOutcome, () -> TransactionBeginOutcome, (TxHandle) -> TransactionCloseOutcome, (TxHandle) -> TransactionCloseOutcome, () -> TransactionCloseOutcome) -> DatabaseAdapter
+
 pub fn delete_sql(ModelSchema, String) -> String
 
 pub fn destroy_record(ModelSchema, MemoryDatabase, String, deleted_at? : String?) -> DestroyOutcome
+
+pub fn destroy_record_with_callbacks(ModelSchema, MemoryDatabase, String, Array[(Record) -> CallbackOutcome], Array[(Record) -> CallbackOutcome], deleted_at? : String?) -> DestroyWithCallbacksOutcome
 
 pub fn dirty_new_record(Record) -> DirtyRecord
 
@@ -89,6 +115,8 @@ pub fn has_one(name~ : String, target~ : String, foreign_key~ : String) -> Assoc
 
 pub fn having_raw(Relation, String) -> Relation
 
+pub fn having_with_binds(Relation, String, Array[RelationBind]) -> Relation
+
 pub fn index_statements(ModelSchema) -> Array[String]
 
 pub fn indexed(Column) -> Column
@@ -116,6 +144,8 @@ pub fn none_relation(Relation) -> Relation
 
 pub fn nullable(Column) -> Column
 
+pub fn null_database_adapter() -> DatabaseAdapter
+
 pub fn offset_by(Relation, Int) -> Relation
 
 pub fn order_by(Relation, String, descending? : Bool) -> Relation
@@ -123,6 +153,8 @@ pub fn order_by(Relation, String, descending? : Bool) -> Relation
 pub fn pluck_sql(Relation, Array[String]) -> String
 
 pub fn preload(Relation, String) -> Relation
+
+pub fn query_result(Array[String], Array[Record], Int, last_insert_id? : String?) -> QueryResult
 
 pub fn record(String, Array[(String, String)]) -> Record
 
@@ -134,6 +166,8 @@ pub fn relation_for(ModelSchema) -> Relation
 
 pub fn relation_to_sql(Relation) -> String
 
+pub fn render_relation_bind(RelationBind) -> String
+
 pub fn reorder_by(Relation, String, descending? : Bool) -> Relation
 
 pub fn reverse_order(Relation) -> Relation
@@ -142,7 +176,11 @@ pub fn rollback_to_savepoint(MemoryTransaction, String) -> MemoryTransaction
 
 pub fn rollback_transaction(MemoryTransaction) -> MemoryDatabase
 
+pub fn run_record_callbacks(Array[(Record) -> CallbackOutcome], Record) -> CallbackOutcome
+
 pub fn save_record(ModelSchema, MemoryDatabase, Record) -> SaveOutcome
+
+pub fn save_record_with_callbacks(ModelSchema, MemoryDatabase, Record, Array[(Record) -> CallbackOutcome], Array[(Record) -> CallbackOutcome]) -> SaveWithCallbacksOutcome
 
 pub fn schema_dump(Array[ModelSchema]) -> String
 
@@ -156,7 +194,11 @@ pub fn serialize_record_json(ModelSchema, Record) -> SerializeRecordOutcome
 
 pub fn string_column(String) -> Column
 
+pub fn substitute_relation_binds(String, Array[RelationBind]) -> String
+
 pub fn text_column(String) -> Column
+
+pub fn tx_handle(String, String) -> TxHandle
 
 pub fn timestamp_column(String) -> Column
 
@@ -169,6 +211,12 @@ pub fn typed_field(String, AttributeValue) -> TypedField
 pub fn typed_record(String, Array[TypedField]) -> TypedRecord
 
 pub fn unique(Column) -> Column
+
+pub fn unsafe_having_raw(Relation, String) -> Relation
+
+pub fn unsafe_join_relation(Relation, String) -> Relation
+
+pub fn unsafe_where_raw(Relation, String) -> Relation
 
 pub fn update_sql(ModelSchema, Record, String) -> String
 
@@ -234,6 +282,8 @@ pub fn where_lt(Relation, String, String) -> Relation
 pub fn where_not_eq(Relation, String, String) -> Relation
 
 pub fn where_raw(Relation, String) -> Relation
+
+pub fn where_with_binds(Relation, String, Array[RelationBind]) -> Relation
 
 pub fn with_association(ModelSchema, Association) -> ModelSchema
 
@@ -319,9 +369,37 @@ pub enum ColumnType {
   References(String)
 } derive(Eq, @debug.Debug)
 
+pub enum AdapterError {
+  ConnectionFailed(String)
+  SyntaxError(String)
+  IntegrityViolation(String)
+  AdapterTimeout(String)
+  OtherAdapterError(String)
+}
+
+pub enum CallbackOutcome {
+  Continue(Record)
+  Halt(String)
+}
+
+pub struct DatabaseAdapter {
+  name : String
+  execute : (String, Array[RelationBind]) -> QueryOutcome
+  begin : () -> TransactionBeginOutcome
+  commit : (TxHandle) -> TransactionCloseOutcome
+  rollback : (TxHandle) -> TransactionCloseOutcome
+  close : () -> TransactionCloseOutcome
+}
+
 pub enum DestroyOutcome {
   DestroyedRecord(MemoryDatabase, Record)
   DestroyNotFound(MemoryDatabase)
+}
+
+pub enum DestroyWithCallbacksOutcome {
+  DestroyedAfterCallbacks(MemoryDatabase, Record)
+  DestroyTargetMissing(MemoryDatabase)
+  DestroyCallbackHalted(String)
 }
 
 pub struct DirtyFieldChange {
@@ -442,6 +520,7 @@ pub fn Relation::distinct_records(Self) -> Self
 pub fn Relation::execute(Self, ModelSchema, MemoryDatabase) -> RelationExecutionOutcome
 pub fn Relation::group_by(Self, Array[String]) -> Self
 pub fn Relation::having_raw(Self, String) -> Self
+pub fn Relation::having_with_binds(Self, String, Array[RelationBind]) -> Self
 pub fn Relation::join_relation(Self, String) -> Self
 pub fn Relation::limit_to(Self, Int) -> Self
 pub fn Relation::merge_relation(Self, Self) -> Self
@@ -459,6 +538,29 @@ pub fn Relation::where_like(Self, String, String) -> Self
 pub fn Relation::where_lt(Self, String, String) -> Self
 pub fn Relation::where_not_eq(Self, String, String) -> Self
 pub fn Relation::where_raw(Self, String) -> Self
+pub fn Relation::where_with_binds(Self, String, Array[RelationBind]) -> Self
+pub fn Relation::unsafe_having_raw(Self, String) -> Self
+pub fn Relation::unsafe_join_relation(Self, String) -> Self
+pub fn Relation::unsafe_where_raw(Self, String) -> Self
+
+pub enum RelationBind {
+  BindText(String)
+  BindInt(Int64)
+  BindBool(Bool)
+  BindNull
+} derive(@debug.Debug)
+
+pub enum QueryOutcome {
+  QuerySucceeded(QueryResult)
+  QueryFailed(AdapterError)
+}
+
+pub struct QueryResult {
+  columns : Array[String]
+  rows : Array[Record]
+  affected_rows : Int
+  last_insert_id : String?
+}
 
 pub struct RelationExecutionIssue {
   feature : String
@@ -481,6 +583,12 @@ pub enum SaveOutcome {
   ValidationFailed(ValidationErrors)
 }
 
+pub enum SaveWithCallbacksOutcome {
+  SavedAfterCallbacks(MemoryDatabase, Record)
+  SaveValidationFailed(ValidationErrors)
+  SaveCallbackHalted(String)
+}
+
 pub struct ScopeDefinition {
   name : String
   relation : Relation
@@ -493,9 +601,24 @@ pub enum SerializeRecordOutcome {
 pub fn SerializeRecordOutcome::errors(Self) -> Array[AttributeCastError]
 pub fn SerializeRecordOutcome::json(Self) -> String?
 
+pub enum TransactionBeginOutcome {
+  TransactionStarted(TxHandle)
+  TransactionBeginFailed(AdapterError)
+}
+
+pub enum TransactionCloseOutcome {
+  TransactionClosed
+  TransactionCloseFailed(AdapterError)
+}
+
 pub enum TransactionSaveOutcome {
   TransactionSaved(MemoryTransaction, Record)
   TransactionValidationFailed(MemoryTransaction, ValidationErrors)
+}
+
+pub struct TxHandle {
+  id : String
+  adapter_name : String
 }
 
 pub struct TransactionSavepoint {

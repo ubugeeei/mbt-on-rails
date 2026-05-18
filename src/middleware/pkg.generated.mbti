@@ -14,11 +14,35 @@ pub fn apply_request_middleware_with_reached(Array[Middleware], @http.Request) -
 
 pub fn apply_response_middleware(Array[Middleware], @http.Request, @http.Response) -> @http.Response
 
+pub fn content_security_policy_middleware(ContentSecurityPolicy) -> Middleware
+
+pub fn content_security_policy_value(ContentSecurityPolicy) -> String
+
+pub fn cors_config(String, Array[@http.HttpMethod], Array[String], Bool, Int) -> CorsConfig
+
+pub fn cors_middleware(CorsConfig) -> Array[Middleware]
+
+pub fn default_security_headers_bundle() -> Array[Middleware]
+
+pub fn frame_options_deny() -> FrameOptionsMode
+
+pub fn frame_options_middleware(FrameOptionsMode) -> Middleware
+
+pub fn frame_options_same_origin() -> FrameOptionsMode
+
 pub fn halt_with_text(String, String, Array[@http.HttpMethod], Int, String) -> Middleware
+
+pub fn hsts_middleware(Int, Bool, Bool) -> Middleware
 
 pub fn middleware(String, String?, Array[@http.HttpMethod], Array[(String, String)], Array[(String, String)], @http.Response?) -> Middleware
 
 pub fn middleware_summary(Array[Middleware]) -> String
+
+pub fn nosniff_middleware() -> Middleware
+
+pub fn referrer_policy_middleware(String) -> Middleware
+
+pub fn strict_content_security_policy() -> ContentSecurityPolicy
 
 pub fn with_request_header(Middleware, String, String) -> Middleware
 
@@ -27,6 +51,32 @@ pub fn with_response_header(Middleware, String, String) -> Middleware
 // Errors
 
 // Types and methods
+pub struct ContentSecurityPolicy {
+  default_src : Array[String]
+  script_src : Array[String]
+  style_src : Array[String]
+  img_src : Array[String]
+  connect_src : Array[String]
+  font_src : Array[String]
+  frame_ancestors : Array[String]
+  object_src : Array[String]
+  base_uri : Array[String]
+  form_action : Array[String]
+}
+
+pub struct CorsConfig {
+  allowed_origin : String
+  allowed_methods : Array[@http.HttpMethod]
+  allowed_headers : Array[String]
+  allow_credentials : Bool
+  max_age_seconds : Int
+}
+
+pub enum FrameOptionsMode {
+  FrameDeny
+  FrameSameOrigin
+} derive(Eq)
+
 pub struct Middleware {
   name : String
   path_prefix : String?

@@ -156,6 +156,22 @@ pub fn Relation::where_raw(self : Relation, sql : String) -> Relation {
 }
 
 ///|
+/// Chainable alias for `unsafe_where_raw`.
+pub fn Relation::unsafe_where_raw(self : Relation, sql : String) -> Relation {
+  Relation::where_raw(self, sql)
+}
+
+///|
+/// Chainable alias for `where_with_binds`.
+pub fn Relation::where_with_binds(
+  self : Relation,
+  sql_template : String,
+  binds : Array[RelationBind],
+) -> Relation {
+  where_with_binds(self, sql_template, binds)
+}
+
+///|
 /// Chainable alias for `order_by`.
 pub fn Relation::order_by(
   self : Relation,
@@ -193,6 +209,15 @@ pub fn Relation::join_relation(self : Relation, join_sql : String) -> Relation {
   let joins = @support.clone_array(self.joins)
   joins.push(join_sql)
   { ..self, joins, }
+}
+
+///|
+/// Chainable alias for `unsafe_join_relation`.
+pub fn Relation::unsafe_join_relation(
+  self : Relation,
+  join_sql : String,
+) -> Relation {
+  Relation::join_relation(self, join_sql)
 }
 
 ///|
@@ -237,6 +262,22 @@ pub fn Relation::having_raw(self : Relation, sql : String) -> Relation {
   let having_clauses = @support.clone_array(self.having_clauses)
   having_clauses.push(sql)
   { ..self, having_clauses, }
+}
+
+///|
+/// Chainable alias for `unsafe_having_raw`.
+pub fn Relation::unsafe_having_raw(self : Relation, sql : String) -> Relation {
+  Relation::having_raw(self, sql)
+}
+
+///|
+/// Chainable alias for `having_with_binds`.
+pub fn Relation::having_with_binds(
+  self : Relation,
+  sql_template : String,
+  binds : Array[RelationBind],
+) -> Relation {
+  having_with_binds(self, sql_template, binds)
 }
 
 ///|
