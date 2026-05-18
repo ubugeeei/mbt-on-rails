@@ -43,10 +43,14 @@ jobs:
 
       - name: Run checks and tests
         run: |
-          moon check
+          scripts/check_moon_warnings.sh
           moon test
           moon test --target js
           moon test --target wasm-gc
+          moon test --target native
+
+      - name: Run documented examples
+        run: scripts/run_documented_examples.sh
 
       - name: Validate example template assets
         run: scripts/validate_template_assets.py

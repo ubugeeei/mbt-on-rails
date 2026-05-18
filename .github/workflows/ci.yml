@@ -91,6 +91,8 @@ jobs:
             command: moon test --target js
           - target: wasm-gc
             command: moon test --target wasm-gc
+          - target: native
+            command: moon test --target native
 
     steps:
       - name: Checkout code
@@ -117,9 +119,7 @@ jobs:
         uses: ./.github/actions/setup-moonbit
 
       - name: Run production examples
-        run: |
-          moon run examples/production_api
-          moon run examples/production_stack
+        run: scripts/run_documented_examples.sh
 
       - name: Validate example template assets
         run: scripts/validate_template_assets.py

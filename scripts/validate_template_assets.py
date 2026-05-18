@@ -74,19 +74,63 @@ def relative(path: Path) -> str:
     return path.relative_to(ROOT).as_posix()
 
 
-def run_generator(package_dir: Path, frontend_path: Path, output_path: Path) -> subprocess.CompletedProcess[str]:
+def run_generator(
+    package_dir: Path,
+    frontend_path: Path,
+    output_path: Path,
+    target: str = "native",
+) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         [
             "moon",
             "run",
             "--target",
-            "native",
+            target,
             "cmd/generate_example_types",
             "--",
             relative(package_dir),
             relative(frontend_path),
             str(output_path),
         ],
+        cwd=ROOT,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=False,
+    )
+
+
+def run_generator_without_args(target: str = "native") -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [
+            "moon",
+            "run",
+            "--target",
+            target,
+            "cmd/generate_example_types",
+        ],
+        cwd=ROOT,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=False,
+    )
+
+
+def run_native_generator_binary_without_args() -> subprocess.CompletedProcess[str]:
+    build_result = subprocess.run(
+        ["moon", "build", "--target", "native", "cmd/generate_example_types"],
+        cwd=ROOT,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=False,
+    )
+    if build_result.returncode != 0:
+        return build_result
+    binary = ROOT / "_build/native/debug/build/cmd/generate_example_types/generate_example_types.exe"
+    return subprocess.run(
+        [str(binary)],
         cwd=ROOT,
         text=True,
         stdout=subprocess.PIPE,
@@ -153,6 +197,12 @@ def validate_generated_types(example: Path, failures: list[str]) -> None:
 def validate_generator_fail_fast(failures: list[str]) -> None:
     with tempfile.TemporaryDirectory(prefix="mbor-generator-fail-fast-") as tmp:
         tmp_path = Path(tmp)
+        usage_result = run_native_generator_binary_without_args()
+        if usage_result.returncode == 0:
+            failures.append("generator CLI invalid usage exited successfully")
+        if "generate_example_types: invalid arguments" not in usage_result.stdout:
+            failures.append("generator CLI invalid usage did not print a fail-fast diagnostic")
+
         cases = [
             (
                 "missing package views",
@@ -181,6 +231,21 @@ def validate_generator_fail_fast(failures: list[str]) -> None:
                 failures.append(f"generator CLI did not fail fast for {label}")
             if wrote_output:
                 failures.append(f"generator CLI wrote output after {label}")
+
+        for target in ("js", "wasm-gc"):
+            output_path = tmp_path / f"unsupported_{target}.mbt"
+            result = run_generator(
+                ROOT / "examples/demo_blog",
+                ROOT / "examples/demo_blog/frontend.mbt",
+                output_path,
+                target=target,
+            )
+            diagnosed = "generate_example_types: unsupported target" in result.stdout
+            wrote_output = output_path.exists() and output_path.stat().st_size > 0
+            if not diagnosed:
+                failures.append(f"generator CLI did not reject unsupported target {target}")
+            if wrote_output:
+                failures.append(f"generator CLI wrote output for unsupported target {target}")
 
 
 def main() -> int:

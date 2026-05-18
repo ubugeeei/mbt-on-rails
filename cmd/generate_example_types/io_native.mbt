@@ -58,6 +58,14 @@ extern "c" fn pclose(stream : UInt64) -> Int = "pclose"
 extern "c" fn abort_process() -> Unit = "abort"
 
 ///|
+extern "c" fn exit_process(code : Int) -> Unit = "exit"
+
+///|
+fn ensure_supported_target() -> Unit {
+  ()
+}
+
+///|
 fn discover_templates(views_dir : String) -> Array[String] {
   let command = "test -d " +
     shell_quote(views_dir) +
@@ -192,4 +200,10 @@ fn shell_quote(input : String) -> String {
 fn fatal_io(message : String) -> Unit {
   println("generate_example_types: " + message)
   abort_process()
+}
+
+///|
+fn fatal_cli(message : String) -> Unit {
+  println("generate_example_types: " + message)
+  exit_process(2)
 }
