@@ -143,3 +143,22 @@ test "execute_relation supports basic raw equality predicates in memory" {
   assert_eq(drafts.issues().length(), 0)
   assert_eq(drafts.count(), 1)
 }
+
+///|
+test "execute_relation where_not_eq ignores missing values like sql nulls" {
+  let schema = relation_execution_schema()
+  let db = relation_execution_db().insert_record(
+    record("posts", [("id", "6"), ("title", "No State")]),
+  )
+
+  let drafts = relation_for(schema)
+    .where_not_eq("published", "true")
+    .execute(schema, db)
+
+  assert_eq(drafts.issues().length(), 0)
+  assert_eq(drafts.count(), 1)
+  match drafts.first() {
+    Some(row) => assert_eq(find_entry(row.fields, "id"), Some("4"))
+    None => assert_true(false)
+  }
+}
