@@ -298,7 +298,7 @@ pub fn with_validation(ModelSchema, Validation) -> ModelSchema
 // Errors
 
 // Types and methods
-pub enum AdapterError {
+pub(all) enum AdapterError {
   ConnectionFailed(String)
   SyntaxError(String)
   IntegrityViolation(String)
@@ -346,7 +346,7 @@ pub struct Callback {
   function_name : String
 }
 
-pub enum CallbackOutcome {
+pub(all) enum CallbackOutcome {
   Continue(Record)
   Halt(String)
 }
@@ -382,7 +382,7 @@ pub enum ColumnType {
   References(String)
 } derive(Eq, @debug.Debug)
 
-pub struct DatabaseAdapter {
+pub(all) struct DatabaseAdapter {
   name : String
   execute : (String, Array[RelationBind]) -> QueryOutcome
   begin : () -> TransactionBeginOutcome
@@ -396,7 +396,7 @@ pub enum DestroyOutcome {
   DestroyNotFound(MemoryDatabase)
 }
 
-pub enum DestroyWithCallbacksOutcome {
+pub(all) enum DestroyWithCallbacksOutcome {
   DestroyedAfterCallbacks(MemoryDatabase, Record)
   DestroyTargetMissing(MemoryDatabase)
   DestroyCallbackHalted(String)
@@ -494,12 +494,12 @@ pub enum Predicate {
   Raw(String)
 } derive(@debug.Debug)
 
-pub enum QueryOutcome {
+pub(all) enum QueryOutcome {
   QuerySucceeded(QueryResult)
   QueryFailed(AdapterError)
 }
 
-pub struct QueryResult {
+pub(all) struct QueryResult {
   columns : Array[String]
   rows : Array[Record]
   affected_rows : Int
@@ -555,7 +555,7 @@ pub fn Relation::where_not_eq(Self, String, String) -> Self
 pub fn Relation::where_raw(Self, String) -> Self
 pub fn Relation::where_with_binds(Self, String, Array[RelationBind]) -> Self
 
-pub enum RelationBind {
+pub(all) enum RelationBind {
   BindText(String)
   BindInt(Int64)
   BindBool(Bool)
@@ -583,7 +583,7 @@ pub enum SaveOutcome {
   ValidationFailed(ValidationErrors)
 }
 
-pub enum SaveWithCallbacksOutcome {
+pub(all) enum SaveWithCallbacksOutcome {
   SavedAfterCallbacks(MemoryDatabase, Record)
   SaveValidationFailed(ValidationErrors)
   SaveCallbackHalted(String)
@@ -601,12 +601,12 @@ pub enum SerializeRecordOutcome {
 pub fn SerializeRecordOutcome::errors(Self) -> Array[AttributeCastError]
 pub fn SerializeRecordOutcome::json(Self) -> String?
 
-pub enum TransactionBeginOutcome {
+pub(all) enum TransactionBeginOutcome {
   TransactionStarted(TxHandle)
   TransactionBeginFailed(AdapterError)
 }
 
-pub enum TransactionCloseOutcome {
+pub(all) enum TransactionCloseOutcome {
   TransactionClosed
   TransactionCloseFailed(AdapterError)
 }
@@ -621,7 +621,7 @@ pub struct TransactionSavepoint {
   database : MemoryDatabase
 }
 
-pub struct TxHandle {
+pub(all) struct TxHandle {
   id : String
   adapter_name : String
 }
