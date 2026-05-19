@@ -9,18 +9,9 @@
 /// out of a quoted string literal once routed through the bind pipeline.
 fn sql_injection_corpus() -> Array[String] {
   [
-    "plain",
-    "with 'single' quote",
-    "with \"double\" quote",
-    "trailing--comment",
-    "semi; colon",
-    "newline\nin\nbody",
-    "carriage\rreturn",
-    "back\\slash",
-    "null\u{0}byte",
-    "mixed '; DROP TABLE users; --",
-    "unicode πr² ★",
-    "",
+    "plain", "with 'single' quote", "with \"double\" quote", "trailing--comment",
+    "semi; colon", "newline\nin\nbody", "carriage\rreturn", "back\\slash", "null\u{0}byte",
+    "mixed '; DROP TABLE users; --", "unicode πr² ★", "",
   ]
 }
 
