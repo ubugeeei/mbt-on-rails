@@ -54,7 +54,7 @@ pub fn with_cc(MailDelivery, Array[String]) -> MailDelivery
 // Errors
 
 // Types and methods
-pub struct MailDelivery {
+pub(all) struct MailDelivery {
   mailer_name : String
   action_name : String
   from : String
