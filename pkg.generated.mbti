@@ -228,6 +228,8 @@ pub fn cache_write(@cache.CacheStore, String, String, String?, String?, Array[St
 
 pub fn cache_write_with_notifications(store~ : @cache.CacheStore, key~ : String, value~ : String, version~ : String?, expires_at~ : String?, tags~ : Array[String], notifications~ : @support.Notifications) -> (@cache.CacheStore, @support.Notifications)
 
+pub fn captured_http_server_adapter(Array[String], Array[Int]) -> @http.HttpServerAdapter
+
 pub fn captured_smtp_adapter(Array[Int]) -> @mailer.SmtpAdapter
 
 pub fn captured_websocket_adapter(Array[Int], Array[Int]) -> @cable.WebSocketAdapter
@@ -567,6 +569,18 @@ pub fn http_post() -> @http.HttpMethod
 
 pub fn http_put() -> @http.HttpMethod
 
+pub fn http_server_adapter(String, (String, (@http.Request) -> @http.Response) -> @http.HttpServerStartOutcome, () -> @http.HttpServerStopOutcome, () -> String?) -> @http.HttpServerAdapter
+
+pub fn http_server_adapter_error_message(@http.HttpServerAdapterError) -> String
+
+pub fn http_server_adapter_summary(@http.HttpServerAdapter) -> String
+
+pub fn http_server_address(@http.HttpServerAdapter) -> String?
+
+pub fn http_server_shutdown(@http.HttpServerAdapter) -> @http.HttpServerStopOutcome
+
+pub fn http_server_start(@http.HttpServerAdapter, String, (@http.Request) -> @http.Response) -> @http.HttpServerStartOutcome
+
 pub fn hydrate_idle() -> @view.HydrationMode
 
 pub fn hydrate_load() -> @view.HydrationMode
@@ -770,6 +784,8 @@ pub fn null_cache_adapter() -> @cache.CacheAdapter
 
 pub fn null_database_adapter() -> @active_record.DatabaseAdapter
 
+pub fn null_http_server_adapter() -> @http.HttpServerAdapter
+
 pub fn null_smtp_adapter() -> @mailer.SmtpAdapter
 
 pub fn null_websocket_adapter() -> @cable.WebSocketAdapter
@@ -882,6 +898,8 @@ pub fn readiness_response(Array[@production.HealthCheck]) -> @http.Response
 pub fn recognize(Array[@http.RouteSpec], @http.Request) -> @http.MatchedRoute?
 
 pub fn record(String, Array[(String, String)]) -> @active_record.Record
+
+pub fn record_captured_dispatch(Array[Int]) -> Unit
 
 pub fn redirect_format() -> @controller.ResponseFormat
 
@@ -1557,6 +1575,14 @@ pub using @generator {type GeneratedArtifact}
 pub using @production {type HealthCheck}
 
 pub using @http {type HttpMethod}
+
+pub using @http {type HttpServerAdapter}
+
+pub using @http {type HttpServerAdapterError}
+
+pub using @http {type HttpServerStartOutcome}
+
+pub using @http {type HttpServerStopOutcome}
 
 pub using @view {type HydrationMode}
 
