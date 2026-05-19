@@ -77,7 +77,7 @@ test "unsafe_where_raw inlines verbatim, confirming the safe-API opt-in is real"
     string_column("title"),
     string_column("status"),
   ])
-  let unsafe = unsafe_where_raw(
+  let raw_relation = unsafe_where_raw(
     relation_for(schema),
     "status = 'draft' OR 1=1",
   )
@@ -85,7 +85,7 @@ test "unsafe_where_raw inlines verbatim, confirming the safe-API opt-in is real"
     BindText("draft' OR 1=1"),
   ])
   // The unsafe path lets the OR-1=1 escape through.
-  assert_true(relation_to_sql(unsafe).contains("OR 1=1"))
+  assert_true(relation_to_sql(raw_relation).contains("OR 1=1"))
   // The safe path keeps the injection payload inside a single literal.
   let safe_sql = relation_to_sql(safe)
   assert_true(safe_sql.contains("'draft'' OR 1=1'"))
@@ -188,8 +188,13 @@ test "verify_signed_cookie_value round-trips an unsigned-looking value containin
 }
 
 ///|
-fn fixture_session_with_token(token : String) -> Session {
-  { id: "sess_test", user_id: "user_1", csrf_token: token, fresh: true }
+fn fixture_session() -> Session {
+  issue_session(
+    "user-1",
+    "browser",
+    entropy=Some("security-properties-entropy"),
+    secret=Some("security-properties-secret"),
+  )
 }
 
 ///|
@@ -199,33 +204,50 @@ test "csrf_valid rejects when session is missing entirely" {
 
 ///|
 test "csrf_valid rejects when provided token is missing" {
-  let session = fixture_session_with_token("abc123")
+  let session = fixture_session()
   assert_false(csrf_valid(Some(session), None))
 }
 
 ///|
 test "csrf_valid accepts the exact token bound to the session" {
-  let session = fixture_session_with_token("expected-token")
-  assert_true(csrf_valid(Some(session), Some("expected-token")))
+  let session = fixture_session()
+  assert_true(csrf_valid(Some(session), Some(session.csrf_token)))
 }
 
 ///|
 test "csrf_valid rejects token of different length (constant-time across length mismatch)" {
-  let session = fixture_session_with_token("expected-token")
-  assert_false(csrf_valid(Some(session), Some("expected-token-x")))
-  assert_false(csrf_valid(Some(session), Some("expected-toke")))
+  let session = fixture_session()
+  assert_false(csrf_valid(Some(session), Some(session.csrf_token + "x")))
+  let truncated = String::unsafe_substring(
+    session.csrf_token,
+    start=0,
+    end=session.csrf_token.length() - 1,
+  )
+  assert_false(csrf_valid(Some(session), Some(truncated)))
 }
 
 ///|
 test "csrf_valid rejects single-byte differences anywhere in the token" {
-  let session = fixture_session_with_token("abcdefghij")
-  // Each variant flips exactly one position.
-  let variants = [
-    "Abcdefghij", // first
-    "abcdefgHij", // middle
-    "abcdefghiJ", // last
-  ]
-  for variant in variants {
+  let session = fixture_session()
+  let token = session.csrf_token
+  // Flip the first non-prefix byte (skip the "csrf_" prefix), a middle
+  // byte, and the last byte. Each variant differs from the original by
+  // exactly one position.
+  let prefix_end = 5
+  assert_true(token.length() > prefix_end + 2)
+  let first_flipped = "X" +
+    String::unsafe_substring(token, start=1, end=token.length())
+  let mid = token.length() / 2
+  let middle_flipped = String::unsafe_substring(token, start=0, end=mid) +
+    "X" +
+    String::unsafe_substring(token, start=mid + 1, end=token.length())
+  let last_flipped = String::unsafe_substring(
+      token,
+      start=0,
+      end=token.length() - 1,
+    ) +
+    "X"
+  for variant in [first_flipped, middle_flipped, last_flipped] {
     assert_false(csrf_valid(Some(session), Some(variant)))
   }
 }
