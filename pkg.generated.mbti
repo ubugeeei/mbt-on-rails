@@ -990,6 +990,8 @@ pub fn rollback_to_savepoint(@active_record.MemoryTransaction, String) -> @activ
 
 pub fn rollback_transaction(@active_record.MemoryTransaction) -> @active_record.MemoryDatabase
 
+pub fn rotate_session(@auth.Session, String, entropy? : String?, secret? : String?) -> @auth.Session
+
 #label_migration(action, allow_positional=true)
 #label_migration(controller, allow_positional=true)
 #label_migration(name, allow_positional=true)
@@ -997,8 +999,6 @@ pub fn rollback_transaction(@active_record.MemoryTransaction) -> @active_record.
 #label_migration(path, allow_positional=true)
 #label_migration(verb, allow_positional=true)
 pub fn route(name~ : String, verb~ : @http.HttpMethod, path~ : String, controller~ : String, action~ : String, page_name~ : String?) -> @http.RouteSpec
-
-pub fn rotate_session(@auth.Session, String, entropy? : String?, secret? : String?) -> @auth.Session
 
 pub fn run_record_callbacks(Array[(@active_record.Record) -> @active_record.CallbackOutcome], @active_record.Record) -> @active_record.CallbackOutcome
 
