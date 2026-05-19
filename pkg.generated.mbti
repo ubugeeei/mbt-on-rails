@@ -106,6 +106,8 @@ pub fn apply_response_middleware(Array[@middleware.Middleware], @http.Request, @
 
 pub fn apply_seed(@active_record.MemoryDatabase, @fixture.SeedPlan) -> @active_record.MemoryDatabase
 
+pub fn apply_trusted_proxy(@http.Request, Array[String], forwarded_for_header? : String, forwarded_proto_header? : String, forwarded_host_header? : String) -> @http.Request
+
 pub fn around_action(String?, String) -> @controller.AroundAction
 
 pub fn around_each() -> @controller.AroundAction
@@ -209,6 +211,8 @@ pub fn cache_summary(@cache.CacheStore) -> String
 pub fn cache_write(@cache.CacheStore, String, String, String?, String?, Array[String]) -> @cache.CacheStore
 
 pub fn cache_write_with_notifications(store~ : @cache.CacheStore, key~ : String, value~ : String, version~ : String?, expires_at~ : String?, tags~ : Array[String], notifications~ : @support.Notifications) -> (@cache.CacheStore, @support.Notifications)
+
+pub fn captured_smtp_adapter(Array[Int]) -> @mailer.SmtpAdapter
 
 pub fn cast_record(@active_record.ModelSchema, @active_record.Record) -> @active_record.CastRecordOutcome
 
@@ -338,6 +342,8 @@ pub fn destroy_record(@active_record.ModelSchema, @active_record.MemoryDatabase,
 pub fn destroy_record_with_callbacks(@active_record.ModelSchema, @active_record.MemoryDatabase, String, Array[(@active_record.Record) -> @active_record.CallbackOutcome], Array[(@active_record.Record) -> @active_record.CallbackOutcome], deleted_at? : String?) -> @active_record.DestroyWithCallbacksOutcome
 
 pub fn digest_password(String, String) -> String
+
+pub fn digest_password_secure(String, String, iterations? : Int) -> String
 
 pub fn dirty_new_record(@active_record.Record) -> @active_record.DirtyRecord
 
@@ -514,6 +520,8 @@ pub fn having_with_binds(@active_record.Relation, String, Array[@active_record.R
 pub fn health_check(name~ : String, ok~ : Bool, detail~ : String) -> @production.HealthCheck
 
 pub fn health_response(Array[@production.HealthCheck]) -> @http.Response
+
+pub fn hex_decode_bytes(String) -> Array[UInt]?
 
 pub fn hex_encode_bytes(Array[UInt]) -> String
 
@@ -740,6 +748,8 @@ pub fn notifications() -> @support.Notifications
 
 pub fn null_database_adapter() -> @active_record.DatabaseAdapter
 
+pub fn null_smtp_adapter() -> @mailer.SmtpAdapter
+
 pub fn nullable(@active_record.Column) -> @active_record.Column
 
 #label_migration(name, allow_positional=true)
@@ -781,6 +791,10 @@ pub fn parse_route_pattern(String) -> @http.RoutePattern
 pub fn partial(local_name~ : String, component~ : @view.VaporComponentRef) -> @view.TemplateImport
 
 pub fn password_field(name~ : String, label~ : String, required? : Bool, placeholder? : String?, value? : String?, autocomplete? : String?, help_text? : String?) -> @view.FormField
+
+pub fn pbkdf2_hmac_sha256(Array[UInt], Array[UInt], Int, Int) -> Array[UInt]
+
+pub fn pbkdf2_hmac_sha256_hex(String, String, Int, Int) -> String
 
 pub fn permission_access(String) -> @auth.AuthRequirement
 
@@ -965,6 +979,12 @@ pub fn required() -> @validation.FieldRule
 
 pub fn resolve_request_id(@http.Request, String, String) -> String
 
+pub fn resolved_client_host(@http.Request) -> String?
+
+pub fn resolved_client_ip(@http.Request) -> String?
+
+pub fn resolved_client_proto(@http.Request) -> String?
+
 pub fn resources(String, String, @http.ResourceOptions) -> Array[@http.RouteSpec]
 
 pub fn restful_controller(String, String) -> @controller.ControllerDefinition
@@ -1136,6 +1156,18 @@ pub fn singularize(String) -> String
 #label_migration(signature, allow_positional=true)
 pub fn slot_contract(name~ : String, signature~ : String, required? : Bool, description? : String?) -> @view.SlotContract
 
+pub fn smtp_adapter(String, (@mailer.MailDelivery) -> @mailer.SmtpDeliveryOutcome, () -> @mailer.SmtpDeliveryOutcome, () -> @mailer.SmtpDeliveryOutcome) -> @mailer.SmtpAdapter
+
+pub fn smtp_adapter_error_message(@mailer.SmtpAdapterError) -> String
+
+pub fn smtp_adapter_summary(@mailer.SmtpAdapter) -> String
+
+pub fn smtp_close(@mailer.SmtpAdapter) -> @mailer.SmtpDeliveryOutcome
+
+pub fn smtp_deliver(@mailer.SmtpAdapter, @mailer.MailDelivery) -> @mailer.SmtpDeliveryOutcome
+
+pub fn smtp_verify(@mailer.SmtpAdapter) -> @mailer.SmtpDeliveryOutcome
+
 pub fn solid_queue_adapter(queue_prefix? : String?) -> @job.JobAdapter
 
 pub fn split_path(String) -> Array[String]
@@ -1152,6 +1184,10 @@ pub fn substitute_relation_binds(String, Array[@active_record.RelationBind]) -> 
 pub fn suspense_boundary(name~ : String, fallback_html~ : String, children~ : Array[@view.VaporNode]) -> @view.VaporNode
 
 pub fn tag(name~ : String, attrs? : Array[(String, String)]) -> String
+
+pub fn tag_request_with_id(@http.Request, String, String) -> (@http.Request, String)
+
+pub fn tag_response_with_request_id(@http.Response, String, String) -> @http.Response
 
 pub fn template_component_imports(String) -> Array[String]
 
@@ -1293,6 +1329,8 @@ pub fn validation_report(schema_name~ : String) -> @validation.ValidationReport
 pub fn validator(name~ : String, rule~ : @validation.FieldRule) -> @validation.ValidatorObject
 
 pub fn verify_password(String, String, String) -> Bool
+
+pub fn verify_password_secure(String, String) -> Bool
 
 pub fn verify_signed_cookie_value(String, String, String) -> String?
 
@@ -1655,6 +1693,12 @@ pub using @process {type ShutdownCoordinator}
 pub using @process {type ShutdownPhase}
 
 pub using @view {type SlotContract}
+
+pub using @mailer {type SmtpAdapter}
+
+pub using @mailer {type SmtpAdapterError}
+
+pub using @mailer {type SmtpDeliveryOutcome}
 
 pub using @view {type SuspenseBoundary}
 

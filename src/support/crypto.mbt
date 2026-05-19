@@ -119,6 +119,41 @@ pub fn hex_encode_bytes(bytes : Array[UInt]) -> String {
 }
 
 ///|
+/// Decodes a lowercase / uppercase hex string back into bytes. Returns
+/// `None` for inputs of odd length or with non-hex characters.
+pub fn hex_decode_bytes(hex : String) -> Array[UInt]? {
+  if hex.length() % 2 != 0 {
+    return None
+  }
+  let chars = hex.to_array()
+  let bytes : Array[UInt] = []
+  let mut index = 0
+  while index < chars.length() {
+    let high = hex_char_value(chars[index])
+    let low = hex_char_value(chars[index + 1])
+    match (high, low) {
+      (Some(h), Some(l)) => bytes.push((h << 4) | l)
+      _ => return None
+    }
+    index = index + 2
+  }
+  Some(bytes)
+}
+
+///|
+fn hex_char_value(ch : Char) -> UInt? {
+  if ch >= '0' && ch <= '9' {
+    Some(ch.to_uint() - '0'.to_uint())
+  } else if ch >= 'a' && ch <= 'f' {
+    Some(ch.to_uint() - 'a'.to_uint() + 10U)
+  } else if ch >= 'A' && ch <= 'F' {
+    Some(ch.to_uint() - 'A'.to_uint() + 10U)
+  } else {
+    None
+  }
+}
+
+///|
 fn hex_char(value : UInt) -> Char {
   if value < 10U {
     ('0'.to_uint() + value).reinterpret_as_int().to_char().unwrap()
@@ -263,4 +298,95 @@ pub fn hmac_sha256_bytes(
 /// Returns the 32-byte tag as a lowercase hex string.
 pub fn hmac_sha256_hex(key : String, message : String) -> String {
   hex_encode_bytes(hmac_sha256_bytes(utf8_bytes(key), utf8_bytes(message)))
+}
+
+///|
+/// PBKDF2 over HMAC-SHA-256 (RFC 2898 §5.2). Stretches `password` and
+/// `salt` through `iterations` rounds of HMAC and returns a derived key
+/// of `dk_len` bytes.
+///
+/// Use at least 600_000 iterations for password storage on modern
+/// hardware; the OWASP 2025 baseline. `dk_len` should be 32 for typical
+/// password hashing (one SHA-256 output block).
+pub fn pbkdf2_hmac_sha256(
+  password : Array[UInt],
+  salt : Array[UInt],
+  iterations : Int,
+  dk_len : Int,
+) -> Array[UInt] {
+  let h_len = 32
+  let blocks = (dk_len + h_len - 1) / h_len
+  let derived : Array[UInt] = []
+  let mut block_index = 1
+  while block_index <= blocks {
+    let block = pbkdf2_block(password, salt, iterations, block_index)
+    for value in block {
+      derived.push(value)
+    }
+    block_index = block_index + 1
+  }
+  let truncated : Array[UInt] = []
+  let mut i = 0
+  while i < dk_len {
+    truncated.push(derived[i])
+    i = i + 1
+  }
+  truncated
+}
+
+///|
+fn pbkdf2_block(
+  password : Array[UInt],
+  salt : Array[UInt],
+  iterations : Int,
+  block_index : Int,
+) -> Array[UInt] {
+  let int_be = int_to_be_bytes(block_index)
+  let salted = concat_bytes(salt, int_be)
+  let mut u_prev = hmac_sha256_bytes(password, salted)
+  let result : Array[UInt] = []
+  for value in u_prev {
+    result.push(value)
+  }
+  let mut iteration = 1
+  while iteration < iterations {
+    u_prev = hmac_sha256_bytes(password, u_prev)
+    let mut byte_index = 0
+    while byte_index < result.length() {
+      result[byte_index] = result[byte_index] ^ u_prev[byte_index]
+      byte_index = byte_index + 1
+    }
+    iteration = iteration + 1
+  }
+  result
+}
+
+///|
+fn int_to_be_bytes(value : Int) -> Array[UInt] {
+  let bytes : Array[UInt] = []
+  let v = value.reinterpret_as_uint()
+  bytes.push((v >> 24) & 0xffU)
+  bytes.push((v >> 16) & 0xffU)
+  bytes.push((v >> 8) & 0xffU)
+  bytes.push(v & 0xffU)
+  bytes
+}
+
+///|
+/// Convenience wrapper that takes UTF-8 string inputs and returns the
+/// derived key as a lowercase hex string.
+pub fn pbkdf2_hmac_sha256_hex(
+  password : String,
+  salt : String,
+  iterations : Int,
+  dk_len : Int,
+) -> String {
+  hex_encode_bytes(
+    pbkdf2_hmac_sha256(
+      utf8_bytes(password),
+      utf8_bytes(salt),
+      iterations,
+      dk_len,
+    ),
+  )
 }

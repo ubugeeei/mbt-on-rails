@@ -34,6 +34,8 @@ pub fn find_entry(Array[(String, String)], String) -> String?
 
 pub fn hash_string(String) -> String
 
+pub fn hex_decode_bytes(String) -> Array[UInt]?
+
 pub fn hex_encode_bytes(Array[UInt]) -> String
 
 pub fn hmac_sha256_bytes(Array[UInt], Array[UInt]) -> Array[UInt]
@@ -55,6 +57,10 @@ pub fn normalize_path(String) -> String
 pub fn notification_event(name~ : String, payload~ : Array[(String, String)]) -> NotificationEvent
 
 pub fn notifications() -> Notifications
+
+pub fn pbkdf2_hmac_sha256(Array[UInt], Array[UInt], Int, Int) -> Array[UInt]
+
+pub fn pbkdf2_hmac_sha256_hex(String, String, Int, Int) -> String
 
 pub fn remove_query_string(String) -> String
 
