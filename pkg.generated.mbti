@@ -1650,6 +1650,10 @@ pub using @auth {type SessionStore}
 
 pub using @auth {type SessionStoreKind}
 
+pub using @process {type ShutdownCoordinator}
+
+pub using @process {type ShutdownPhase}
+
 pub using @view {type SlotContract}
 
 pub using @view {type SuspenseBoundary}
