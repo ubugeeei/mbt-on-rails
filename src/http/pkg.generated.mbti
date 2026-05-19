@@ -19,6 +19,8 @@ pub fn append_set_cookie(Response, @auth.AuthCookie) -> Response
 
 pub fn append_set_cookies(Response, Array[@auth.AuthCookie]) -> Response
 
+pub fn apply_trusted_proxy(Request, Array[String], forwarded_for_header? : String, forwarded_proto_header? : String, forwarded_host_header? : String) -> Request
+
 pub fn build_path(RouteSpec, Array[(String, String)]) -> String
 
 pub fn captured_http_server_adapter(Array[String], Array[Int]) -> HttpServerAdapter
@@ -113,6 +115,12 @@ pub fn request_session_id(Request, @auth.SessionStore) -> String?
 
 pub fn resolve_request_id(Request, String, String) -> String
 
+pub fn resolved_client_host(Request) -> String?
+
+pub fn resolved_client_ip(Request) -> String?
+
+pub fn resolved_client_proto(Request) -> String?
+
 pub fn resources(String, String, ResourceOptions) -> Array[RouteSpec]
 
 #label_migration(action, allow_positional=true)
@@ -128,6 +136,10 @@ pub fn scope_routes(String, String, Array[RouteSpec]) -> Array[RouteSpec]
 pub fn see_other_response(String) -> Response
 
 pub fn signed_request_cookie(Request, String, String) -> String?
+
+pub fn tag_request_with_id(Request, String, String) -> (Request, String)
+
+pub fn tag_response_with_request_id(Response, String, String) -> Response
 
 pub fn text_response(Int, String) -> Response
 
