@@ -176,6 +176,8 @@ pub struct PasswordResetToken {
   expires_at : String
 }
 
+type Pbkdf2DigestParts
+
 pub struct PolicyRule {
   resource : String
   action : String
