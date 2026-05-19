@@ -181,6 +181,22 @@ pub fn cable_process(String, String, Int, Array[String]) -> @process.ProcessDefi
 
 pub fn cable_summary(Array[@cable.CableChannel]) -> String
 
+pub fn cache_adapter(String, (String) -> @cache.CacheReadOutcome, (String, String, String?) -> @cache.CacheWriteOutcome, (String) -> @cache.CacheWriteOutcome, (String) -> @cache.CacheWriteOutcome, () -> @cache.CacheWriteOutcome) -> @cache.CacheAdapter
+
+pub fn cache_adapter_close(@cache.CacheAdapter) -> @cache.CacheWriteOutcome
+
+pub fn cache_adapter_delete(@cache.CacheAdapter, String) -> @cache.CacheWriteOutcome
+
+pub fn cache_adapter_delete_tag(@cache.CacheAdapter, String) -> @cache.CacheWriteOutcome
+
+pub fn cache_adapter_error_message(@cache.CacheAdapterError) -> String
+
+pub fn cache_adapter_read(@cache.CacheAdapter, String) -> @cache.CacheReadOutcome
+
+pub fn cache_adapter_summary(@cache.CacheAdapter) -> String
+
+pub fn cache_adapter_write(@cache.CacheAdapter, String, String, String?) -> @cache.CacheWriteOutcome
+
 pub fn cache_delete(@cache.CacheStore, String) -> @cache.CacheStore
 
 pub fn cache_delete_tag(@cache.CacheStore, String) -> @cache.CacheStore
@@ -209,26 +225,6 @@ pub fn cache_summary(@cache.CacheStore) -> String
 pub fn cache_write(@cache.CacheStore, String, String, String?, String?, Array[String]) -> @cache.CacheStore
 
 pub fn cache_write_with_notifications(store~ : @cache.CacheStore, key~ : String, value~ : String, version~ : String?, expires_at~ : String?, tags~ : Array[String], notifications~ : @support.Notifications) -> (@cache.CacheStore, @support.Notifications)
-
-pub fn cache_adapter(String, (String) -> @cache.CacheReadOutcome, (String, String, String?) -> @cache.CacheWriteOutcome, (String) -> @cache.CacheWriteOutcome, (String) -> @cache.CacheWriteOutcome, () -> @cache.CacheWriteOutcome) -> @cache.CacheAdapter
-
-pub fn cache_adapter_close(@cache.CacheAdapter) -> @cache.CacheWriteOutcome
-
-pub fn cache_adapter_delete(@cache.CacheAdapter, String) -> @cache.CacheWriteOutcome
-
-pub fn cache_adapter_delete_tag(@cache.CacheAdapter, String) -> @cache.CacheWriteOutcome
-
-pub fn cache_adapter_error_message(@cache.CacheAdapterError) -> String
-
-pub fn cache_adapter_read(@cache.CacheAdapter, String) -> @cache.CacheReadOutcome
-
-pub fn cache_adapter_summary(@cache.CacheAdapter) -> String
-
-pub fn cache_adapter_write(@cache.CacheAdapter, String, String, String?) -> @cache.CacheWriteOutcome
-
-pub fn memory_cache_adapter(Array[@cache.CacheStore]) -> @cache.CacheAdapter
-
-pub fn null_cache_adapter() -> @cache.CacheAdapter
 
 pub fn cast_record(@active_record.ModelSchema, @active_record.Record) -> @active_record.CastRecordOutcome
 
@@ -690,6 +686,8 @@ pub fn max_length(maximum~ : Int) -> @validation.FieldRule
 
 pub fn mbtv_path(String) -> @support.MbtvPath
 
+pub fn memory_cache_adapter(Array[@cache.CacheStore]) -> @cache.CacheAdapter
+
 pub fn merge_class_names(Array[String]) -> String
 
 pub fn merge_params(Array[(String, String)], Array[(String, String)], Array[(String, String)]) -> @params.Parameters
@@ -757,6 +755,8 @@ pub fn not_found_response() -> @http.Response
 pub fn notification_event(name~ : String, payload~ : Array[(String, String)]) -> @support.NotificationEvent
 
 pub fn notifications() -> @support.Notifications
+
+pub fn null_cache_adapter() -> @cache.CacheAdapter
 
 pub fn null_database_adapter() -> @active_record.DatabaseAdapter
 
@@ -1418,11 +1418,19 @@ pub using @cable {type CableBroadcast}
 
 pub using @cable {type CableChannel}
 
+pub using @cache {type CacheAdapter}
+
+pub using @cache {type CacheAdapterError}
+
 pub using @cache {type CacheEntry}
 
 pub using @cache {type CacheFetchResult}
 
+pub using @cache {type CacheReadOutcome}
+
 pub using @cache {type CacheStore}
+
+pub using @cache {type CacheWriteOutcome}
 
 pub using @active_record {type Callback}
 
