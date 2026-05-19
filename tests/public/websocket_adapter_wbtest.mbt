@@ -1,11 +1,10 @@
 ///|
 fn sample_broadcast() -> CableBroadcast {
-  {
-    channel_name: "ChatChannel",
-    stream_name: "room:lobby",
-    payload: "{\"hello\":\"world\"}",
-    content_type: "application/json",
-  }
+  cable_broadcast(
+    cable_channel("ChatChannel", "room:lobby", []),
+    "{\"hello\":\"world\"}",
+    "application/json",
+  )
 }
 
 ///|
