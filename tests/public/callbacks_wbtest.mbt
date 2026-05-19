@@ -98,15 +98,13 @@ test "save_record_with_callbacks runs before_save then after_save" {
 test "save_record_with_callbacks surfaces halts as SaveCallbackHalted" {
   let schema = callback_schema()
   let halt_step : (Record) -> CallbackOutcome = fn(_) { Halt("blocked") }
-  let unreachable : (Record) -> CallbackOutcome = fn(record_in) {
-    Continue(record_in)
-  }
+  let noop : (Record) -> CallbackOutcome = fn(record_in) { Continue(record_in) }
   let outcome = save_record_with_callbacks(
     schema,
     empty_memory_database(),
     record("tags", [("id", "1"), ("name", "x"), ("state", "")]),
     [halt_step],
-    [unreachable],
+    [noop],
   )
   match outcome {
     SaveCallbackHalted(reason) => assert_eq(reason, "blocked")

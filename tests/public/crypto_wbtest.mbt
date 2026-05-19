@@ -87,7 +87,7 @@ test "sign_cookie_value now produces an HMAC-SHA-256 tag" {
   }
   // The tag portion is 64 lowercase hex characters.
   let parts_index = signed.length() - 64
-  let tag = signed[parts_index:].to_string()
+  let tag = signed[parts_index:].to_owned()
   assert_eq(tag.length(), 64)
   for ch in tag {
     let allowed = (ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f')
