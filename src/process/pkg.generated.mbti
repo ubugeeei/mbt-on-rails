@@ -25,6 +25,22 @@ pub fn release_task(name~ : String, command~ : String, required~ : Bool) -> Rele
 
 pub fn scheduler_process(String, String, Array[String]) -> ProcessDefinition
 
+pub fn shutdown_begin_drain(ShutdownCoordinator, String) -> Unit
+
+pub fn shutdown_complete(ShutdownCoordinator) -> Unit
+
+pub fn shutdown_coordinator((String) -> Unit, () -> Unit) -> ShutdownCoordinator
+
+pub fn shutdown_coordinator_summary(ShutdownCoordinator) -> String
+
+pub fn shutdown_is_stopped(ShutdownCoordinator) -> Bool
+
+pub fn shutdown_phase(ShutdownCoordinator) -> ShutdownPhase
+
+pub fn shutdown_phase_summary(ShutdownPhase) -> String
+
+pub fn shutdown_should_accept(ShutdownCoordinator) -> Bool
+
 pub fn web_process(String, String, Int, Array[String]) -> ProcessDefinition
 
 pub fn worker_process(String, String, Int, Array[String], Array[String]) -> ProcessDefinition
@@ -53,6 +69,18 @@ pub struct ReleaseTask {
   name : String
   command : String
   required : Bool
+}
+
+pub(all) struct ShutdownCoordinator {
+  phase_ref : Array[ShutdownPhase]
+  on_drain : (String) -> Unit
+  on_stop : () -> Unit
+}
+
+pub(all) enum ShutdownPhase {
+  ShutdownAccepting
+  ShutdownDraining(String)
+  ShutdownStopped
 }
 
 // Type aliases

@@ -7,6 +7,8 @@ import {
 }
 
 // Values
+pub fn captured_log_sink(Array[LogEvent]) -> LogSink
+
 pub fn config_summary(DeploymentConfig) -> String
 
 pub fn default_development_config() -> DeploymentConfig
@@ -42,11 +44,25 @@ pub fn json_api_error(Int, String, String) -> @http.Response
 
 pub fn json_api_ok(String, String, Array[(String, String)]) -> @http.Response
 
+pub fn json_lines_log_sink(Array[String]) -> LogSink
+
 pub fn json_log(LogEvent) -> String
 
 pub fn log_event(String, String, String?, Array[(String, String)]) -> LogEvent
 
+pub fn log_sink(String, (LogEvent) -> LogSinkEmitOutcome, () -> LogSinkEmitOutcome) -> LogSink
+
+pub fn log_sink_close(LogSink) -> LogSinkEmitOutcome
+
+pub fn log_sink_emit(LogSink, LogEvent) -> LogSinkEmitOutcome
+
+pub fn log_sink_error_message(LogSinkError) -> String
+
+pub fn log_sink_summary(LogSink) -> String
+
 pub fn metrics_response(String) -> @http.Response
+
+pub fn null_log_sink() -> LogSink
 
 pub fn rate_limit_rule(String, String, Int, Int) -> RateLimitRule
 
@@ -96,6 +112,23 @@ pub struct LogEvent {
   message : String
   request_id : String?
   metadata : Array[(String, String)]
+}
+
+pub(all) struct LogSink {
+  name : String
+  emit : (LogEvent) -> LogSinkEmitOutcome
+  close : () -> LogSinkEmitOutcome
+}
+
+pub(all) enum LogSinkEmitOutcome {
+  LogSinkEmitted
+  LogSinkEmitFailed(LogSinkError)
+}
+
+pub(all) enum LogSinkError {
+  LogSinkBackendUnavailable(String)
+  LogSinkBufferOverflow(String)
+  LogSinkOtherError(String)
 }
 
 pub struct RateLimitRule {

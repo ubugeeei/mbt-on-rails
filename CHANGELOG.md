@@ -9,6 +9,15 @@ changes; breaking changes are always called out under `### Changed` or
 
 ## [Unreleased]
 
+### Added — observability
+
+- `@production.LogSink` contract with `log_sink`, `null_log_sink`,
+  `captured_log_sink`, and `json_lines_log_sink` drivers, plus
+  `log_sink_emit` / `log_sink_close` / `log_sink_summary` /
+  `log_sink_error_message` helpers. Mirrors the shape of `SmtpAdapter`
+  and `CacheAdapter` so concrete sinks (stdout, file, network shipper)
+  can plug in uniformly. Refs #117.
+
 ## [0.2.0] — 2026-05-19
 
 Production-readiness bundle landed on top of the 0.1.0 baseline. This is
