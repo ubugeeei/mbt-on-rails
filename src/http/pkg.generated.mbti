@@ -105,10 +105,6 @@ pub fn resolved_client_proto(Request) -> String?
 
 pub fn resources(String, String, ResourceOptions) -> Array[RouteSpec]
 
-pub fn tag_request_with_id(Request, String, String) -> (Request, String)
-
-pub fn tag_response_with_request_id(Response, String, String) -> Response
-
 #label_migration(action, allow_positional=true)
 #label_migration(controller, allow_positional=true)
 #label_migration(name, allow_positional=true)
@@ -122,6 +118,10 @@ pub fn scope_routes(String, String, Array[RouteSpec]) -> Array[RouteSpec]
 pub fn see_other_response(String) -> Response
 
 pub fn signed_request_cookie(Request, String, String) -> String?
+
+pub fn tag_request_with_id(Request, String, String) -> (Request, String)
+
+pub fn tag_response_with_request_id(Response, String, String) -> Response
 
 pub fn text_response(Int, String) -> Response
 
