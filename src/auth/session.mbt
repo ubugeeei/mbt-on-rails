@@ -76,7 +76,7 @@ pub fn verify_password_secure(password : String, digest : String) -> Bool {
 }
 
 ///|
-struct Pbkdf2DigestParts {
+priv struct Pbkdf2DigestParts {
   iterations : Int
   salt_bytes : Array[UInt]
   expected_hash : Array[UInt]
@@ -86,7 +86,7 @@ struct Pbkdf2DigestParts {
 fn parse_pbkdf2_digest(digest : String) -> Pbkdf2DigestParts? {
   let parts : Array[String] = []
   for chunk in digest.split("$") {
-    parts.push(chunk.to_string())
+    parts.push(chunk.to_owned())
   }
   if parts.length() != 5 {
     return None
