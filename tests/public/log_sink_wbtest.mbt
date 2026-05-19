@@ -43,7 +43,7 @@ test "captured_log_sink records every event into the shared buffer" {
   assert_eq(events[0].level, "info")
   assert_eq(events[0].message, "request handled")
   assert_eq(events[1].level, "error")
-  assert_eq(events[1].request_id, None)
+  assert_true(events[1].request_id is None)
 }
 
 ///|
