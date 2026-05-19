@@ -38,6 +38,8 @@ pub fn default_auth_config() -> AuthConfig
 
 pub fn digest_password(String, String) -> String
 
+pub fn digest_password_secure(String, String, iterations? : Int) -> String
+
 pub fn disabled_session_store() -> SessionStore
 
 pub fn find_cookie(Array[(String, String)], String) -> String?
@@ -103,6 +105,8 @@ pub fn sign_cookie_value(String, String, String) -> String
 pub fn signed_cookie(name~ : String, value~ : String, secret~ : String, path? : String, domain? : String?, http_only? : Bool, secure? : Bool, same_site? : CookieSameSite, max_age_seconds? : Int?, expires_at? : String?) -> AuthCookie
 
 pub fn verify_password(String, String, String) -> Bool
+
+pub fn verify_password_secure(String, String) -> Bool
 
 pub fn verify_signed_cookie_value(String, String, String) -> String?
 
