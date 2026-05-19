@@ -11,17 +11,17 @@ fn callback_schema() -> ModelSchema {
 ///|
 test "run_record_callbacks threads the record through each step" {
   let record0 = record("tags", [("id", "1"), ("name", "ruby"), ("state", "")])
-  let promote : (Record) -> CallbackOutcome = fn(current) {
+  let promote : (Record) -> CallbackOutcome = fn(_) {
     Continue(
       record("tags", [("id", "1"), ("name", "ruby"), ("state", "promoted")]),
     )
   }
-  let tag : (Record) -> CallbackOutcome = fn(current) {
+  let tag : (Record) -> CallbackOutcome = fn(record_in) {
     Continue(
       record("tags", [
         ("id", "1"),
-        ("name", find_entry(current.fields, "name").unwrap() + "-tagged"),
-        ("state", find_entry(current.fields, "state").unwrap()),
+        ("name", find_entry(record_in.fields, "name").unwrap() + "-tagged"),
+        ("state", find_entry(record_in.fields, "state").unwrap()),
       ]),
     )
   }
@@ -40,7 +40,7 @@ test "run_record_callbacks threads the record through each step" {
 test "run_record_callbacks halts on the first Halt and skips the rest" {
   let record0 = record("tags", [("id", "1"), ("name", "x"), ("state", "")])
   let halt_step : (Record) -> CallbackOutcome = fn(_) { Halt("nope") }
-  let should_not_run : (Record) -> CallbackOutcome = fn(current) {
+  let should_not_run : (Record) -> CallbackOutcome = fn(_) {
     Continue(
       record("tags", [("id", "1"), ("name", "should-not-appear"), ("state", "")]),
     )
@@ -60,21 +60,21 @@ test "save_record_with_callbacks runs before_save then after_save" {
     ("name", "draft"),
     ("state", "raw"),
   ])
-  let before_save : (Record) -> CallbackOutcome = fn(current) {
+  let before_save : (Record) -> CallbackOutcome = fn(record_in) {
     Continue(
       record("tags", [
-        ("id", find_entry(current.fields, "id").unwrap()),
-        ("name", find_entry(current.fields, "name").unwrap()),
+        ("id", find_entry(record_in.fields, "id").unwrap()),
+        ("name", find_entry(record_in.fields, "name").unwrap()),
         ("state", "pre"),
       ]),
     )
   }
-  let after_save : (Record) -> CallbackOutcome = fn(current) {
+  let after_save : (Record) -> CallbackOutcome = fn(record_in) {
     Continue(
       record("tags", [
-        ("id", find_entry(current.fields, "id").unwrap()),
-        ("name", find_entry(current.fields, "name").unwrap() + "!"),
-        ("state", find_entry(current.fields, "state").unwrap() + "/post"),
+        ("id", find_entry(record_in.fields, "id").unwrap()),
+        ("name", find_entry(record_in.fields, "name").unwrap() + "!"),
+        ("state", find_entry(record_in.fields, "state").unwrap() + "/post"),
       ]),
     )
   }
@@ -98,15 +98,13 @@ test "save_record_with_callbacks runs before_save then after_save" {
 test "save_record_with_callbacks surfaces halts as SaveCallbackHalted" {
   let schema = callback_schema()
   let halt_step : (Record) -> CallbackOutcome = fn(_) { Halt("blocked") }
-  let unreachable : (Record) -> CallbackOutcome = fn(current) {
-    Continue(current)
-  }
+  let noop : (Record) -> CallbackOutcome = fn(record_in) { Continue(record_in) }
   let outcome = save_record_with_callbacks(
     schema,
     empty_memory_database(),
     record("tags", [("id", "1"), ("name", "x"), ("state", "")]),
     [halt_step],
-    [unreachable],
+    [noop],
   )
   match outcome {
     SaveCallbackHalted(reason) => assert_eq(reason, "blocked")
@@ -126,13 +124,13 @@ test "destroy_record_with_callbacks runs before/after around a real destroy" {
   let db = insert_record(empty_memory_database(), starting)
   let mut before_calls = 0
   let mut after_calls = 0
-  let before_destroy : (Record) -> CallbackOutcome = fn(current) {
+  let before_destroy : (Record) -> CallbackOutcome = fn(record_in) {
     before_calls = before_calls + 1
-    Continue(current)
+    Continue(record_in)
   }
-  let after_destroy : (Record) -> CallbackOutcome = fn(current) {
+  let after_destroy : (Record) -> CallbackOutcome = fn(record_in) {
     after_calls = after_calls + 1
-    Continue(current)
+    Continue(record_in)
   }
   let outcome = destroy_record_with_callbacks(
     schema,
@@ -162,7 +160,9 @@ test "destroy_record_with_callbacks halts when before_destroy bails out" {
   ])
   let db = insert_record(empty_memory_database(), starting)
   let halt : (Record) -> CallbackOutcome = fn(_) { Halt("not-yet") }
-  let after : (Record) -> CallbackOutcome = fn(current) { Continue(current) }
+  let after : (Record) -> CallbackOutcome = fn(record_in) {
+    Continue(record_in)
+  }
   let outcome = destroy_record_with_callbacks(schema, db, "1", [halt], [after])
   match outcome {
     DestroyCallbackHalted(reason) => {

@@ -406,7 +406,17 @@ pub fn entries_to_json(Array[(String, String)]) -> String
 
 pub fn env_keys_summary(@process.ProcessDefinition) -> String
 
+pub fn escape_css_value(String) -> String
+
 pub fn escape_html(String) -> String
+
+pub fn escape_html_attribute(String) -> String
+
+pub fn escape_html_text(String) -> String
+
+pub fn escape_js_string(String) -> String
+
+pub fn escape_url_component(String) -> String
 
 pub fn execute_relation(@active_record.ModelSchema, @active_record.MemoryDatabase, @active_record.Relation) -> @active_record.RelationExecutionOutcome
 
@@ -977,6 +987,8 @@ pub fn role_access(String) -> @auth.AuthRequirement
 pub fn rollback_to_savepoint(@active_record.MemoryTransaction, String) -> @active_record.MemoryTransaction
 
 pub fn rollback_transaction(@active_record.MemoryTransaction) -> @active_record.MemoryDatabase
+
+pub fn rotate_session(@auth.Session, String, entropy? : String?, secret? : String?) -> @auth.Session
 
 #label_migration(action, allow_positional=true)
 #label_migration(controller, allow_positional=true)
