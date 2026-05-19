@@ -183,6 +183,22 @@ pub fn cable_process(String, String, Int, Array[String]) -> @process.ProcessDefi
 
 pub fn cable_summary(Array[@cable.CableChannel]) -> String
 
+pub fn cache_adapter(String, (String) -> @cache.CacheReadOutcome, (String, String, String?) -> @cache.CacheWriteOutcome, (String) -> @cache.CacheWriteOutcome, (String) -> @cache.CacheWriteOutcome, () -> @cache.CacheWriteOutcome) -> @cache.CacheAdapter
+
+pub fn cache_adapter_close(@cache.CacheAdapter) -> @cache.CacheWriteOutcome
+
+pub fn cache_adapter_delete(@cache.CacheAdapter, String) -> @cache.CacheWriteOutcome
+
+pub fn cache_adapter_delete_tag(@cache.CacheAdapter, String) -> @cache.CacheWriteOutcome
+
+pub fn cache_adapter_error_message(@cache.CacheAdapterError) -> String
+
+pub fn cache_adapter_read(@cache.CacheAdapter, String) -> @cache.CacheReadOutcome
+
+pub fn cache_adapter_summary(@cache.CacheAdapter) -> String
+
+pub fn cache_adapter_write(@cache.CacheAdapter, String, String, String?) -> @cache.CacheWriteOutcome
+
 pub fn cache_delete(@cache.CacheStore, String) -> @cache.CacheStore
 
 pub fn cache_delete_tag(@cache.CacheStore, String) -> @cache.CacheStore
@@ -211,6 +227,8 @@ pub fn cache_summary(@cache.CacheStore) -> String
 pub fn cache_write(@cache.CacheStore, String, String, String?, String?, Array[String]) -> @cache.CacheStore
 
 pub fn cache_write_with_notifications(store~ : @cache.CacheStore, key~ : String, value~ : String, version~ : String?, expires_at~ : String?, tags~ : Array[String], notifications~ : @support.Notifications) -> (@cache.CacheStore, @support.Notifications)
+
+pub fn captured_http_server_adapter(Array[String], Array[Int]) -> @http.HttpServerAdapter
 
 pub fn captured_log_sink(Array[@production.LogEvent]) -> @production.LogSink
 
@@ -555,6 +573,18 @@ pub fn http_post() -> @http.HttpMethod
 
 pub fn http_put() -> @http.HttpMethod
 
+pub fn http_server_adapter(String, (String, (@http.Request) -> @http.Response) -> @http.HttpServerStartOutcome, () -> @http.HttpServerStopOutcome, () -> String?) -> @http.HttpServerAdapter
+
+pub fn http_server_adapter_error_message(@http.HttpServerAdapterError) -> String
+
+pub fn http_server_adapter_summary(@http.HttpServerAdapter) -> String
+
+pub fn http_server_address(@http.HttpServerAdapter) -> String?
+
+pub fn http_server_shutdown(@http.HttpServerAdapter) -> @http.HttpServerStopOutcome
+
+pub fn http_server_start(@http.HttpServerAdapter, String, (@http.Request) -> @http.Response) -> @http.HttpServerStartOutcome
+
 pub fn hydrate_idle() -> @view.HydrationMode
 
 pub fn hydrate_load() -> @view.HydrationMode
@@ -696,6 +726,8 @@ pub fn max_length(maximum~ : Int) -> @validation.FieldRule
 
 pub fn mbtv_path(String) -> @support.MbtvPath
 
+pub fn memory_cache_adapter(Array[@cache.CacheStore]) -> @cache.CacheAdapter
+
 pub fn merge_class_names(Array[String]) -> String
 
 pub fn merge_params(Array[(String, String)], Array[(String, String)], Array[(String, String)]) -> @params.Parameters
@@ -762,7 +794,11 @@ pub fn notification_event(name~ : String, payload~ : Array[(String, String)]) ->
 
 pub fn notifications() -> @support.Notifications
 
+pub fn null_cache_adapter() -> @cache.CacheAdapter
+
 pub fn null_database_adapter() -> @active_record.DatabaseAdapter
+
+pub fn null_http_server_adapter() -> @http.HttpServerAdapter
 
 pub fn null_log_sink() -> @production.LogSink
 
@@ -878,6 +914,8 @@ pub fn readiness_response(Array[@production.HealthCheck]) -> @http.Response
 pub fn recognize(Array[@http.RouteSpec], @http.Request) -> @http.MatchedRoute?
 
 pub fn record(String, Array[(String, String)]) -> @active_record.Record
+
+pub fn record_captured_dispatch(Array[Int]) -> Unit
 
 pub fn redirect_format() -> @controller.ResponseFormat
 
@@ -1142,6 +1180,22 @@ pub fn sha256_bytes(Array[UInt]) -> Array[UInt]
 pub fn sha256_hex(String) -> String
 
 pub fn show_style(Bool, String) -> String
+
+pub fn shutdown_begin_drain(@process.ShutdownCoordinator, String) -> Unit
+
+pub fn shutdown_complete(@process.ShutdownCoordinator) -> Unit
+
+pub fn shutdown_coordinator((String) -> Unit, () -> Unit) -> @process.ShutdownCoordinator
+
+pub fn shutdown_coordinator_summary(@process.ShutdownCoordinator) -> String
+
+pub fn shutdown_is_stopped(@process.ShutdownCoordinator) -> Bool
+
+pub fn shutdown_phase(@process.ShutdownCoordinator) -> @process.ShutdownPhase
+
+pub fn shutdown_phase_summary(@process.ShutdownPhase) -> String
+
+pub fn shutdown_should_accept(@process.ShutdownCoordinator) -> Bool
 
 pub fn sign_cookie_value(String, String, String) -> String
 
@@ -1466,11 +1520,19 @@ pub using @cable {type CableBroadcast}
 
 pub using @cable {type CableChannel}
 
+pub using @cache {type CacheAdapter}
+
+pub using @cache {type CacheAdapterError}
+
 pub using @cache {type CacheEntry}
 
 pub using @cache {type CacheFetchResult}
 
+pub using @cache {type CacheReadOutcome}
+
 pub using @cache {type CacheStore}
+
+pub using @cache {type CacheWriteOutcome}
 
 pub using @active_record {type Callback}
 
@@ -1539,6 +1601,14 @@ pub using @middleware {type FrameOptionsMode}
 pub using @production {type HealthCheck}
 
 pub using @http {type HttpMethod}
+
+pub using @http {type HttpServerAdapter}
+
+pub using @http {type HttpServerAdapterError}
+
+pub using @http {type HttpServerStartOutcome}
+
+pub using @http {type HttpServerStopOutcome}
 
 pub using @view {type HydrationMode}
 
@@ -1705,6 +1775,10 @@ pub using @auth {type Session}
 pub using @auth {type SessionStore}
 
 pub using @auth {type SessionStoreKind}
+
+pub using @process {type ShutdownCoordinator}
+
+pub using @process {type ShutdownPhase}
 
 pub using @view {type SlotContract}
 

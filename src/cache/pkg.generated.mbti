@@ -6,6 +6,22 @@ import {
 }
 
 // Values
+pub fn cache_adapter(String, (String) -> CacheReadOutcome, (String, String, String?) -> CacheWriteOutcome, (String) -> CacheWriteOutcome, (String) -> CacheWriteOutcome, () -> CacheWriteOutcome) -> CacheAdapter
+
+pub fn cache_adapter_close(CacheAdapter) -> CacheWriteOutcome
+
+pub fn cache_adapter_delete(CacheAdapter, String) -> CacheWriteOutcome
+
+pub fn cache_adapter_delete_tag(CacheAdapter, String) -> CacheWriteOutcome
+
+pub fn cache_adapter_error_message(CacheAdapterError) -> String
+
+pub fn cache_adapter_read(CacheAdapter, String) -> CacheReadOutcome
+
+pub fn cache_adapter_summary(CacheAdapter) -> String
+
+pub fn cache_adapter_write(CacheAdapter, String, String, String?) -> CacheWriteOutcome
+
 pub fn cache_delete(CacheStore, String) -> CacheStore
 
 pub fn cache_delete_tag(CacheStore, String) -> CacheStore
@@ -32,9 +48,29 @@ pub fn cache_write(CacheStore, String, String, String?, String?, Array[String]) 
 
 pub fn cache_write_with_notifications(store~ : CacheStore, key~ : String, value~ : String, version~ : String?, expires_at~ : String?, tags~ : Array[String], notifications~ : @support.Notifications) -> (CacheStore, @support.Notifications)
 
+pub fn memory_cache_adapter(Array[CacheStore]) -> CacheAdapter
+
+pub fn null_cache_adapter() -> CacheAdapter
+
 // Errors
 
 // Types and methods
+pub(all) struct CacheAdapter {
+  name : String
+  read : (String) -> CacheReadOutcome
+  write : (String, String, String?) -> CacheWriteOutcome
+  delete : (String) -> CacheWriteOutcome
+  delete_tag : (String) -> CacheWriteOutcome
+  close : () -> CacheWriteOutcome
+}
+
+pub(all) enum CacheAdapterError {
+  CacheConnectionFailed(String)
+  CacheSerializationFailed(String)
+  CacheTimeout(String)
+  CacheOtherError(String)
+}
+
 pub struct CacheEntry {
   key : String
   value : String
@@ -49,9 +85,20 @@ pub struct CacheFetchResult {
   hit : Bool
 }
 
+pub(all) enum CacheReadOutcome {
+  CacheHit(String)
+  CacheMiss
+  CacheReadFailed(CacheAdapterError)
+}
+
 pub struct CacheStore {
   store_name : String
   entries : Array[CacheEntry]
+}
+
+pub(all) enum CacheWriteOutcome {
+  CacheWritten
+  CacheWriteFailed(CacheAdapterError)
 }
 
 // Type aliases
