@@ -1652,6 +1652,12 @@ pub using @auth {type SessionStoreKind}
 
 pub using @view {type SlotContract}
 
+pub using @mailer {type SmtpAdapter}
+
+pub using @mailer {type SmtpAdapterError}
+
+pub using @mailer {type SmtpDeliveryOutcome}
+
 pub using @view {type SuspenseBoundary}
 
 pub using @view {type TemplateImport}
