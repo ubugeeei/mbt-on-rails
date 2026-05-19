@@ -212,6 +212,8 @@ pub fn cache_write(@cache.CacheStore, String, String, String?, String?, Array[St
 
 pub fn cache_write_with_notifications(store~ : @cache.CacheStore, key~ : String, value~ : String, version~ : String?, expires_at~ : String?, tags~ : Array[String], notifications~ : @support.Notifications) -> (@cache.CacheStore, @support.Notifications)
 
+pub fn captured_smtp_adapter(Array[Int]) -> @mailer.SmtpAdapter
+
 pub fn cast_record(@active_record.ModelSchema, @active_record.Record) -> @active_record.CastRecordOutcome
 
 pub fn change_default_step(String, String, String?, String?) -> @migration.MigrationStep
@@ -746,6 +748,8 @@ pub fn notifications() -> @support.Notifications
 
 pub fn null_database_adapter() -> @active_record.DatabaseAdapter
 
+pub fn null_smtp_adapter() -> @mailer.SmtpAdapter
+
 pub fn nullable(@active_record.Column) -> @active_record.Column
 
 #label_migration(name, allow_positional=true)
@@ -1133,6 +1137,18 @@ pub fn singularize(String) -> String
 #label_migration(name, allow_positional=true)
 #label_migration(signature, allow_positional=true)
 pub fn slot_contract(name~ : String, signature~ : String, required? : Bool, description? : String?) -> @view.SlotContract
+
+pub fn smtp_adapter(String, (@mailer.MailDelivery) -> @mailer.SmtpDeliveryOutcome, () -> @mailer.SmtpDeliveryOutcome, () -> @mailer.SmtpDeliveryOutcome) -> @mailer.SmtpAdapter
+
+pub fn smtp_adapter_error_message(@mailer.SmtpAdapterError) -> String
+
+pub fn smtp_adapter_summary(@mailer.SmtpAdapter) -> String
+
+pub fn smtp_close(@mailer.SmtpAdapter) -> @mailer.SmtpDeliveryOutcome
+
+pub fn smtp_deliver(@mailer.SmtpAdapter, @mailer.MailDelivery) -> @mailer.SmtpDeliveryOutcome
+
+pub fn smtp_verify(@mailer.SmtpAdapter) -> @mailer.SmtpDeliveryOutcome
 
 pub fn solid_queue_adapter(queue_prefix? : String?) -> @job.JobAdapter
 
@@ -1651,6 +1667,12 @@ pub using @auth {type SessionStore}
 pub using @auth {type SessionStoreKind}
 
 pub using @view {type SlotContract}
+
+pub using @mailer {type SmtpAdapter}
+
+pub using @mailer {type SmtpAdapterError}
+
+pub using @mailer {type SmtpDeliveryOutcome}
 
 pub using @view {type SuspenseBoundary}
 
