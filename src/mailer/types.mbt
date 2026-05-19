@@ -18,7 +18,7 @@ pub struct MailerDefinition {
 
 ///|
 /// Represents one composed outgoing message.
-pub struct MailDelivery {
+pub(all) struct MailDelivery {
   mailer_name : String
   action_name : String
   from : String

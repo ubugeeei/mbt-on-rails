@@ -7,6 +7,8 @@ import {
 }
 
 // Values
+pub fn captured_smtp_adapter(Array[Int]) -> SmtpAdapter
+
 pub fn compose_mail(MailerDefinition, String, Array[String], Array[(String, String)]) -> MailDelivery?
 
 pub fn compose_mail_with_notifications(mailer~ : MailerDefinition, action_name~ : String, to~ : Array[String], assigns~ : Array[(String, String)], notifications~ : @support.Notifications) -> (MailDelivery?, @support.Notifications)
@@ -31,6 +33,20 @@ pub fn mailer(name~ : String, from~ : String, layout_name~ : String?, templates~
 
 pub fn mailer_summary(MailerDefinition) -> String
 
+pub fn null_smtp_adapter() -> SmtpAdapter
+
+pub fn smtp_adapter(String, (MailDelivery) -> SmtpDeliveryOutcome, () -> SmtpDeliveryOutcome, () -> SmtpDeliveryOutcome) -> SmtpAdapter
+
+pub fn smtp_adapter_error_message(SmtpAdapterError) -> String
+
+pub fn smtp_adapter_summary(SmtpAdapter) -> String
+
+pub fn smtp_close(SmtpAdapter) -> SmtpDeliveryOutcome
+
+pub fn smtp_deliver(SmtpAdapter, MailDelivery) -> SmtpDeliveryOutcome
+
+pub fn smtp_verify(SmtpAdapter) -> SmtpDeliveryOutcome
+
 pub fn with_bcc(MailDelivery, Array[String]) -> MailDelivery
 
 pub fn with_cc(MailDelivery, Array[String]) -> MailDelivery
@@ -38,7 +54,7 @@ pub fn with_cc(MailDelivery, Array[String]) -> MailDelivery
 // Errors
 
 // Types and methods
-pub struct MailDelivery {
+pub(all) struct MailDelivery {
   mailer_name : String
   action_name : String
   from : String
@@ -61,6 +77,26 @@ pub struct MailerDefinition {
   from : String
   layout_name : String?
   templates : Array[MailTemplate]
+}
+
+pub(all) struct SmtpAdapter {
+  name : String
+  deliver : (MailDelivery) -> SmtpDeliveryOutcome
+  verify : () -> SmtpDeliveryOutcome
+  close : () -> SmtpDeliveryOutcome
+}
+
+pub(all) enum SmtpAdapterError {
+  SmtpConnectionFailed(String)
+  SmtpAuthenticationFailed(String)
+  SmtpRecipientRejected(String)
+  SmtpRateLimited(String)
+  SmtpOtherError(String)
+}
+
+pub(all) enum SmtpDeliveryOutcome {
+  SmtpDelivered(String?)
+  SmtpDeliveryFailed(SmtpAdapterError)
 }
 
 // Type aliases
