@@ -16,6 +16,24 @@ pub fn cable_channel(String, String, Array[String]) -> CableChannel
 
 pub fn cable_summary(Array[CableChannel]) -> String
 
+pub fn captured_websocket_adapter(Array[Int], Array[Int]) -> WebSocketAdapter
+
+pub fn null_websocket_adapter() -> WebSocketAdapter
+
+pub fn websocket_adapter(String, (CableBroadcast) -> WebSocketBroadcastOutcome, (String, String) -> WebSocketSubscriptionOutcome, (String, String) -> WebSocketSubscriptionOutcome, () -> WebSocketSubscriptionOutcome) -> WebSocketAdapter
+
+pub fn websocket_adapter_error_message(WebSocketAdapterError) -> String
+
+pub fn websocket_adapter_summary(WebSocketAdapter) -> String
+
+pub fn websocket_broadcast(WebSocketAdapter, CableBroadcast) -> WebSocketBroadcastOutcome
+
+pub fn websocket_close(WebSocketAdapter) -> WebSocketSubscriptionOutcome
+
+pub fn websocket_subscribe(WebSocketAdapter, String, String) -> WebSocketSubscriptionOutcome
+
+pub fn websocket_unsubscribe(WebSocketAdapter, String, String) -> WebSocketSubscriptionOutcome
+
 // Errors
 
 // Types and methods
@@ -30,6 +48,32 @@ pub struct CableChannel {
   name : String
   stream_name : String
   topic_fields : Array[String]
+}
+
+pub(all) struct WebSocketAdapter {
+  name : String
+  broadcast : (CableBroadcast) -> WebSocketBroadcastOutcome
+  subscribe : (String, String) -> WebSocketSubscriptionOutcome
+  unsubscribe : (String, String) -> WebSocketSubscriptionOutcome
+  close : () -> WebSocketSubscriptionOutcome
+}
+
+pub(all) enum WebSocketAdapterError {
+  WebSocketConnectionFailed(String)
+  WebSocketHandshakeFailed(String)
+  WebSocketRejected(String)
+  WebSocketProtocolError(String)
+  WebSocketOtherError(String)
+}
+
+pub(all) enum WebSocketBroadcastOutcome {
+  WebSocketBroadcasted(Int)
+  WebSocketBroadcastFailed(WebSocketAdapterError)
+}
+
+pub(all) enum WebSocketSubscriptionOutcome {
+  WebSocketSubscriptionAcknowledged
+  WebSocketSubscriptionFailed(WebSocketAdapterError)
 }
 
 // Type aliases

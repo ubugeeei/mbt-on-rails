@@ -230,6 +230,8 @@ pub fn cache_write_with_notifications(store~ : @cache.CacheStore, key~ : String,
 
 pub fn captured_smtp_adapter(Array[Int]) -> @mailer.SmtpAdapter
 
+pub fn captured_websocket_adapter(Array[Int], Array[Int]) -> @cable.WebSocketAdapter
+
 pub fn cast_record(@active_record.ModelSchema, @active_record.Record) -> @active_record.CastRecordOutcome
 
 pub fn change_default_step(String, String, String?, String?) -> @migration.MigrationStep
@@ -769,6 +771,8 @@ pub fn null_cache_adapter() -> @cache.CacheAdapter
 pub fn null_database_adapter() -> @active_record.DatabaseAdapter
 
 pub fn null_smtp_adapter() -> @mailer.SmtpAdapter
+
+pub fn null_websocket_adapter() -> @cable.WebSocketAdapter
 
 pub fn nullable(@active_record.Column) -> @active_record.Column
 
@@ -1340,6 +1344,20 @@ pub fn verify_signed_cookie_value(String, String, String) -> String?
 
 pub fn web_process(String, String, Int, Array[String]) -> @process.ProcessDefinition
 
+pub fn websocket_adapter(String, (@cable.CableBroadcast) -> @cable.WebSocketBroadcastOutcome, (String, String) -> @cable.WebSocketSubscriptionOutcome, (String, String) -> @cable.WebSocketSubscriptionOutcome, () -> @cable.WebSocketSubscriptionOutcome) -> @cable.WebSocketAdapter
+
+pub fn websocket_adapter_error_message(@cable.WebSocketAdapterError) -> String
+
+pub fn websocket_adapter_summary(@cable.WebSocketAdapter) -> String
+
+pub fn websocket_broadcast(@cable.WebSocketAdapter, @cable.CableBroadcast) -> @cable.WebSocketBroadcastOutcome
+
+pub fn websocket_close(@cable.WebSocketAdapter) -> @cable.WebSocketSubscriptionOutcome
+
+pub fn websocket_subscribe(@cable.WebSocketAdapter, String, String) -> @cable.WebSocketSubscriptionOutcome
+
+pub fn websocket_unsubscribe(@cable.WebSocketAdapter, String, String) -> @cable.WebSocketSubscriptionOutcome
+
 pub fn where_eq(@active_record.Relation, String, String) -> @active_record.Relation
 
 pub fn where_gt(@active_record.Relation, String, String) -> @active_record.Relation
@@ -1753,6 +1771,14 @@ pub using @validation {type ValidatorObject}
 pub using @view {type VaporComponentRef}
 
 pub using @view {type VaporNode}
+
+pub using @cable {type WebSocketAdapter}
+
+pub using @cable {type WebSocketAdapterError}
+
+pub using @cable {type WebSocketBroadcastOutcome}
+
+pub using @cable {type WebSocketSubscriptionOutcome}
 
 // Traits
 
