@@ -28,9 +28,12 @@ pub using @support {
   escape_url_component,
   find_entry,
   hash_string,
+  hex_decode_bytes,
   hex_encode_bytes,
   hmac_sha256_bytes,
   hmac_sha256_hex,
+  pbkdf2_hmac_sha256,
+  pbkdf2_hmac_sha256_hex,
   sha256_bytes,
   sha256_hex,
   utf8_bytes,
@@ -148,6 +151,7 @@ pub using @auth {
   csrf_valid,
   default_auth_config,
   digest_password,
+  digest_password_secure,
   disabled_session_store,
   find_cookie,
   forgery_strategy_summary,
@@ -174,6 +178,7 @@ pub using @auth {
   signed_cookie,
   verify_signed_cookie_value,
   verify_password,
+  verify_password_secure,
 }
 
 ///|
