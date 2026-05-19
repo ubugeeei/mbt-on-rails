@@ -11,24 +11,6 @@ pub fn accepted_json(String) -> Response
 
 pub fn all_http_methods() -> Array[HttpMethod]
 
-pub fn captured_http_server_adapter(Array[String], Array[Int]) -> HttpServerAdapter
-
-pub fn http_server_address(HttpServerAdapter) -> String?
-
-pub fn http_server_adapter(String, (String, (Request) -> Response) -> HttpServerStartOutcome, () -> HttpServerStopOutcome, () -> String?) -> HttpServerAdapter
-
-pub fn http_server_adapter_error_message(HttpServerAdapterError) -> String
-
-pub fn http_server_adapter_summary(HttpServerAdapter) -> String
-
-pub fn http_server_shutdown(HttpServerAdapter) -> HttpServerStopOutcome
-
-pub fn http_server_start(HttpServerAdapter, String, (Request) -> Response) -> HttpServerStartOutcome
-
-pub fn null_http_server_adapter() -> HttpServerAdapter
-
-pub fn record_captured_dispatch(Array[Int]) -> Unit
-
 pub fn append_request_header(Request, String, String) -> Request
 
 pub fn append_response_headers(Response, Array[(String, String)]) -> Response
@@ -38,6 +20,8 @@ pub fn append_set_cookie(Response, @auth.AuthCookie) -> Response
 pub fn append_set_cookies(Response, Array[@auth.AuthCookie]) -> Response
 
 pub fn build_path(RouteSpec, Array[(String, String)]) -> String
+
+pub fn captured_http_server_adapter(Array[String], Array[Int]) -> HttpServerAdapter
 
 pub fn created_json(String, location? : String?) -> Response
 
@@ -59,6 +43,18 @@ pub fn http_post() -> HttpMethod
 
 pub fn http_put() -> HttpMethod
 
+pub fn http_server_adapter(String, (String, (Request) -> Response) -> HttpServerStartOutcome, () -> HttpServerStopOutcome, () -> String?) -> HttpServerAdapter
+
+pub fn http_server_adapter_error_message(HttpServerAdapterError) -> String
+
+pub fn http_server_adapter_summary(HttpServerAdapter) -> String
+
+pub fn http_server_address(HttpServerAdapter) -> String?
+
+pub fn http_server_shutdown(HttpServerAdapter) -> HttpServerStopOutcome
+
+pub fn http_server_start(HttpServerAdapter, String, (Request) -> Response) -> HttpServerStartOutcome
+
 pub fn is_safe_internal_redirect(String) -> Bool
 
 pub fn json_response(Int, String) -> Response
@@ -70,6 +66,8 @@ pub fn namespace_routes(String, Array[RouteSpec]) -> Array[RouteSpec]
 pub fn no_content_response() -> Response
 
 pub fn not_found_response() -> Response
+
+pub fn null_http_server_adapter() -> HttpServerAdapter
 
 pub fn ok_html(String) -> Response
 
@@ -86,6 +84,8 @@ pub fn parse_forwarded_leftmost(String) -> String?
 pub fn parse_route_pattern(String) -> RoutePattern
 
 pub fn recognize(Array[RouteSpec], Request) -> MatchedRoute?
+
+pub fn record_captured_dispatch(Array[Int]) -> Unit
 
 pub fn redirect_response(String) -> Response
 
@@ -164,6 +164,30 @@ pub enum HttpMethod {
 } derive(Eq, @debug.Debug)
 pub impl Show for HttpMethod
 
+pub(all) struct HttpServerAdapter {
+  name : String
+  start : (String, (Request) -> Response) -> HttpServerStartOutcome
+  shutdown : () -> HttpServerStopOutcome
+  address : () -> String?
+}
+
+pub(all) enum HttpServerAdapterError {
+  HttpServerBindFailed(String)
+  HttpServerListenFailed(String)
+  HttpServerShutdownFailed(String)
+  HttpServerOtherError(String)
+}
+
+pub(all) enum HttpServerStartOutcome {
+  HttpServerStarted(String)
+  HttpServerStartFailed(HttpServerAdapterError)
+}
+
+pub(all) enum HttpServerStopOutcome {
+  HttpServerStopped
+  HttpServerStopFailed(HttpServerAdapterError)
+}
+
 pub struct MatchedRoute {
   route : RouteSpec
   params : Array[(String, String)]
@@ -225,30 +249,6 @@ pub struct RouteSpec {
   controller : String
   action : String
   page_name : String?
-}
-
-pub(all) struct HttpServerAdapter {
-  name : String
-  start : (String, (Request) -> Response) -> HttpServerStartOutcome
-  shutdown : () -> HttpServerStopOutcome
-  address : () -> String?
-}
-
-pub(all) enum HttpServerAdapterError {
-  HttpServerBindFailed(String)
-  HttpServerListenFailed(String)
-  HttpServerShutdownFailed(String)
-  HttpServerOtherError(String)
-}
-
-pub(all) enum HttpServerStartOutcome {
-  HttpServerStarted(String)
-  HttpServerStartFailed(HttpServerAdapterError)
-}
-
-pub(all) enum HttpServerStopOutcome {
-  HttpServerStopped
-  HttpServerStopFailed(HttpServerAdapterError)
 }
 
 // Type aliases
