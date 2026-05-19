@@ -22,8 +22,15 @@ test "substitute_relation_binds replaces ? placeholders in order" {
 test "substitute_relation_binds quotes injection attempts as data" {
   let payload = "'; DROP TABLE users; --"
   let rendered = substitute_relation_binds("name = ?", [BindText(payload)])
+  // The injection payload is enclosed in a single SQL string with its
+  // leading quote doubled (per the SQL standard's escape rule), so the
+  // database parses the whole thing as one literal value rather than as
+  // a statement terminator + a DROP TABLE follow-up.
   assert_eq(rendered, "name = '''; DROP TABLE users; --'")
-  assert_false(rendered.contains("DROP TABLE users; --'"))
+  // The doubled-quote prefix is what neutralises the attack.
+  assert_true(rendered.has_prefix("name = '''"))
+  // And the literal stays terminated by a single trailing quote so the
+  // SQL parser closes the string before reaching anything outside it.
   assert_true(rendered.has_suffix("--'"))
 }
 
