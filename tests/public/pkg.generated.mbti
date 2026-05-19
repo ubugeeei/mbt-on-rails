@@ -212,6 +212,8 @@ pub fn cache_write(@cache.CacheStore, String, String, String?, String?, Array[St
 
 pub fn cache_write_with_notifications(store~ : @cache.CacheStore, key~ : String, value~ : String, version~ : String?, expires_at~ : String?, tags~ : Array[String], notifications~ : @support.Notifications) -> (@cache.CacheStore, @support.Notifications)
 
+pub fn captured_log_sink(Array[@production.LogEvent]) -> @production.LogSink
+
 pub fn captured_smtp_adapter(Array[Int]) -> @mailer.SmtpAdapter
 
 pub fn captured_websocket_adapter(Array[Int], Array[Int]) -> @cable.WebSocketAdapter
@@ -626,6 +628,8 @@ pub fn json_column(String) -> @active_record.Column
 
 pub fn json_format() -> @controller.ResponseFormat
 
+pub fn json_lines_log_sink(Array[String]) -> @production.LogSink
+
 pub fn json_log(@production.LogEvent) -> String
 
 pub fn json_response(Int, String) -> @http.Response
@@ -656,6 +660,16 @@ pub fn load_member_step(String) -> @controller.ActionStep
 pub fn loader_module(name~ : String, cache_key~ : String, revalidate_seconds~ : Int?, depends_on~ : Array[String]) -> @view.LoaderModule
 
 pub fn log_event(String, String, String?, Array[(String, String)]) -> @production.LogEvent
+
+pub fn log_sink(String, (@production.LogEvent) -> @production.LogSinkEmitOutcome, () -> @production.LogSinkEmitOutcome) -> @production.LogSink
+
+pub fn log_sink_close(@production.LogSink) -> @production.LogSinkEmitOutcome
+
+pub fn log_sink_emit(@production.LogSink, @production.LogEvent) -> @production.LogSinkEmitOutcome
+
+pub fn log_sink_error_message(@production.LogSinkError) -> String
+
+pub fn log_sink_summary(@production.LogSink) -> String
 
 #label_migration(action_name, allow_positional=true)
 #label_migration(html_path, allow_positional=true)
@@ -749,6 +763,8 @@ pub fn notification_event(name~ : String, payload~ : Array[(String, String)]) ->
 pub fn notifications() -> @support.Notifications
 
 pub fn null_database_adapter() -> @active_record.DatabaseAdapter
+
+pub fn null_log_sink() -> @production.LogSink
 
 pub fn null_smtp_adapter() -> @mailer.SmtpAdapter
 
@@ -1547,6 +1563,12 @@ pub using @active_record {type LifecycleHook}
 pub using @view {type LoaderModule}
 
 pub using @production {type LogEvent}
+
+pub using @production {type LogSink}
+
+pub using @production {type LogSinkEmitOutcome}
+
+pub using @production {type LogSinkError}
 
 pub using @mailer {type MailDelivery}
 
