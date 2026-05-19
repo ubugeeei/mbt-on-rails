@@ -183,8 +183,6 @@ pub fn cable_summary(Array[@cable.CableChannel]) -> String
 
 pub fn cache_delete(@cache.CacheStore, String) -> @cache.CacheStore
 
-pub fn captured_websocket_adapter(Array[Int], Array[Int]) -> @cable.WebSocketAdapter
-
 pub fn cache_delete_tag(@cache.CacheStore, String) -> @cache.CacheStore
 
 pub fn cache_delete_tag_with_notifications(store~ : @cache.CacheStore, tag~ : String, notifications~ : @support.Notifications) -> (@cache.CacheStore, @support.Notifications)
@@ -211,6 +209,8 @@ pub fn cache_summary(@cache.CacheStore) -> String
 pub fn cache_write(@cache.CacheStore, String, String, String?, String?, Array[String]) -> @cache.CacheStore
 
 pub fn cache_write_with_notifications(store~ : @cache.CacheStore, key~ : String, value~ : String, version~ : String?, expires_at~ : String?, tags~ : Array[String], notifications~ : @support.Notifications) -> (@cache.CacheStore, @support.Notifications)
+
+pub fn captured_websocket_adapter(Array[Int], Array[Int]) -> @cable.WebSocketAdapter
 
 pub fn cast_record(@active_record.ModelSchema, @active_record.Record) -> @active_record.CastRecordOutcome
 
@@ -1699,6 +1699,14 @@ pub using @validation {type ValidatorObject}
 pub using @view {type VaporComponentRef}
 
 pub using @view {type VaporNode}
+
+pub using @cable {type WebSocketAdapter}
+
+pub using @cable {type WebSocketAdapterError}
+
+pub using @cable {type WebSocketBroadcastOutcome}
+
+pub using @cable {type WebSocketSubscriptionOutcome}
 
 // Traits
 
